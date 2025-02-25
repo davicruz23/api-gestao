@@ -6,23 +6,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-public class Carregamento {
+public class Charging {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDate dataCarregamento;
 
-    @OneToOne
-    private Usuario usuario;
+    private LocalDate chargingDate;
 
-    @OneToMany
-    private List<Mercadoria> mercadorias;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Users user;
+
+    @OneToMany(mappedBy = "charging", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> products;
 }
+

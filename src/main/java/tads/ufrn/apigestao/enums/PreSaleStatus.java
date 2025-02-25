@@ -3,25 +3,24 @@ package tads.ufrn.apigestao.enums;
 import lombok.Getter;
 
 @Getter
-public enum TipoDeUsuario {
+public enum PreSaleStatus {
 
-    SUPERADMIN(1),
-    FUNCIONARIO(2);
+    PENDENTE(1),
+    APROVADA(2),
+    RECUSADA(3);
 
     private final int value;
 
-    TipoDeUsuario(int value){
+    PreSaleStatus(int value){
         this.value = value;
     }
 
-    /*public static TipoDeUsuario fromValue(int value){
-        for (TipoDeUsuario type : TipoDeUsuario.values()){
+    public static PreSaleStatus fromValue(int value){
+        for (PreSaleStatus type : PreSaleStatus.values()){
             if (type.getValue() == value){
                 return type;
             }
         }
         throw new RuntimeException("Unknown value: "+ value);
     }
-
-     */
 }

@@ -3,27 +3,24 @@ package tads.ufrn.apigestao.enums;
 import lombok.Getter;
 
 @Getter
-public enum StatusMercadoria {
+public enum UserType {
 
-    DISPONIVEL(1),
-    INDISPONIVEL(2),
-    RESERVADA(3),
-    ENTREGUE(4),
-    PERDIDO(5);
+    SUPERADMIN(1),
+    FUNCIONARIO(2);
 
     private final int value;
 
-    StatusMercadoria(int value){
+    UserType(int value){
         this.value = value;
     }
 
-    /*public static StatusMercadoria fromValue(int value){
-        for (StatusMercadoria type : StatusMercadoria.values()){
+    public static UserType fromValue(int value){
+        for (UserType type : UserType.values()){
             if (type.getValue() == value){
                 return type;
             }
         }
         throw new RuntimeException("Unknown value: "+ value);
     }
-     */
+
 }

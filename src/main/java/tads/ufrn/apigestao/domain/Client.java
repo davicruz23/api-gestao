@@ -8,24 +8,22 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
-public class Usuario {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nome;
+    private String name;
     private String cpf;
-    private String funcao;
-    private String email;
-    private String senha;
-    private int roleId;
+    private String phone;
+    private String address;
 
-    @OneToMany
-    private List<PreVenda> preVendas;
-
-    @OneToOne
-    private Carregamento carregamento;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Sale> sales;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Collector collector;
 }
+

@@ -3,26 +3,26 @@ package tads.ufrn.apigestao.enums;
 import lombok.Getter;
 
 @Getter
-public enum StatusPreVenda {
+public enum PaymentType {
 
-    PENDENTE(1),
-    APROVADA(2),
-    RECUSADA(3);
+    CASH(1),
+    PARCEL(2),
+    CREDIT(3),
+    DEBIT(4),
+    PIX(5);
 
     private final int value;
 
-    StatusPreVenda(int value){
+    PaymentType(int value){
         this.value = value;
     }
 
-    /*public static StatusPreVenda fromValue(int value){
-        for (StatusPreVenda type : StatusPreVenda.values()){
+    public static PaymentType fromValue(int value){
+        for (PaymentType type : PaymentType.values()){
             if (type.getValue() == value){
                 return type;
             }
         }
         throw new RuntimeException("Unknown value: "+ value);
     }
-
-     */
 }

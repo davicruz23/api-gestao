@@ -1,0 +1,21 @@
+body {
+    background-color: #2e2e2e;
+    color: #ffffff;
+}
+.swagger-ui .topbar {
+    background-color: #1e1e1e;
+}
+.swagger-ui .info, .swagger-ui .opblock-summary-description, .swagger-ui .response-col_description {
+    color: #ffffff;
+}
+.swagger-ui .opblock, .swagger-ui .response, .swagger-ui .tab, .swagger-ui .info, .swagger-ui .opblock-summary {
+    background-color: #1e1e1e;
+    border-color: #444444;
+}
+.swagger-ui .btn, .swagger-ui .btn:hover {
+    background-color: #444444;
+    border-color: #555555;
+}
+.swagger-ui .opblock-summary-method {
+    color: #ffffff;
+}

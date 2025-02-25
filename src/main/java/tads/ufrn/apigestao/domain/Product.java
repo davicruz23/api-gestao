@@ -5,24 +5,24 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Venda {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime dataVenda;
-    private Integer nParcelas;
-    @OneToOne
-    private Cliente cliente;
-    @OneToMany
-    private List<Mercadoria> mercadorias;
+    private String name;
+    private String brand;
+    private Integer amount;
+    private Double value;
+    private Long statusId;
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "charging_id")
+    private Charging charging;
 }
+
+

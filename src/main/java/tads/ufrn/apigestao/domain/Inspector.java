@@ -12,19 +12,20 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class PreVenda {
+public class Inspector {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime dataPreVenda;
-    private String statusVenda;
-    @OneToMany
-    private List<Mercadoria> mercadorias;
-    @ManyToOne
-    private Usuario usuario;
+    private LocalDateTime inspectionData;
+    private String statusId;
+    private String observation;
+
     @OneToOne
-    private Cliente cliente;
-    @ManyToOne
-    private Fiscal fiscal;
+    @JoinColumn(name = "user_id")
+    private Users user;
+
+    @OneToMany(mappedBy = "inspector", cascade = CascadeType.ALL)
+    private List<PreSale> preSales;
 }
+
