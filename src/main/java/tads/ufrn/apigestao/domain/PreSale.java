@@ -19,6 +19,9 @@ public class PreSale {
     private Long id;
     private LocalDateTime preSaleDate;
 
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
 
     @ManyToOne
     @JoinColumn(name = "seller_id")

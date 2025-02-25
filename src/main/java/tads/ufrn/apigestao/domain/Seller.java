@@ -21,6 +21,10 @@ public class Seller {
     @JoinColumn(name = "user_id")
     private Users user;
 
+    @ManyToOne
+    @JoinColumn(name = "charging_id", nullable = false)
+    private Charging charging;
+
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
     private List<PreSale> preSales;
 }

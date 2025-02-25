@@ -21,8 +21,12 @@ public class Client {
     private String phone;
     private String address;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PreSale> preSales;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sale> sales;
+
     @ManyToOne(cascade = CascadeType.ALL)
     private Collector collector;
 }

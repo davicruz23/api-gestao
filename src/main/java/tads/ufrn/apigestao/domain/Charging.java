@@ -24,6 +24,9 @@ public class Charging {
     @JoinColumn(name = "user_id")
     private Users user;
 
+    @OneToMany(mappedBy = "charging", cascade = CascadeType.ALL)
+    private List<Seller> sellers;
+
     @OneToMany(mappedBy = "charging", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products;
 }
