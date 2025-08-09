@@ -9,6 +9,8 @@ import tads.ufrn.apigestao.domain.Charging;
 import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.Inspector;
 import tads.ufrn.apigestao.domain.Seller;
+import tads.ufrn.apigestao.domain.dto.inspector.InspectorDTO;
+import tads.ufrn.apigestao.domain.dto.seller.SellerDTO;
 
 @Data
 @AllArgsConstructor
@@ -19,9 +21,5 @@ public class UserDTO {
     private Long id;
     private String name;
     private String cpf;
-    private String function;
-    private String password;
-    private Seller seller;
-    private Inspector inspector;
-    private Collector collector;
+    private String position;
 }

@@ -7,8 +7,8 @@ public class CollectorMapper {
     public static CollectorDTO mapper(Collector src){
         return CollectorDTO.builder()
                 .id(src.getId())
-                .user(src.getUser())
-                .sales(src.getSales().stream().map(SaleMapper::mapper).toList())
+                //.user(src.getUser())
+                //.sales(src.getSales().stream().map(SaleMapper::mapper).toList())
                 .build();
     }
 }

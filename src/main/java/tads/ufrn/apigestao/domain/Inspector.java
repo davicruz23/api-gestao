@@ -17,15 +17,24 @@ public class Inspector {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDateTime inspectionData;
+
+    private Integer paymentType;
+    private Integer nParcel;
     private String statusId;
     private String observation;
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    private Users user;
+    private User user;
 
-    @OneToMany(mappedBy = "inspector", cascade = CascadeType.ALL)
-    private List<PreSale> preSales;
+    @OneToOne
+    @JoinColumn(name = "pre_sale_id")
+    private PreSale preSale;
+
+    @OneToOne(mappedBy = "inspector")
+    private Sale sale;
 }
+
 

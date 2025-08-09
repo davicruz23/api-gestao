@@ -1,16 +1,13 @@
 package tads.ufrn.apigestao.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Charging {
 
@@ -18,16 +15,15 @@ public class Charging {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate chargingDate;
+    private String description;
+
+    private LocalDate date;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private Users user;
+    private User user;
 
-    @OneToMany(mappedBy = "charging", cascade = CascadeType.ALL)
-    private List<Seller> sellers;
 
     @OneToMany(mappedBy = "charging", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Product> products;
+    private List<ChargingItem> items = new ArrayList<>();
 }
-

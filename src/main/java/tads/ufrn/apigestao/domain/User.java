@@ -4,31 +4,33 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import tads.ufrn.apigestao.enums.UserType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Users {
+@Table(name = "users")
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
+    @Column(unique = true)
     private String cpf;
-    private String function;
     private String password;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Seller seller;
+    @Enumerated(EnumType.STRING)
+    private UserType position;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Inspector inspector;
+    @OneToMany(mappedBy = "user")
+    private List<Charging> chargings = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Collector collector;
 }
 

@@ -11,7 +11,7 @@ public class ProductMapper {
                 .brand(src.getBrand())
                 .amount(src.getAmount())
                 .value(src.getValue())
-                .statusId(src.getStatusId())
+                .status(src.getStatus().toString())
                 .build();
     }
 }

@@ -17,29 +17,21 @@ public class Sale {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String numberSale;
     private LocalDateTime saleDate;
-    private Integer paymentType;
-    private Integer nParcel;
 
     @OneToOne
     @JoinColumn(name = "pre_sale_id")
     private PreSale preSale;
 
     @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;
-
-    @ManyToMany
-    @JoinTable(
-            name = "sale_products",
-            joinColumns = @JoinColumn(name = "sale_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private List<Product> products;
-
-    @ManyToOne
     @JoinColumn(name = "collector_id")
     private Collector collector;
+
+    @OneToOne
+    @JoinColumn(name = "inspector_id")
+    private Inspector inspector;
 }
+
 

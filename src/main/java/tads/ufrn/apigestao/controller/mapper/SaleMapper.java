@@ -10,11 +10,11 @@ public class SaleMapper {
         return SaleDTO.builder()
                 .id(src.getId())
                 .numberSale(src.getNumberSale())
-                .paymentType(src.getPaymentType())
-                .nParcel(src.getNParcel())
-                .client(src.getClient())
-                .products(src.getProducts().stream().map(ProductMapper::mapper).toList())
-                .collector(src.getCollector())
+                //.paymentType(src.getPaymentType())
+                //.nParcel(src.getNParcel())
+                //.client(src.getClient())
+                //.products(src.getProducts().stream().map(ProductMapper::mapper).toList())
+                //.collector(src.getCollector())
                 .build();
     }
 }

@@ -8,16 +8,16 @@ public class ChargingMapper {
     public static ChargingDTO chargingDTO(Charging src){
         return ChargingDTO.builder()
                 .id(src.getId())
-                .chargingDate(src.getChargingDate())
-                .userName(src.getUser().getName())
-                .products(src.getProducts().stream().map(ProductMapper::mapper).toList())
+                .chargingDate(src.getDate())
+                //.userName(src.getUser().getName())
+                //.products(src.getProducts().stream().map(ProductMapper::mapper).toList())
                 .build();
 
     }
 
     public static UpsertChargingDTO updateChargingDTO(Charging src){
         return UpsertChargingDTO.builder()
-                .products(src.getProducts().stream().map(ProductMapper::mapper).toList())
+                //.products(src.getProducts().stream().map(ProductMapper::mapper).toList())
                 .build();
     }
 }

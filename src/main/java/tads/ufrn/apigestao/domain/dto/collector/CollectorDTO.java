@@ -4,10 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tads.ufrn.apigestao.domain.Sale;
-import tads.ufrn.apigestao.domain.Users;
+import tads.ufrn.apigestao.domain.User;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
-import tads.ufrn.apigestao.domain.dto.user.UserDTO;
 
 import java.util.List;
 
@@ -18,6 +16,6 @@ import java.util.List;
 public class CollectorDTO {
 
     private Long id;
-    private Users user;
+    private User user;
     private List<SaleDTO> sales;
 }

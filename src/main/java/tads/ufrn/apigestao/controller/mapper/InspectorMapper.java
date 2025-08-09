@@ -9,8 +9,8 @@ public class InspectorMapper {
                 .id(src.getId())
                 .inspectionData(src.getInspectionData())
                 .observation(src.getObservation())
-                .userName(src.getUser().getName())
-                .preSales(src.getPreSales().stream().map(PreSaleMapper::mapper).toList())
+                //.userName(src.getUser().getName())
+                //.preSales(src.getPreSales().stream().map(PreSaleMapper::mapper).toList())
                 .build();
     }
 }

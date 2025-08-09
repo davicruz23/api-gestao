@@ -10,7 +10,7 @@ public class ClientMapper {
                 .cpf(src.getCpf())
                 .phone(src.getName())
                 .address(src.getAddress())
-                .sales(src.getSales().stream().map(SaleMapper::mapper).toList())
+                //.sales(src.getSales().stream().map(SaleMapper::mapper).toList())
                 .build();
     }
 }

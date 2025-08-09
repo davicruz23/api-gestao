@@ -8,26 +8,19 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@Entity
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
 public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String cpf;
     private String phone;
     private String address;
-
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PreSale> preSales;
-
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Sale> sales;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Collector collector;
 }
+
 

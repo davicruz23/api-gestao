@@ -5,11 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Collector {
 
@@ -19,8 +20,9 @@ public class Collector {
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    private Users user;
+    private User user;
 
-    @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL)
-    private List<Sale> sales;
+    @OneToMany(mappedBy = "collector")
+    private List<Sale> sales = new ArrayList<>();
 }
+
