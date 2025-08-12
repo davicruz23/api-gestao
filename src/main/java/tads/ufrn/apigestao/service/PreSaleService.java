@@ -4,31 +4,31 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
-import tads.ufrn.apigestao.domain.Client;
-import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
-import tads.ufrn.apigestao.repository.ClientRepository;
+import tads.ufrn.apigestao.domain.PreSale;
+import tads.ufrn.apigestao.domain.dto.preSale.UpsertPreSaleDTO;
+import tads.ufrn.apigestao.repository.PreSaleRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class ClientService {
+public class PreSaleService {
 
-    private final ClientRepository repository;
+    private final PreSaleRepository repository;
     private final ModelMapper mapper;
 
-    public List<Client> findAll(){
+    public List<PreSale> findAll(){
         return repository.findAll();
     }
 
-    public Client findById(Long id) {
-        Optional<Client> client = repository.findById(id);
-        return client.orElseThrow(() -> new NotFoundException("User not found"));
+    public PreSale findById(Long id) {
+        Optional<PreSale> preSale = repository.findById(id);
+        return preSale.orElseThrow(() -> new NotFoundException("User not found"));
     }
 
-    public Client store(UpsertClientDTO client) {
-        return repository.save(mapper.map(client, Client.class));
+    public PreSale store(UpsertPreSaleDTO preSale) {
+        return repository.save(mapper.map(preSale, PreSale.class));
     }
 
     /*public Product update(ProductDTO product){
@@ -44,10 +44,9 @@ public class ClientService {
     }*/
 
     public void deleteById(Long id){
-        Client client = repository.findById(id)
+        PreSale client = repository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Product not found"));
         repository.save(client);
 
     }
-
 }

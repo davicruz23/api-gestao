@@ -5,11 +5,12 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.*;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Charging {
+public class Charging extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

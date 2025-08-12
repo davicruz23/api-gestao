@@ -5,7 +5,7 @@ import tads.ufrn.apigestao.domain.dto.charging.ChargingDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 
 public class ChargingMapper {
-    public static ChargingDTO chargingDTO(Charging src){
+    public static ChargingDTO mapper(Charging src){
         return ChargingDTO.builder()
                 .id(src.getId())
                 .chargingDate(src.getDate())

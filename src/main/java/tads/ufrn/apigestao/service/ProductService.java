@@ -38,6 +38,7 @@ public class ProductService {
         if (product.getStatus() != null) {
             prod.setStatus(ProductStatus.fromValue(product.getStatus()));
         }
+        prod.create();
 
         return repository.save(prod);
     }
@@ -52,5 +53,13 @@ public class ProductService {
         p.setAmount(product.getAmount());
 
         return repository.save(p);
+    }
+
+    public void deleteById(Long id){
+        Product product = repository.findById(id)
+                        .orElseThrow(()-> new NotFoundException("Product not found"));
+        product.delete();
+        repository.save(product);
+
     }
 }

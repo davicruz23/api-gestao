@@ -1,22 +1,25 @@
-package tads.ufrn.apigestao.domain.dto.charging;
+package tads.ufrn.apigestao.domain.dto.preSale;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.domain.User;
+import tads.ufrn.apigestao.domain.dto.client.ClientDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpsertChargingDTO {
+public class UpsertPreSaleDTO {
 
-    private String description;
-    private LocalDate date;
+    private Long id;
+    private LocalDateTime preSaleDate;
+    private User userName;
+    private ClientDTO clientName;
     private List<ProductDTO> products;
 }
