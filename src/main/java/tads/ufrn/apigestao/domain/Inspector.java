@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -14,29 +14,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Inspector extends AbstractEntity{
+public class Inspector extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime inspectionData;
-
-    private Integer paymentType;
-    private Integer nParcel;
-    private String statusId;
-    private String observation;
-
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "pre_sale_id")
-    private PreSale preSale;
-
-    @OneToOne(mappedBy = "inspector")
-    private Sale sale;
+    @OneToMany(mappedBy = "inspector")
+    private List<PreSale> preSales = new ArrayList<>();
 }
-
-

@@ -6,12 +6,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class ChargingItem extends AbstractEntity {
+public class ChargingItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

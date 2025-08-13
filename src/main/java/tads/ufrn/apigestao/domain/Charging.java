@@ -1,6 +1,7 @@
 package tads.ufrn.apigestao.domain;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -27,4 +28,12 @@ public class Charging extends AbstractEntity {
 
     @OneToMany(mappedBy = "charging", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChargingItem> items = new ArrayList<>();
+
+    public void addItem(Product product, Integer quantity) {
+        ChargingItem item = new ChargingItem();
+        item.setCharging(this);
+        item.setProduct(product);
+        item.setQuantity(quantity);
+        this.items.add(item);
+    }
 }

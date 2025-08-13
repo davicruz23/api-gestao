@@ -6,7 +6,10 @@ import lombok.Getter;
 public enum UserType {
 
     SUPERADMIN(1),
-    FUNCIONARIO(2);
+    FUNCIONARIO(2),
+    VENDEDOR(3),
+    COBRADOR(4),
+    FISCAL(5);
 
     private final int value;
 

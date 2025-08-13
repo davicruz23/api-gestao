@@ -18,17 +18,21 @@ public class PreSale {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDateTime preSaleDate;
 
-    @ManyToOne @JoinColumn(name = "seller_id")
+    @ManyToOne
+    @JoinColumn(name = "seller_id", nullable = false)
     private Seller seller;
 
-    @ManyToOne @JoinColumn(name = "client_id")
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
     private Client client;
+
+    @ManyToOne
+    @JoinColumn(name = "inspector_id", nullable = false)
+    private Inspector inspector; // agora todas as pré-vendas apontam para o mesmo inspector
 
     @OneToMany(mappedBy = "preSale", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChargingItem> items = new ArrayList<>();
 }
-
-
-

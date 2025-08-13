@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -22,16 +21,10 @@ public class Sale {
     private LocalDateTime saleDate;
 
     @OneToOne
-    @JoinColumn(name = "pre_sale_id")
+    @JoinColumn(name = "pre_sale_id", nullable = false)
     private PreSale preSale;
 
     @ManyToOne
     @JoinColumn(name = "collector_id")
     private Collector collector;
-
-    @OneToOne
-    @JoinColumn(name = "inspector_id")
-    private Inspector inspector;
 }
-
-
