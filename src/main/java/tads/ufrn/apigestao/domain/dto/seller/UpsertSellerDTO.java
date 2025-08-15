@@ -5,18 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.domain.User;
-import tads.ufrn.apigestao.domain.dto.preSale.PreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.user.UserDTO;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SellerDTO {
+public class UpsertSellerDTO {
 
     private Long id;
-    private User user;
-
+    private UserDTO user;
 }

@@ -8,8 +8,7 @@ public class SellerMapper {
     public static SellerDTO mapper(Seller src){
         return SellerDTO.builder()
                 .id(src.getId())
-                //.user(src.getUser())
-                //.preSales(src.getPreSales().stream().map(PreSaleMapper::mapper).toList())
+                .user(src.getUser())
                 .build();
     }
 }
