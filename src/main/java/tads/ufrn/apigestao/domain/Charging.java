@@ -31,9 +31,9 @@ public class Charging extends AbstractEntity {
 
     public void addItem(Product product, Integer quantity) {
         ChargingItem item = new ChargingItem();
-        item.setCharging(this);
         item.setProduct(product);
         item.setQuantity(quantity);
+        item.setCharging(this);
         this.items.add(item);
     }
 }

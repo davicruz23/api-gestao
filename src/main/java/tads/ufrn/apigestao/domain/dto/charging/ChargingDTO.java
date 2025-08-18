@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tads.ufrn.apigestao.controller.mapper.ChargingItemMapper;
+import tads.ufrn.apigestao.domain.dto.chargingItem.ChargingItemDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 
 import java.time.LocalDate;
@@ -18,5 +20,6 @@ public class ChargingDTO {
     private Long id;
     private LocalDate chargingDate;
     private String userName;
-    private List<ProductDTO> products;
+    private String description;
+    private List<ChargingItemDTO> chargingItems;
 }

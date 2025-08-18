@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.domain.User;
+import tads.ufrn.apigestao.domain.dto.chargingItem.UpsertChargingItemDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 
 import java.time.LocalDate;
@@ -18,5 +19,5 @@ public class UpsertChargingDTO {
 
     private String description;
     private LocalDate date;
-    private List<ProductDTO> products;
+    private List<UpsertChargingItemDTO> items;
 }

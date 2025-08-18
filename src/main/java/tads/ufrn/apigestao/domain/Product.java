@@ -28,7 +28,8 @@ public class Product extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    @ManyToOne @JoinColumn(name = "created_by_id")
+    @ManyToOne
+    @JoinColumn(name = "created_by_id")
     private User createdBy;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)

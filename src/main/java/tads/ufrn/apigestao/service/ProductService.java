@@ -5,6 +5,7 @@ import org.apache.catalina.LifecycleState;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
+import tads.ufrn.apigestao.domain.ChargingItem;
 import tads.ufrn.apigestao.domain.Product;
 import tads.ufrn.apigestao.domain.User;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
@@ -27,7 +28,7 @@ public class ProductService {
         return repository.findAll();
     }
 
-    public Product findUserById(Long id) {
+    public Product findById(Long id) {
         Optional<Product> product = repository.findById(id);
         return product.orElseThrow(() -> new NotFoundException("Product not found"));
     }
@@ -61,5 +62,12 @@ public class ProductService {
         product.delete();
         repository.save(product);
 
+    }
+
+    public void saveAllFromChargingItems(List<ChargingItem> items) {
+        List<Product> products = items.stream()
+                .map(ChargingItem::getProduct)
+                .toList();
+        repository.saveAll(products);
     }
 }

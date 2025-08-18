@@ -30,7 +30,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(ProductMapper.mapper(service.findUserById(id)));
+        return ResponseEntity.ok().body(ProductMapper.mapper(service.findById(id)));
     }
 
     @PostMapping
