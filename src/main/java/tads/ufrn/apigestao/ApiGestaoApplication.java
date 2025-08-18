@@ -30,7 +30,7 @@ public class ApiGestaoApplication {
             ProductService productService,
             ProductRepository productRepository,
             SaleService saleService,
-            SaleRepository saleRepository,
+            SellerRepository sellerRepository,
             ChangingService changingService,
             ChargingRepository chargingRepository,
             ChargingItemRepository chargingItemRepository
@@ -77,8 +77,6 @@ public class ApiGestaoApplication {
 
                 chargingRepository.save(charging);
                 productRepository.saveAll(managedProducts);
-
-
 
                 System.out.println("Carregamento criado com sucesso!");
             }
