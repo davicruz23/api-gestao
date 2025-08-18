@@ -50,11 +50,13 @@ public class ApiGestaoApplication {
                 userRepository.saveAll(users);
 
                 User carregador = userService.findUserById(2L);
+                User admin = userService.findUserById(1L);
+                User vendedor = userService.findUserById(4L);
 
                 List<Product> products = new ArrayList<>();
-                products.add(new Product(null,"Panela Inox","Tramontina",100,50.00, ProductStatus.DISPONIVEL,null,null));
-                products.add(new Product(null,"Travesseiro","Coteminas",100,30.00, ProductStatus.DISPONIVEL,null,null));
-                products.add(new Product(null,"Ventilador","Arno",50,200.00, ProductStatus.DISPONIVEL,null,null));
+                products.add(new Product(null,"Panela Inox","Tramontina",100,50.00, ProductStatus.DISPONIVEL,admin,null));
+                products.add(new Product(null,"Travesseiro","Coteminas",100,30.00, ProductStatus.DISPONIVEL,admin,null));
+                products.add(new Product(null,"Ventilador","Arno",50,200.00, ProductStatus.DISPONIVEL,admin,null));
                 productRepository.saveAll(products);
 
                 List<Product> managedProducts = productRepository.findAll();
@@ -75,6 +77,8 @@ public class ApiGestaoApplication {
 
                 chargingRepository.save(charging);
                 productRepository.saveAll(managedProducts);
+
+
 
                 System.out.println("Carregamento criado com sucesso!");
             }
