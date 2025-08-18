@@ -21,5 +21,5 @@ public class ClientDTO {
     private String cpf;
     private String phone;
     private String address;
-    private List<SaleDTO> sales;
+    private List<SaleDTO> products;
 }

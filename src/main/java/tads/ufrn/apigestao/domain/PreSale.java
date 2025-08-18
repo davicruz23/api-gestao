@@ -34,5 +34,5 @@ public class PreSale {
     private Inspector inspector; // agora todas as pré-vendas apontam para o mesmo inspector
 
     @OneToMany(mappedBy = "preSale", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChargingItem> items = new ArrayList<>();
+    private List<PreSaleItem> items = new ArrayList<>();
 }

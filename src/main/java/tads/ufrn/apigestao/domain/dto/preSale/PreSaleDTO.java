@@ -20,8 +20,8 @@ public class PreSaleDTO {
 
     private Long id;
     private LocalDateTime preSaleDate;
-    private User userName;
-    private Client clientName;
+    private User seller;
+    private Client client;
     private String inspector;
     private List<ProductDTO> products;
 }

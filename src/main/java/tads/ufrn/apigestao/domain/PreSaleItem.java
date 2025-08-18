@@ -5,26 +5,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Client {
+public class PreSaleItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
 
-    @Column(unique = true)
-    private String cpf;
-    private String phone;
+    @ManyToOne
+    private PreSale preSale;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id", nullable = false)
-    private Address address;
+    @ManyToOne
+    private Product product;
+
+    private Integer quantity;
 }
-
-

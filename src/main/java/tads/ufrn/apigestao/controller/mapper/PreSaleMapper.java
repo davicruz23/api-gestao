@@ -8,9 +8,10 @@ public class PreSaleMapper {
         return PreSaleDTO.builder()
                 .id(src.getId())
                 .preSaleDate(src.getPreSaleDate())
-                //.userName(src.getSeller().getUser())
-                //.clientName(src.getClient())
-                //.products(src.getProducts().stream().map(ProductMapper::mapper).toList())
+                .seller(src.getSeller().getUser())
+                .client(src.getClient())
+                .inspector(src.getInspector().getUser().getName())
+                //.products(src.getItems())
                 .build();
     }
 }
