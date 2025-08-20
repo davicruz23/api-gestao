@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
+import tads.ufrn.apigestao.domain.Inspector;
 import tads.ufrn.apigestao.domain.PreSale;
 import tads.ufrn.apigestao.domain.dto.preSale.UpsertPreSaleDTO;
 import tads.ufrn.apigestao.repository.PreSaleRepository;
@@ -48,5 +49,19 @@ public class PreSaleService {
                 .orElseThrow(()-> new NotFoundException("Product not found"));
         repository.save(client);
 
+    }
+
+    public PreSale approvePreSale(Long preSaleId, Inspector inspector) {
+        PreSale preSale = findById(preSaleId);
+        preSale.setApproved(true);
+        preSale.setInspector(inspector);
+        return repository.save(preSale);
+    }
+
+    public PreSale rejectPreSale(Long preSaleId, Inspector inspector) {
+        PreSale preSale = findById(preSaleId);
+        preSale.setApproved(false);
+        preSale.setInspector(inspector);
+        return repository.save(preSale);
     }
 }

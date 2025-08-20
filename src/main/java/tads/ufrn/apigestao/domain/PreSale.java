@@ -33,6 +33,8 @@ public class PreSale {
     @JoinColumn(name = "inspector_id", nullable = false)
     private Inspector inspector; // agora todas as pré-vendas apontam para o mesmo inspector
 
+    private boolean approved;
+
     @OneToMany(mappedBy = "preSale", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PreSaleItem> items = new ArrayList<>();
 }

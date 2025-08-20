@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import tads.ufrn.apigestao.domain.*;
+import tads.ufrn.apigestao.enums.PaymentType;
 import tads.ufrn.apigestao.enums.ProductStatus;
 import tads.ufrn.apigestao.enums.UserType;
 import tads.ufrn.apigestao.repository.*;
@@ -46,11 +47,11 @@ public class ApiGestaoApplication {
 
                 //salva os usuarios
                 List<User> users = new ArrayList<>();
-                users.add(new User(null,"Marlene Balbino","12345678910","123456",UserType.SUPERADMIN, null));
-                users.add(new User(null,"Miriam Balbino","12345678911","123456",UserType.FUNCIONARIO, null));
-                users.add(new User(null,"Gil Bahia","12345678912","123456",UserType.FISCAL, null));
-                users.add(new User(null,"José Santos","12345678913","123456",UserType.VENDEDOR, null));
-                users.add(new User(null,"Carlos Miguelino","12345678914","123456",UserType.COBRADOR, null));
+                users.add(new User(null,"Marlene Balbino","12345678910","123456",UserType.SUPERADMIN));
+                users.add(new User(null,"Miriam Balbino","12345678911","123456",UserType.FUNCIONARIO));
+                users.add(new User(null,"Gil Bahia","12345678912","123456",UserType.FISCAL));
+                users.add(new User(null,"José Santos","12345678913","123456",UserType.VENDEDOR));
+                users.add(new User(null,"Carlos Miguelino","12345678914","123456",UserType.COBRADOR));
                 userRepository.saveAll(users);
 
                 User carregador = userService.findUserById(2L);
@@ -133,6 +134,20 @@ public class ApiGestaoApplication {
 
                 preSaleRepository.save(preSale);
                 chargingRepository.save(charging);
+
+                PreSale preSaleSaved = preSaleService.findById(preSale.getId());
+
+                Sale sale = saleService.approvePreSale(
+                        preSaleSaved.getId(),
+                        inspector1,
+                        PaymentType.CREDIT,
+                        3
+                );
+
+                System.out.println("Venda aprovada pelo inspetor "
+                        + preSaleSaved.getInspector().getUser().getName()
+                        + " para o cliente "
+                        + preSaleSaved.getClient().getName());
 
                 System.out.println("Pré-venda criada com sucesso!");
 

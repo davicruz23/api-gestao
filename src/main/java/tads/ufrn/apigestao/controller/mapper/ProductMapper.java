@@ -2,6 +2,7 @@ package tads.ufrn.apigestao.controller.mapper;
 
 import tads.ufrn.apigestao.domain.Product;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
+import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 
 public class ProductMapper {
     public static ProductDTO mapper(Product src){
@@ -12,6 +13,13 @@ public class ProductMapper {
                 .amount(src.getAmount())
                 .value(src.getValue())
                 .status(src.getStatus().toString())
+                .build();
+    }
+
+    public static ProductSaleDTO mapperProductSale(Product product){
+        return ProductSaleDTO.builder()
+                .id(product.getId())
+                .nameProduct(product.getName())
                 .build();
     }
 }

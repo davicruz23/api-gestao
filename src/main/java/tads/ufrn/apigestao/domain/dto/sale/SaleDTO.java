@@ -9,6 +9,7 @@ import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.dto.client.ClientDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
+import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,9 +23,9 @@ public class SaleDTO {
     private Long id;
     private String numberSale;
     private LocalDateTime saleDate;
-    private Integer paymentType;
+    private String paymentType;
     private Integer nParcel;
-    private ClientDTO client;
-    private List<ProductDTO> products;
-    private CollectorDTO collector;
+    private String clientName;
+    private Double total;
+    private List<ProductSaleDTO> products;
 }

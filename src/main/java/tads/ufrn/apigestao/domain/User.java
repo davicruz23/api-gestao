@@ -29,8 +29,5 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserType position;
 
-    @OneToMany(mappedBy = "user")
-    private List<Charging> chargings = new ArrayList<>();
-
 }
 
