@@ -1,10 +1,12 @@
 package tads.ufrn.apigestao.controller.mapper;
 
 import tads.ufrn.apigestao.domain.Sale;
+import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class SaleMapper {
@@ -19,6 +21,19 @@ public class SaleMapper {
                 .total(src.getTotal())
                 .products(src.getPreSale().getItems().stream()
                         .map(item -> ProductMapper.mapperProductSale(item.getProduct()))
-                        .toList()).build();
+                        .toList())
+                .installments(
+                        src.getInstallments() != 0 && src.getId() != null ?
+                                src.getInstallmentsEntities().stream()
+                                        .map(inst -> InstallmentDTO.builder()
+                                                .dueDate(inst.getDueDate())
+                                                .amount(inst.getAmount())
+                                                .paid(inst.isPaid())
+                                                .build())
+                                        .toList()
+                                : List.of()
+                )
+                .build();
+
     }
 }

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.enums.PaymentType;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -34,4 +36,7 @@ public class Sale {
     @ManyToOne
     @JoinColumn(name = "collector_id")
     private Collector collector;
+
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Installment> installmentsEntities = new ArrayList<>();
 }

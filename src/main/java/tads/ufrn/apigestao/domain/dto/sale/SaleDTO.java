@@ -8,6 +8,7 @@ import tads.ufrn.apigestao.domain.Client;
 import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.dto.client.ClientDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorDTO;
+import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 
@@ -28,4 +29,5 @@ public class SaleDTO {
     private String clientName;
     private Double total;
     private List<ProductSaleDTO> products;
+    private List<InstallmentDTO> installments;
 }
