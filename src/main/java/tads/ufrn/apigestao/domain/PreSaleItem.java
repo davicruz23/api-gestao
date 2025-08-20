@@ -22,4 +22,8 @@ public class PreSaleItem {
     private Product product;
 
     private Integer quantity;
+
+    @ManyToOne
+    @JoinColumn(name = "charging_item_id")
+    private ChargingItem chargingItem;
 }

@@ -3,9 +3,9 @@ package tads.ufrn.apigestao.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
-import tads.ufrn.apigestao.domain.Inspector;
-import tads.ufrn.apigestao.domain.PreSale;
+import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.preSale.UpsertPreSaleDTO;
 import tads.ufrn.apigestao.repository.PreSaleRepository;
 
@@ -58,10 +58,29 @@ public class PreSaleService {
         return repository.save(preSale);
     }
 
-    public PreSale rejectPreSale(Long preSaleId, Inspector inspector) {
+    @Transactional
+    public void rejectPreSale(Long preSaleId, Inspector inspector) {
         PreSale preSale = findById(preSaleId);
+
         preSale.setApproved(false);
         preSale.setInspector(inspector);
-        return repository.save(preSale);
+
+        // Para cada item da pré-venda
+        for (PreSaleItem item : preSale.getItems()) {
+            int quantity = item.getQuantity();
+
+            ChargingItem chargingItem = item.getChargingItem();
+            if (chargingItem != null) {
+                // devolve a quantidade reservada
+                chargingItem.setQuantity(chargingItem.getQuantity() + quantity);
+            }
+            // não mexe no Product.amount global
+        }
+
+        repository.save(preSale);
     }
+
+
+
+
 }

@@ -31,7 +31,7 @@ public class PreSale {
 
     @ManyToOne
     @JoinColumn(name = "inspector_id", nullable = false)
-    private Inspector inspector; // agora todas as pré-vendas apontam para o mesmo inspector
+    private Inspector inspector;
 
     private boolean approved;
 

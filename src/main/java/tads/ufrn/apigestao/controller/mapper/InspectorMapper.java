@@ -7,10 +7,8 @@ public class InspectorMapper {
     public static InspectorDTO mapper(Inspector src){
         return InspectorDTO.builder()
                 .id(src.getId())
-                //.inspectionData(src.getInspectionData())
-                //.observation(src.get())
                 .userName(src.getUser().getName())
-                //.preSales(src.getPreSales().stream().map(PreSaleMapper::mapper).toList())
+                .preSales(src.getPreSales().stream().map(PreSaleMapper::mapper).toList())
                 .build();
     }
 }

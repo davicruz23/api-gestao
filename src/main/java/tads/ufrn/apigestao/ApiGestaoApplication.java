@@ -64,6 +64,7 @@ public class ApiGestaoApplication {
                 products.add(new Product(null,"Panela Inox","Tramontina",100,50.00, ProductStatus.DISPONIVEL,admin,null));
                 products.add(new Product(null,"Travesseiro","Coteminas",100,30.00, ProductStatus.DISPONIVEL,admin,null));
                 products.add(new Product(null,"Ventilador","Arno",50,200.00, ProductStatus.DISPONIVEL,admin,null));
+                products.add(new Product(null,"Jodo de Talheres","Tramontina",50,100.00, ProductStatus.DISPONIVEL,admin,null));
                 productRepository.saveAll(products);
 
                 List<Product> managedProducts = productRepository.findAll();
@@ -94,60 +95,93 @@ public class ApiGestaoApplication {
                 inspector1.setUser(inspector);
                 inspectorRepository.save(inspector1);
 
-                Address address1 = new Address();
-                address1.setCity("Macaiba");
-                address1.setState("RN");
-                address1.setStreet("São José");
-                address1.setNumber("270");
-                address1.setZipCode("59280-676");
+                List<Client> clients = List.of(
+                        new Client(null,"Larissa Barbosa","10101010101","84994611450",
+                                new Address(null,"Macaiba","RN","São José","57","59280-646",null)
+                        ),
+                        new Client(null,"Elizabete Cruz de Souza","11111111111","84992049249",
+                                new Address(null,"Macaiba","RN","Maria Hilda Costa Torres","270","59280-676",null)
+                        )
+                );
 
-                Client client1 = new Client();
-                client1.setName("Larissa Barbosa");
-                client1.setCpf("10101010101");
-                client1.setPhone("84994611450");
-                client1.setAddress(address1);
-                clientRepository.save(client1);
+                clientRepository.saveAll(clients);
 
-                PreSale preSale = new PreSale();
-                preSale.setPreSaleDate(LocalDateTime.now());
-                preSale.setSeller(seller);
-                preSale.setClient(client1);
-                preSale.setInspector(inspector1);
-                preSale.setItems(new ArrayList<>());
 
-                List<ChargingItem> chargingItems = charging.getItems();
-                List<PreSaleItem> preSaleItems = new ArrayList<>();
+                List<Client> savedClients = clientRepository.findAll();
 
-                for (ChargingItem ci : chargingItems) {
-                    if (ci.getProduct().getName().equals("Panela Inox") || ci.getProduct().getName().equals("Travesseiro")) {
+                PreSale preSale1 = new PreSale();
+                preSale1.setPreSaleDate(LocalDateTime.now());
+                preSale1.setSeller(seller);
+                preSale1.setClient(savedClients.get(0)); // Larissa Barbosa
+                preSale1.setInspector(inspector1);
+                preSale1.setItems(new ArrayList<>());
+
+                List<PreSaleItem> preSaleItems1 = new ArrayList<>();
+                for (ChargingItem ci : charging.getItems()) {
+                    if (ci.getProduct().getName().equals("Panela Inox") || ci.getProduct().getName().equals("Travesseiro") || ci.getProduct().getName().equals("Jodo de Talheres"))  {
                         PreSaleItem preItem = new PreSaleItem();
                         preItem.setProduct(ci.getProduct());
-                        preItem.setPreSale(preSale);
+                        preItem.setPreSale(preSale1);
                         preItem.setQuantity(1);
-                        preSaleItems.add(preItem);
-
+                        preItem.setChargingItem(ci);
+                        preSaleItems1.add(preItem);
                         ci.setQuantity(ci.getQuantity() - 1);
                     }
                 }
+                preSale1.setItems(preSaleItems1);
+                preSaleRepository.save(preSale1);
 
-                preSale.setItems(preSaleItems);
+                PreSale preSale2 = new PreSale();
+                preSale2.setPreSaleDate(LocalDateTime.now());
+                preSale2.setSeller(seller);
+                preSale2.setClient(savedClients.get(1));
+                preSale2.setInspector(inspector1);
+                preSale2.setItems(new ArrayList<>());
 
-                preSaleRepository.save(preSale);
+                List<PreSaleItem> preSaleItems2 = new ArrayList<>();
+                for (ChargingItem ci : charging.getItems()) {
+                    if (ci.getProduct().getName().equals("Travesseiro") || ci.getProduct().getName().equals("Ventilador")) {
+                        PreSaleItem preItem = new PreSaleItem();
+                        preItem.setProduct(ci.getProduct());
+                        preItem.setPreSale(preSale2);
+                        preItem.setQuantity(1);
+                        preItem.setChargingItem(ci);
+                        preSaleItems2.add(preItem);
+                        ci.setQuantity(ci.getQuantity() - 1);
+                    }
+                }
+                preSale2.setItems(preSaleItems2);
+                preSaleRepository.save(preSale2);
+
                 chargingRepository.save(charging);
 
-                PreSale preSaleSaved = preSaleService.findById(preSale.getId());
 
-                Sale sale = saleService.approvePreSale(
-                        preSaleSaved.getId(),
+
+                PreSale preSaleSaved1 = preSaleService.findById(preSale1.getId());
+
+                saleService.approvePreSale(
+                        preSaleSaved1.getId(),
                         inspector1,
                         PaymentType.CREDIT,
                         3
                 );
 
                 System.out.println("Venda aprovada pelo inspetor "
-                        + preSaleSaved.getInspector().getUser().getName()
+                        + preSaleSaved1.getInspector().getUser().getName()
                         + " para o cliente "
-                        + preSaleSaved.getClient().getName());
+                        + preSaleSaved1.getClient().getName());
+
+                PreSale preSaleSaved2 = preSaleService.findById(preSale2.getId());
+
+                saleService.rejectPreSale(
+                        preSaleSaved2.getId(),
+                        inspector1
+                );
+
+                System.out.println("Venda aprovada pelo inspetor "
+                        + preSaleSaved2.getInspector().getUser().getName()
+                        + " para o cliente "
+                        + preSaleSaved2.getClient().getName());
 
                 System.out.println("Pré-venda criada com sucesso!");
 

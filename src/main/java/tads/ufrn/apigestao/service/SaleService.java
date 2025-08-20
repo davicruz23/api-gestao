@@ -5,10 +5,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.*;
-import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
 import tads.ufrn.apigestao.domain.dto.sale.UpsertSaleDTO;
 import tads.ufrn.apigestao.enums.PaymentType;
-import tads.ufrn.apigestao.repository.ClientRepository;
 import tads.ufrn.apigestao.repository.InstallmentRepository;
 import tads.ufrn.apigestao.repository.SaleRepository;
 
@@ -59,7 +57,7 @@ public class SaleService {
 
     }
 
-    public Sale approvePreSale(Long preSaleId, Inspector inspector, PaymentType paymentMethod, int installments) {
+    public void approvePreSale(Long preSaleId, Inspector inspector, PaymentType paymentMethod, int installments) {
         PreSale preSale = preSaleService.approvePreSale(preSaleId, inspector);
 
         Sale sale = new Sale();
@@ -76,7 +74,6 @@ public class SaleService {
 
         repository.save(sale);
         generateInstallments(sale);
-        return sale;
     }
 
     public void rejectPreSale(Long preSaleId, Inspector inspector) {

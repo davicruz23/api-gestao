@@ -16,9 +16,6 @@ import java.util.List;
 public class InspectorDTO {
 
     private Long id;
-    private LocalDateTime inspectionData;
-    private String statusId;
-    private String observation;
     private String userName;
     private List<PreSaleDTO> preSales;
 }
