@@ -4,9 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tads.ufrn.apigestao.domain.User;
-import tads.ufrn.apigestao.domain.dto.client.ClientDTO;
-import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
+import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
+import tads.ufrn.apigestao.domain.dto.preSaleItem.UpsertPreSaleItemDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +18,8 @@ public class UpsertPreSaleDTO {
 
     private Long id;
     private LocalDateTime preSaleDate;
-    private User userName;
-    private ClientDTO clientName;
-    private List<ProductDTO> products;
+    private Long userId;
+    private UpsertClientDTO client;
+    private List<UpsertPreSaleItemDTO> products;
+    private Long chargingId;
 }

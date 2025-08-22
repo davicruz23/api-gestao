@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tads.ufrn.apigestao.domain.dto.address.UpsertAddressDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
 
 import java.util.List;
@@ -18,6 +19,6 @@ public class UpsertClientDTO {
     private String name;
     private String cpf;
     private String phone;
-    private String address;
-    private List<SaleDTO> sales;
+    private UpsertAddressDTO address;
+    //private List<SaleDTO> sales;
 }

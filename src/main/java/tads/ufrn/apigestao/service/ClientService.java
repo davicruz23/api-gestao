@@ -1,9 +1,11 @@
 package tads.ufrn.apigestao.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
+import tads.ufrn.apigestao.domain.Address;
 import tads.ufrn.apigestao.domain.Client;
 import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
 import tads.ufrn.apigestao.repository.ClientRepository;
@@ -27,9 +29,29 @@ public class ClientService {
         return client.orElseThrow(() -> new NotFoundException("User not found"));
     }
 
-    public Client store(UpsertClientDTO client) {
-        return repository.save(mapper.map(client, Client.class));
+    @Transactional
+    public Client store(UpsertClientDTO dto) {
+        Address address = new Address(
+                null,
+                dto.getAddress().getCity(),
+                dto.getAddress().getState(),
+                dto.getAddress().getStreet(),
+                dto.getAddress().getNumber(),
+                dto.getAddress().getZipCode(),
+                dto.getAddress().getComplement()
+        );
+
+        Client client = new Client(
+                null,
+                dto.getName(),
+                dto.getCpf(),
+                dto.getPhone(),
+                address
+        );
+
+        return repository.save(client);
     }
+
 
     /*public Product update(ProductDTO product){
         Product productId = repository.findById(product.getId())

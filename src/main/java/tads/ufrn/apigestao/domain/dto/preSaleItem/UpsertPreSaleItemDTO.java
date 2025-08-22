@@ -9,10 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PreSaleItemDTO {
+public class UpsertPreSaleItemDTO {
 
     private Long id;
     private Long productId;
-    private String productName;
     private Integer quantity;
 }

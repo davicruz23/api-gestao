@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.PreSaleMapper;
+import tads.ufrn.apigestao.domain.PreSale;
 import tads.ufrn.apigestao.domain.dto.client.ClientDTO;
 import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
 import tads.ufrn.apigestao.domain.dto.preSale.PreSaleDTO;
@@ -32,10 +33,21 @@ public class PreSaleController {
     }
 
     @PostMapping
-    public ResponseEntity<UpsertPreSaleDTO> store(@RequestBody UpsertPreSaleDTO model){
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}").buildAndExpand(service.store(model).getId()).toUri();
-        return ResponseEntity.created(uri).build();
+    public ResponseEntity<?> store(@RequestBody UpsertPreSaleDTO model) {
+        try {
+            PreSale savedPreSale = service.store(model);
+            PreSaleDTO dto = PreSaleMapper.mapper(savedPreSale);
+
+            URI uri = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(savedPreSale.getId())
+                    .toUri();
+
+            return ResponseEntity.created(uri).body(dto);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("{id}/delete")

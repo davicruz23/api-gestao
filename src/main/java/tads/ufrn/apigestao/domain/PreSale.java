@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tads.ufrn.apigestao.enums.PreSaleStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,10 +31,11 @@ public class PreSale {
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "inspector_id", nullable = false)
+    @JoinColumn(name = "inspector_id", nullable = true)
     private Inspector inspector;
 
-    private boolean approved;
+    @Enumerated(EnumType.STRING)
+    private PreSaleStatus status;
 
     @OneToMany(mappedBy = "preSale", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PreSaleItem> items = new ArrayList<>();
