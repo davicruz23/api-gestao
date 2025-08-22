@@ -26,4 +26,5 @@ public class PreSaleDTO {
     private Client client;
     private String inspector;
     private List<PreSaleItemDTO> items;
+    private String status;
 }

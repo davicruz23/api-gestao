@@ -13,6 +13,7 @@ public class PreSaleMapper {
                 .seller(src.getSeller().getUser())
                 .client(src.getClient())
                 .inspector(src.getInspector().getUser().getName())
+                .status(src.getStatus().toString())
                 .items(src.getItems().stream().map(PreSaleItemMapper::mapper).collect(Collectors.toList()))
                 .build();
     }

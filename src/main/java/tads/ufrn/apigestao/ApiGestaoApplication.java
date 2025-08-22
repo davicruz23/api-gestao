@@ -64,7 +64,7 @@ public class ApiGestaoApplication {
                 products.add(new Product(null,"Panela Inox","Tramontina",100,50.00, ProductStatus.DISPONIVEL,admin,null));
                 products.add(new Product(null,"Travesseiro","Coteminas",100,30.00, ProductStatus.DISPONIVEL,admin,null));
                 products.add(new Product(null,"Ventilador","Arno",50,200.00, ProductStatus.DISPONIVEL,admin,null));
-                products.add(new Product(null,"Jodo de Talheres","Tramontina",50,100.00, ProductStatus.DISPONIVEL,admin,null));
+                products.add(new Product(null,"Jogo de Talheres","Tramontina",50,100.00, ProductStatus.DISPONIVEL,admin,null));
                 productRepository.saveAll(products);
 
                 List<Product> managedProducts = productRepository.findAll();
@@ -118,7 +118,7 @@ public class ApiGestaoApplication {
 
                 List<PreSaleItem> preSaleItems1 = new ArrayList<>();
                 for (ChargingItem ci : charging.getItems()) {
-                    if (ci.getProduct().getName().equals("Panela Inox") || ci.getProduct().getName().equals("Travesseiro") || ci.getProduct().getName().equals("Jodo de Talheres"))  {
+                    if (ci.getProduct().getName().equals("Panela Inox") || ci.getProduct().getName().equals("Travesseiro") || ci.getProduct().getName().equals("Jogo de Talheres"))  {
                         PreSaleItem preItem = new PreSaleItem();
                         preItem.setProduct(ci.getProduct());
                         preItem.setPreSale(preSale1);
@@ -166,7 +166,7 @@ public class ApiGestaoApplication {
                         3
                 );
 
-                System.out.println("Venda aprovada pelo inspetor "
+                System.out.println("Venda aprovada pelo fiscal "
                         + preSaleSaved1.getInspector().getUser().getName()
                         + " para o cliente "
                         + preSaleSaved1.getClient().getName());
@@ -178,7 +178,7 @@ public class ApiGestaoApplication {
                         inspector1
                 );
 
-                System.out.println("Venda aprovada pelo inspetor "
+                System.out.println("Venda recusada pelo fiscal "
                         + preSaleSaved2.getInspector().getUser().getName()
                         + " para o cliente "
                         + preSaleSaved2.getClient().getName());
