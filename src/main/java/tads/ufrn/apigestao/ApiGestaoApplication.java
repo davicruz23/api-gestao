@@ -95,7 +95,7 @@ public class ApiGestaoApplication {
                 inspector1.setUser(inspector);
                 inspectorRepository.save(inspector1);
 
-                List<Client> clients = List.of(
+                /*List<Client> clients = List.of(
                         new Client(null,"Larissa Barbosa","10101010101","84994611450",
                                 new Address(null,"Macaiba","RN","São José","57","59280-646",null)
                         ),
@@ -183,7 +183,7 @@ public class ApiGestaoApplication {
                         + " para o cliente "
                         + preSaleSaved2.getClient().getName());
 
-                System.out.println("Pré-venda criada com sucesso!");
+                System.out.println("Pré-venda criada com sucesso!");*/
 
             }
         };

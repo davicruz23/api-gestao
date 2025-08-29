@@ -57,7 +57,7 @@ public class SaleService {
 
     }
 
-    public void approvePreSale(Long preSaleId, Inspector inspector, PaymentType paymentMethod, int installments) {
+    public Sale approvePreSale(Long preSaleId, Inspector inspector, PaymentType paymentMethod, int installments) {
         PreSale preSale = preSaleService.approvePreSale(preSaleId, inspector);
 
         Sale sale = new Sale();
@@ -73,12 +73,16 @@ public class SaleService {
         sale.setTotal(total);
 
         repository.save(sale);
+
         generateInstallments(sale);
+
+        return sale;
     }
 
-    public void rejectPreSale(Long preSaleId, Inspector inspector) {
-        preSaleService.rejectPreSale(preSaleId, inspector);
-    }
+
+//    public void rejectPreSale(Long preSaleId) {
+//        preSaleService.rejectPreSale(preSaleId);
+//    }
 
     public void generateInstallments(Sale sale) {
         double installmentValue = sale.getTotal() / sale.getInstallments();

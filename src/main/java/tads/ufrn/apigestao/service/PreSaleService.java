@@ -118,20 +118,6 @@ public class PreSaleService {
         return savedPreSale;
     }
 
-
-
-    /*public Product update(ProductDTO product){
-        Product productId = repository.findById(product.getId())
-                .orElseThrow(()-> new RuntimeException("Produto não encontrado"));
-
-        Product p = new Product();
-        p.setName(product.getName());
-        p.setBrand(product.getBrand());
-        p.setAmount(product.getAmount());
-
-        return repository.save(p);
-    }*/
-
     public void deleteById(Long id){
         PreSale client = repository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Product not found"));
@@ -147,11 +133,11 @@ public class PreSaleService {
     }
 
     @Transactional
-    public void rejectPreSale(Long preSaleId, Inspector inspector) {
+    public PreSale rejectPreSale(Long preSaleId) {
         PreSale preSale = findById(preSaleId);
 
         preSale.setStatus(PreSaleStatus.RECUSADA);
-        preSale.setInspector(inspector);
+        //preSale.setInspector(inspector);
 
         // Para cada item da pré-venda
         for (PreSaleItem item : preSale.getItems()) {
@@ -166,9 +152,12 @@ public class PreSaleService {
         }
 
         repository.save(preSale);
+
+        return preSale;
     }
 
-
-
+    public List<PreSale> listAllPreSales(Long inspectorId, PreSaleStatus status) {
+        return repository.findByInspectorIdAndStatus(inspectorId, status);
+    }
 
 }

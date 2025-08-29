@@ -36,4 +36,17 @@ public class SaleMapper {
                 .build();
 
     }
+
+    public static SaleDTO toDTO(Sale sale) {
+        if (sale == null) return null;
+
+        return SaleDTO.builder()
+                .numberSale(sale.getNumberSale())
+                .saleDate(sale.getSaleDate())
+                .paymentType(sale.getPaymentMethod().name())
+                .nParcel(sale.getInstallments())
+                .clientName(sale.getPreSale().getClient().getName())
+                .total(sale.getTotal())
+                .build();
+    }
 }

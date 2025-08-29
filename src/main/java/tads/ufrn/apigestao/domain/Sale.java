@@ -1,6 +1,8 @@
 package tads.ufrn.apigestao.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,9 +29,11 @@ public class Sale {
     @JoinColumn(name = "pre_sale_id", nullable = false)
     private PreSale preSale;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private PaymentType paymentMethod;
 
+    @Min(1)
     private int installments;
     private Double total;
 
