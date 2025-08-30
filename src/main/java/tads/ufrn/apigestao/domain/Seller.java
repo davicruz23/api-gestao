@@ -20,5 +20,8 @@ public class Seller {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(nullable = false, columnDefinition = "double default 0.0")
+    private Double totalCommission = 0.0;
 }
 

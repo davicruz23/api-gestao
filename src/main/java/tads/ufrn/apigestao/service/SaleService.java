@@ -22,6 +22,7 @@ public class SaleService {
 
     private final SaleRepository repository;
     private final PreSaleService preSaleService;
+    private final SellerService sellerService;
     private final InstallmentRepository installmentRepository;
     private final ModelMapper mapper;
 
@@ -72,17 +73,17 @@ public class SaleService {
                 .sum();
         sale.setTotal(total);
 
-        repository.save(sale);
+        double commissionValue = total < 1000 ? total * 0.09 : total * 0.045;
 
+        sellerService.addCommission(preSale.getSeller(), commissionValue);
+
+        repository.save(sale);
         generateInstallments(sale);
 
         return sale;
     }
 
 
-//    public void rejectPreSale(Long preSaleId) {
-//        preSaleService.rejectPreSale(preSaleId);
-//    }
 
     public void generateInstallments(Sale sale) {
         double installmentValue = sale.getTotal() / sale.getInstallments();

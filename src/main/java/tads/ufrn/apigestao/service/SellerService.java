@@ -31,4 +31,9 @@ public class SellerService {
     public Seller store(UpsertSellerDTO seller) {
         return repository.save(mapper.map(seller, Seller.class));
     }
+
+    public void addCommission(Seller seller, double commissionValue) {
+        seller.setTotalCommission(seller.getTotalCommission() + commissionValue);
+        repository.save(seller);
+    }
 }
