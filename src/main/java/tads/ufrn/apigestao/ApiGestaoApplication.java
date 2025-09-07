@@ -1,5 +1,6 @@
 package tads.ufrn.apigestao;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -19,6 +20,12 @@ import java.util.List;
 
 @SpringBootApplication
 public class ApiGestaoApplication {
+
+    public final PasswordEncoder passwordEncoder;
+
+    public ApiGestaoApplication(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Bean
     @Transactional
@@ -47,11 +54,11 @@ public class ApiGestaoApplication {
 
                 //salva os usuarios
                 List<User> users = new ArrayList<>();
-                users.add(new User(null,"Marlene Balbino","12345678910","123456",UserType.SUPERADMIN));
-                users.add(new User(null,"Miriam Balbino","12345678911","123456",UserType.FUNCIONARIO));
-                users.add(new User(null,"Gil Bahia","12345678912","123456",UserType.FISCAL));
-                users.add(new User(null,"José Santos","12345678913","123456",UserType.VENDEDOR));
-                users.add(new User(null,"Carlos Miguelino","12345678914","123456",UserType.COBRADOR));
+                users.add(new User(null,"Marlene Balbino","12345678910",passwordEncoder.encode("123456"),UserType.SUPERADMIN));
+                users.add(new User(null,"Miriam Balbino","12345678911",passwordEncoder.encode("123456"),UserType.FUNCIONARIO));
+                users.add(new User(null,"Gil Bahia","12345678912",passwordEncoder.encode("123456"),UserType.FISCAL));
+                users.add(new User(null,"José Santos","12345678913",passwordEncoder.encode("123456"),UserType.VENDEDOR));
+                users.add(new User(null,"Carlos Miguelino","12345678914",passwordEncoder.encode("123456"),UserType.COBRADOR));
                 userRepository.saveAll(users);
 
                 User carregador = userService.findUserById(2L);
