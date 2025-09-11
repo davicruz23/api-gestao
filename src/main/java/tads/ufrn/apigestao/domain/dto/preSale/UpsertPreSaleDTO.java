@@ -18,7 +18,7 @@ public class UpsertPreSaleDTO {
 
     private Long id;
     private LocalDateTime preSaleDate;
-    private Long userId;
+    private Long sellerId;
     private UpsertClientDTO client;
     private List<UpsertPreSaleItemDTO> products;
     private Long chargingId;

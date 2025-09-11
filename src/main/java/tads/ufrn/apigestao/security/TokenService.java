@@ -26,12 +26,17 @@ public class TokenService {
             return JWT.create()
                     .withIssuer(ISSUER)
                     .withSubject(user.getCpf())
+                    .withClaim("id", user.getId())
+                    .withClaim("name", user.getName())
+                    .withClaim("cpf", user.getCpf())
+                    .withClaim("position", user.getPosition().name())
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException("Error while generating token", exception);
         }
     }
+
 
     public String validateToken(String token) {
         try {

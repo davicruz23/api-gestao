@@ -39,7 +39,7 @@ public class PreSaleService {
     public PreSale store(UpsertPreSaleDTO dto) {
         System.out.println("=== INICIANDO MÉTODO STORE ===");
         System.out.println("DTO recebido: " + dto.toString());
-        System.out.println("UserID do DTO: " + dto.getUserId());
+        System.out.println("UserID do DTO: " + dto.getSellerId());
 
         // Busca ou cria o cliente
         System.out.println("=== BUSCANDO/CRIANDO CLIENTE ===");
@@ -48,13 +48,13 @@ public class PreSaleService {
 
         // Busca o vendedor - agora usando o ID do DTO
         System.out.println("=== BUSCANDO VENDEDOR ===");
-        System.out.println("Buscando seller com ID: " + dto.getUserId());
-        Seller seller = sellerService.findById(dto.getUserId());
+        System.out.println("Buscando seller com ID: " + dto.getSellerId());
+        Seller seller = sellerService.findById(dto.getSellerId());
         System.out.println("Seller encontrado: " + (seller != null ? seller.getId() + " - " + seller.getUser().getName() : "NULL"));
 
         if (seller == null) {
             System.out.println("=== ERRO: VENDEDOR NÃO ENCONTRADO ===");
-            throw new RuntimeException("Vendedor não encontrado: " + dto.getUserId());
+            throw new RuntimeException("Vendedor não encontrado: " + dto.getSellerId());
         }
 
         Inspector inspector = inspectorService.findById(1L);
