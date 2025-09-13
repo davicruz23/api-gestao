@@ -13,6 +13,7 @@ public class ChargingMapper {
                 .userName(src.getUser().getName())
                 .chargingDate(src.getCreatedAt())
                 .description(src.getDescription())
+                .data(src.getCreatedAt())
                 .chargingItems(src.getItems().stream().map(ChargingItemMapper::mapper).collect(Collectors.toList()))
                 .build();
     }

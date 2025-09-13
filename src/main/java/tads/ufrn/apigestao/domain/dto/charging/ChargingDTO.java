@@ -21,5 +21,6 @@ public class ChargingDTO {
     private LocalDate chargingDate;
     private String userName;
     private String description;
+    private LocalDate data;
     private List<ChargingItemDTO> chargingItems;
 }
