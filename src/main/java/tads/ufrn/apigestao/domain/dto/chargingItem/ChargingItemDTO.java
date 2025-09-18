@@ -15,4 +15,6 @@ public class ChargingItemDTO {
     private Long productId;
     private Long chargingId;
     private Integer quantity;
+    private String nameProduct;
+    private String brand;
 }
