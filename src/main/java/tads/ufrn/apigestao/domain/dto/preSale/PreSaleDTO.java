@@ -10,6 +10,7 @@ import tads.ufrn.apigestao.domain.PreSaleItem;
 import tads.ufrn.apigestao.domain.User;
 import tads.ufrn.apigestao.domain.dto.preSaleItem.PreSaleItemDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
+import tads.ufrn.apigestao.domain.dto.seller.SellerDetailsDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +23,7 @@ public class PreSaleDTO {
 
     private Long id;
     private LocalDateTime preSaleDate;
-    private User seller;
+    private SellerDetailsDTO seller;
     private Client client;
     private String inspector;
     private List<PreSaleItemDTO> items;

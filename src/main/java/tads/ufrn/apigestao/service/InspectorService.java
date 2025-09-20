@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
+import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.inspector.UpsertInspectorDTO;
+import tads.ufrn.apigestao.domain.dto.seller.SellerIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.user.UpsertUserDTO;
 import tads.ufrn.apigestao.enums.PreSaleStatus;
 import tads.ufrn.apigestao.enums.UserType;
@@ -42,5 +44,12 @@ public class InspectorService {
         inspector.delete();
         repository.save(inspector);
 
+    }
+
+    public InspectorIdUserDTO getInspectorByUserId(Long userId) {
+        Inspector inspector = repository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Seller não encontrado para o usuário: " + userId));
+
+        return new InspectorIdUserDTO(inspector.getId()); // retorna apenas o id do Seller
     }
 }

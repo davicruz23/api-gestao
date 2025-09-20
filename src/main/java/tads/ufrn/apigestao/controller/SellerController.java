@@ -7,6 +7,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.SellerMapper;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 import tads.ufrn.apigestao.domain.dto.seller.SellerDTO;
+import tads.ufrn.apigestao.domain.dto.seller.SellerIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.seller.UpsertSellerDTO;
 import tads.ufrn.apigestao.service.SellerService;
 
@@ -35,5 +36,12 @@ public class SellerController {
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}").buildAndExpand(service.store(model).getId()).toUri();
         return ResponseEntity.created(uri).build();
+    }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<SellerIdUserDTO> getSellerByUserId(@PathVariable Long userId) {
+        SellerIdUserDTO dto = service.getSellerByUserId(userId);
+        System.out.println("chamei o endpoint de seller user: "+ dto.toString());
+        return ResponseEntity.ok(dto);
     }
 }

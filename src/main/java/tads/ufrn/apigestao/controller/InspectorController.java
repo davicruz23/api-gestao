@@ -12,10 +12,12 @@ import tads.ufrn.apigestao.domain.Inspector;
 import tads.ufrn.apigestao.domain.PreSale;
 import tads.ufrn.apigestao.domain.Sale;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorDTO;
+import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.inspector.UpsertInspectorDTO;
 import tads.ufrn.apigestao.domain.dto.preSale.PreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.ApprovePreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
+import tads.ufrn.apigestao.domain.dto.seller.SellerIdUserDTO;
 import tads.ufrn.apigestao.enums.PreSaleStatus;
 import tads.ufrn.apigestao.service.InspectorService;
 import tads.ufrn.apigestao.service.PreSaleService;
@@ -83,6 +85,13 @@ public class InspectorController {
     public ResponseEntity<PreSaleDTO> reject(@PathVariable Long preSaleId) {
         PreSale preSale = preSaleService.rejectPreSale(preSaleId);
         return ResponseEntity.ok(PreSaleMapper.mapper(preSale));
+    }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<InspectorIdUserDTO> getInspectorByUserId(@PathVariable Long userId) {
+        InspectorIdUserDTO dto = service.getInspectorByUserId(userId);
+        System.out.println("chamei o endpoint de seller user: "+ dto.toString());
+        return ResponseEntity.ok(dto);
     }
 
 }

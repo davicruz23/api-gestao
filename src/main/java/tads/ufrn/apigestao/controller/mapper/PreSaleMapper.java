@@ -2,6 +2,7 @@ package tads.ufrn.apigestao.controller.mapper;
 
 import tads.ufrn.apigestao.domain.PreSale;
 import tads.ufrn.apigestao.domain.dto.preSale.PreSaleDTO;
+import tads.ufrn.apigestao.domain.dto.seller.SellerDetailsDTO;
 
 import java.util.stream.Collectors;
 
@@ -10,7 +11,7 @@ public class PreSaleMapper {
         return PreSaleDTO.builder()
                 .id(src.getId())
                 .preSaleDate(src.getPreSaleDate())
-                .seller(src.getSeller().getUser())
+                .seller(SellerMapper.mapperDetails(src.getSeller()))
                 .client(src.getClient())
                 .inspector(src.getInspector().getUser().getName())
                 .status(src.getStatus().toString())

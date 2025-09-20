@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.Seller;
 import tads.ufrn.apigestao.domain.dto.seller.SellerDTO;
+import tads.ufrn.apigestao.domain.dto.seller.SellerDetailsDTO;
+import tads.ufrn.apigestao.domain.dto.seller.SellerIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.seller.UpsertSellerDTO;
 import tads.ufrn.apigestao.repository.SellerRepository;
 
@@ -36,4 +38,12 @@ public class SellerService {
         seller.setTotalCommission(seller.getTotalCommission() + commissionValue);
         repository.save(seller);
     }
+
+    public SellerIdUserDTO getSellerByUserId(Long userId) {
+        Seller seller = repository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Seller não encontrado para o usuário: " + userId));
+
+        return new SellerIdUserDTO(seller.getId()); // retorna apenas o id do Seller
+    }
+
 }
