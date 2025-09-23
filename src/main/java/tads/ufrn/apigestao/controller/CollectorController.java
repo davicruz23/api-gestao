@@ -1,13 +1,19 @@
 package tads.ufrn.apigestao.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tads.ufrn.apigestao.domain.Collector;
+import tads.ufrn.apigestao.domain.Installment;
 import tads.ufrn.apigestao.domain.Sale;
+import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesAssignedDTO;
+import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesDTO;
+import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.service.CollectorService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -24,8 +30,32 @@ public class CollectorController {
         return service.assignSalesByCity(collectorId, city);
     }
 
-    @GetMapping("/{collectorId}/sales")
+    @GetMapping("/{collectorId}/salesssssss")
     public List<Sale> getSales(@PathVariable Long collectorId) {
         return service.getSales(collectorId);
+    }
+
+    @GetMapping("/{collectorId}/sales")
+    public ResponseEntity<List<CollectorSalesDTO>> getCollectorSales(@PathVariable Long collectorId) {
+        List<CollectorSalesDTO> salesDTO = service.getSalesByCollectorDTO(collectorId);
+        return ResponseEntity.ok(salesDTO);
+    }
+
+    @PutMapping("/{id}/pay")
+    public ResponseEntity<?> payInstallment(@PathVariable Long id) {
+        try {
+            InstallmentPaidDTO paidInstallment = service.markAsPaid(id);
+            return ResponseEntity.ok(paidInstallment);
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}/commission")
+    public ResponseEntity<CollectorCommissionDTO> getCurrentMonthCommission(@PathVariable Long id) {
+        CollectorCommissionDTO dto = service.getCurrentMonthCommission(id);
+        return ResponseEntity.ok(dto);
     }
 }

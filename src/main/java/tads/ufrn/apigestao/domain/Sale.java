@@ -34,7 +34,7 @@ public class Sale {
     private PaymentType paymentMethod;
 
     @Min(1)
-    private int installments;
+    private Integer installments;
     private Double total;
 
     @ManyToOne

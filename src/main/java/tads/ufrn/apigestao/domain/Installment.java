@@ -24,4 +24,5 @@ public class Installment {
     private LocalDateTime dueDate;
     private Double amount;
     private boolean paid = false;
+    private LocalDateTime paymentDate;
 }
