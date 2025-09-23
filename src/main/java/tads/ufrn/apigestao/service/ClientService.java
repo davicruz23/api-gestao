@@ -33,8 +33,8 @@ public class ClientService {
     public Client store(UpsertClientDTO dto) {
         Address address = new Address(
                 null,
-                dto.getAddress().getCity(),
                 dto.getAddress().getState(),
+                dto.getAddress().getCity(),
                 dto.getAddress().getStreet(),
                 dto.getAddress().getNumber(),
                 dto.getAddress().getZipCode(),

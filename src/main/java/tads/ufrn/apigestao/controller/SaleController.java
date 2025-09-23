@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.SaleMapper;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
+import tads.ufrn.apigestao.domain.dto.sale.SalesByCityDTO;
 import tads.ufrn.apigestao.domain.dto.sale.UpsertSaleDTO;
 import tads.ufrn.apigestao.service.SaleService;
 
@@ -40,5 +41,10 @@ public class SaleController {
     public ResponseEntity<SaleDTO> deleteById(@PathVariable Long id){
         service.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/sales/by-city")
+    public List<SalesByCityDTO> getSalesByCity() {
+        return service.getSalesGroupedByCity();
     }
 }

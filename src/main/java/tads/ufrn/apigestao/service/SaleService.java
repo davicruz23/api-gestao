@@ -1,10 +1,12 @@
 package tads.ufrn.apigestao.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.*;
+import tads.ufrn.apigestao.domain.dto.sale.SalesByCityDTO;
 import tads.ufrn.apigestao.domain.dto.sale.UpsertSaleDTO;
 import tads.ufrn.apigestao.enums.PaymentType;
 import tads.ufrn.apigestao.repository.InstallmentRepository;
@@ -83,8 +85,6 @@ public class SaleService {
         return sale;
     }
 
-
-
     public void generateInstallments(Sale sale) {
         double installmentValue = sale.getTotal() / sale.getInstallments();
         List<Installment> installments = new ArrayList<>();
@@ -100,5 +100,13 @@ public class SaleService {
         }
 
         installmentRepository.saveAll(installments);
+    }
+
+    public List<SalesByCityDTO> getSalesGroupedByCity() {
+        return repository.countSaleByCity();
+    }
+
+    public List<Sale> getSalesByCollector(Long collectorId) {
+        return repository.findByCollectorId(collectorId);
     }
 }

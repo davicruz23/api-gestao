@@ -65,6 +65,7 @@ public class ApiGestaoApplication {
                 User admin = userService.findUserById(1L);
                 User vendedor = userService.findUserById(4L);
                 User inspector = userService.findUserById(3L);
+                User cobrador = userService.findUserById(5L);
 
                 //salva os produtos
                 List<Product> products = new ArrayList<>();
@@ -101,6 +102,9 @@ public class ApiGestaoApplication {
                 Inspector inspector1 = new Inspector();
                 inspector1.setUser(inspector);
                 inspectorRepository.save(inspector1);
+
+                Collector collector1 = new Collector();
+                collector1.setUser(cobrador);
 
                 /*List<Client> clients = List.of(
                         new Client(null,"Larissa Barbosa","10101010101","84994611450",
