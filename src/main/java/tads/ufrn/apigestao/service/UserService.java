@@ -2,6 +2,7 @@ package tads.ufrn.apigestao.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.User;
@@ -19,6 +20,7 @@ public class UserService {
 
     private final UserRepository repository;
     private final ModelMapper mapper;
+    public final PasswordEncoder passwordEncoder;
 
     public List<User> allUsers() {
         return repository.findAll();
@@ -32,6 +34,7 @@ public class UserService {
     public User store(UpsertUserDTO userDTO) {
         User user = mapper.map(userDTO, User.class);
 
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         if (userDTO.getPosition() != null) {
             user.setPosition(UserType.fromValue(userDTO.getPosition()));
         }

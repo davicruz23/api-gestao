@@ -101,29 +101,33 @@ public class CollectorService {
         );
     }
 
-    public CollectorCommissionDTO getCurrentMonthCommission(Long collectorId) {
+    public CollectorCommissionDTO getCommissionByPeriod(Long collectorId, LocalDateTime startDate, LocalDateTime endDate) {
+        if (endDate.isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("A data final não pode ser posterior à data atual.");
+        }
+        if (endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("A data final não pode ser anterior à data inicial.");
+        }
         Collector collector = repository.findById(collectorId)
                 .orElseThrow(() -> new RuntimeException("Cobrador não encontrado"));
-
-        YearMonth currentMonth = YearMonth.now();
-
-        // Pegar todas as vendas do cobrador
         List<Sale> sales = saleService.getSalesByCollector(collectorId);
-
-        // Somar todas as parcelas pagas do mês atual
         double totalCollected = sales.stream()
                 .flatMap(sale -> installmentRepository.findBySaleId(sale.getId()).stream())
-                .filter(inst -> inst.isPaid() && YearMonth.from(inst.getPaymentDate()).equals(currentMonth))
+                .filter(inst -> inst.isPaid()
+                        && inst.getPaymentDate() != null
+                        && !inst.getPaymentDate().isBefore(startDate)
+                        && !inst.getPaymentDate().isAfter(endDate))
                 .mapToDouble(Installment::getAmount)
                 .sum();
-
-        double commission = totalCollected * 0.01; // 1%
-
+        double commission = totalCollected * 0.01;
         return new CollectorCommissionDTO(
                 collector.getId(),
                 collector.getUser().getName(),
-                currentMonth,
+                startDate,
+                endDate,
                 commission
         );
     }
+
+
 }
