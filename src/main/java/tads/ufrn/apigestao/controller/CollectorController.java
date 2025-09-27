@@ -13,6 +13,7 @@ import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.service.CollectorService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -25,16 +26,17 @@ public class CollectorController {
     private final CollectorService service;
 
     @PostMapping("/{collectorId}/assign/{city}")
-    public CollectorSalesAssignedDTO assignSalesByCity(
+    public ResponseEntity<CollectorSalesAssignedDTO> assignSalesByCity(
             @PathVariable Long collectorId,
             @PathVariable String city
     ) {
-        return service.assignSalesByCity(collectorId, city);
+        System.out.println("entrei no metodo de cidade");
+        return ResponseEntity.ok(service.assignSalesByCity(collectorId, city));
     }
 
     @GetMapping("/{collectorId}/salesssssss")
-    public List<Sale> getSales(@PathVariable Long collectorId) {
-        return service.getSales(collectorId);
+    public ResponseEntity<List<Sale>> getSales(@PathVariable Long collectorId) {
+        return ResponseEntity.ok(service.getSales(collectorId));
     }
 
     @GetMapping("/{collectorId}/sales")
@@ -58,10 +60,11 @@ public class CollectorController {
     @GetMapping("/{id}/commission")
     public ResponseEntity<CollectorCommissionDTO> getCommissionByPeriod(
             @PathVariable Long id,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(defaultValue = "false") boolean saveHistory) {
 
-        CollectorCommissionDTO dto = service.getCommissionByPeriod(id, startDate, endDate);
+        CollectorCommissionDTO dto = service.getCommissionByPeriod(id, startDate, endDate, saveHistory);
         return ResponseEntity.ok(dto);
     }
 

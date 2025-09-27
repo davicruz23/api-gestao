@@ -43,9 +43,9 @@ public class ApiGestaoApplication {
             ChangingService changingService,
             ChargingRepository chargingRepository,
             ChargingItemRepository chargingItemRepository,
-            ClientRepository clientRepository
+            ClientRepository clientRepository,
 
-    ) {
+            CollectorRepository collectorRepository) {
         return args -> {
             try {
                 User user = userService.findUserById(1L);
@@ -54,11 +54,11 @@ public class ApiGestaoApplication {
 
                 //salva os usuarios
                 List<User> users = new ArrayList<>();
-                users.add(new User(null,"Marlene Balbino","1",passwordEncoder.encode("123456"),UserType.SUPERADMIN));
-                users.add(new User(null,"Miriam Balbino","2",passwordEncoder.encode("123456"),UserType.FUNCIONARIO));
-                users.add(new User(null,"Gil Bahia","3",passwordEncoder.encode("123456"),UserType.FISCAL));
-                users.add(new User(null,"José Santos","4",passwordEncoder.encode("123456"),UserType.VENDEDOR));
-                users.add(new User(null,"Carlos Miguelino","5",passwordEncoder.encode("123456"),UserType.COBRADOR));
+                users.add(new User(null,"Marlene Balbino","1",passwordEncoder.encode("123"),UserType.SUPERADMIN));
+                users.add(new User(null,"Miriam Balbino","2",passwordEncoder.encode("123"),UserType.FUNCIONARIO));
+                users.add(new User(null,"Gil Bahia","3",passwordEncoder.encode("123"),UserType.FISCAL));
+                users.add(new User(null,"José Santos","4",passwordEncoder.encode("123"),UserType.VENDEDOR));
+                users.add(new User(null,"Carlos Miguelino","5",passwordEncoder.encode("123"),UserType.COBRADOR));
                 userRepository.saveAll(users);
 
                 User carregador = userService.findUserById(2L);
@@ -105,6 +105,7 @@ public class ApiGestaoApplication {
 
                 Collector collector1 = new Collector();
                 collector1.setUser(cobrador);
+                collectorRepository.save(collector1);
 
                 /*List<Client> clients = List.of(
                         new Client(null,"Larissa Barbosa","10101010101","84994611450",

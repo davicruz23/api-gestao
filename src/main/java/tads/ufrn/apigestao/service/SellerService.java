@@ -1,16 +1,18 @@
 package tads.ufrn.apigestao.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
-import tads.ufrn.apigestao.domain.Seller;
-import tads.ufrn.apigestao.domain.dto.seller.SellerDTO;
-import tads.ufrn.apigestao.domain.dto.seller.SellerDetailsDTO;
-import tads.ufrn.apigestao.domain.dto.seller.SellerIdUserDTO;
-import tads.ufrn.apigestao.domain.dto.seller.UpsertSellerDTO;
+import tads.ufrn.apigestao.domain.*;
+import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
+import tads.ufrn.apigestao.domain.dto.seller.*;
+import tads.ufrn.apigestao.repository.CommissionHistoryRepository;
+import tads.ufrn.apigestao.repository.InstallmentRepository;
 import tads.ufrn.apigestao.repository.SellerRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,16 +36,15 @@ public class SellerService {
         return repository.save(mapper.map(seller, Seller.class));
     }
 
-    public void addCommission(Seller seller, double commissionValue) {
-        seller.setTotalCommission(seller.getTotalCommission() + commissionValue);
-        repository.save(seller);
-    }
+//    public void addCommission(Seller seller, double commissionValue) {
+//        seller.setTotalCommission(seller.getTotalCommission() + commissionValue);
+//        repository.save(seller);
+//    }
 
     public SellerIdUserDTO getSellerByUserId(Long userId) {
         Seller seller = repository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Seller não encontrado para o usuário: " + userId));
 
-        return new SellerIdUserDTO(seller.getId()); // retorna apenas o id do Seller
+        return new SellerIdUserDTO(seller.getId());
     }
-
 }

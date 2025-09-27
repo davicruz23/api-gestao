@@ -10,6 +10,7 @@ import tads.ufrn.apigestao.domain.dto.sale.SalesByCityDTO;
 import tads.ufrn.apigestao.domain.dto.sale.UpsertSaleDTO;
 import tads.ufrn.apigestao.enums.PaymentType;
 import tads.ufrn.apigestao.repository.InstallmentRepository;
+import tads.ufrn.apigestao.repository.PreSaleRepository;
 import tads.ufrn.apigestao.repository.SaleRepository;
 
 import java.time.LocalDateTime;
@@ -24,9 +25,9 @@ public class SaleService {
 
     private final SaleRepository repository;
     private final PreSaleService preSaleService;
-    private final SellerService sellerService;
     private final InstallmentRepository installmentRepository;
     private final ModelMapper mapper;
+    private final PreSaleRepository  preSaleRepository;
 
     public List<Sale> findAll(){
         return repository.findAll();
@@ -60,6 +61,7 @@ public class SaleService {
 
     }
 
+    @Transactional
     public Sale approvePreSale(Long preSaleId, Inspector inspector, PaymentType paymentMethod, int installments) {
         PreSale preSale = preSaleService.approvePreSale(preSaleId, inspector);
 
@@ -75,9 +77,10 @@ public class SaleService {
                 .sum();
         sale.setTotal(total);
 
-        double commissionValue = total < 1000 ? total * 0.09 : total * 0.045;
+        //preSale.setTotalPreSale(total);
+        preSaleRepository.save(preSale);
 
-        sellerService.addCommission(preSale.getSeller(), commissionValue);
+
 
         repository.save(sale);
         generateInstallments(sale);

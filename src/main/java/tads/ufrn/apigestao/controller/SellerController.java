@@ -1,17 +1,23 @@
 package tads.ufrn.apigestao.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.SellerMapper;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
+import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
+import tads.ufrn.apigestao.domain.dto.seller.SellerCommissionDTO;
 import tads.ufrn.apigestao.domain.dto.seller.SellerDTO;
 import tads.ufrn.apigestao.domain.dto.seller.SellerIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.seller.UpsertSellerDTO;
+import tads.ufrn.apigestao.service.PreSaleService;
 import tads.ufrn.apigestao.service.SellerService;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -20,6 +26,7 @@ import java.util.List;
 public class SellerController {
 
     private final SellerService service;
+    private final PreSaleService preSaleService;
 
     @GetMapping("/all")
     public ResponseEntity<List<SellerDTO>> findAll() {
@@ -42,6 +49,17 @@ public class SellerController {
     public ResponseEntity<SellerIdUserDTO> getSellerByUserId(@PathVariable Long userId) {
         SellerIdUserDTO dto = service.getSellerByUserId(userId);
         System.out.println("chamei o endpoint de seller user: "+ dto.toString());
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{id}/commission")
+    public ResponseEntity<SellerCommissionDTO> getCommissionByPeriod(
+            @PathVariable Long id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(defaultValue = "false") boolean saveHistory) {
+
+        SellerCommissionDTO dto = preSaleService.getCommissionByPeriod(id, startDate, endDate, saveHistory);
         return ResponseEntity.ok(dto);
     }
 }

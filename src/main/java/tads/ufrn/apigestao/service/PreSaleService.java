@@ -8,9 +8,13 @@ import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.preSale.UpsertPreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.preSaleItem.UpsertPreSaleItemDTO;
+import tads.ufrn.apigestao.domain.dto.seller.SellerCommissionDTO;
 import tads.ufrn.apigestao.enums.PreSaleStatus;
+import tads.ufrn.apigestao.repository.CommissionHistoryRepository;
 import tads.ufrn.apigestao.repository.PreSaleRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +26,9 @@ public class PreSaleService {
     private final PreSaleRepository repository;
     private final ClientService clientService;
     private final SellerService sellerService;
-    private final ModelMapper mapper;
     private final ChangingService changingService;
     private final InspectorService inspectorService;
+    private final CommissionHistoryRepository commissionHistoryRepository;
 
     public List<PreSale> findAll(){
         return repository.findAll();
@@ -59,7 +63,6 @@ public class PreSaleService {
 
         Inspector inspector = inspectorService.findById(1L);
 
-        System.out.println("=== CRIANDO PRÉ-VENDA ===");
         PreSale preSale = new PreSale();
         preSale.setPreSaleDate(dto.getPreSaleDate());
         preSale.setSeller(seller);
@@ -69,17 +72,9 @@ public class PreSaleService {
         preSale.setItems(new ArrayList<>());
         System.out.println("Pré-venda criada com seller: " + seller.getId() + " e client: " + client.getId());
 
-        System.out.println("=== BUSCANDO CARREGAMENTO ===");
-        System.out.println("Buscando charging com ID: " + dto.getChargingId());
         Charging charging = changingService.findById(dto.getChargingId());
-        System.out.println("Charging encontrado: " + (charging != null ? charging.getId() + " - Itens: " + charging.getItems().size() : "NULL"));
-
-        System.out.println("=== PROCESSANDO PRODUTOS ===");
-        System.out.println("Quantidade de produtos no DTO: " + dto.getProducts().size());
 
         for (UpsertPreSaleItemDTO prodDTO : dto.getProducts()) {
-            System.out.println("Processando produto ID: " + prodDTO.getProductId() + ", Quantidade: " + prodDTO.getQuantity());
-
             assert charging != null;
             ChargingItem ci = charging.getItems().stream()
                     .filter(item -> item.getProduct().getId().equals(prodDTO.getProductId()))
@@ -89,33 +84,27 @@ public class PreSaleService {
                         return new RuntimeException("Produto não encontrado no carregamento: " + prodDTO.getProductId());
                     });
 
-            System.out.println("ChargingItem encontrado - Produto: " + ci.getProduct().getName() + ", Quantidade disponível: " + ci.getQuantity());
-
             if (ci.getQuantity() < prodDTO.getQuantity()) {
                 System.out.println("ERRO: Quantidade insuficiente. Disponível: " + ci.getQuantity() + ", Solicitado: " + prodDTO.getQuantity());
                 throw new RuntimeException("Quantidade insuficiente no carregamento para o produto: " + ci.getProduct().getName());
             }
 
-            // Atualiza a quantidade no carregamento
             ci.setQuantity(ci.getQuantity() - prodDTO.getQuantity());
-            System.out.println("Quantidade atualizada: " + ci.getQuantity() + " para produto: " + ci.getProduct().getName());
 
             PreSaleItem preSaleItem = new PreSaleItem();
             preSaleItem.setPreSale(preSale);
             preSaleItem.setProduct(ci.getProduct());
             preSaleItem.setChargingItem(ci);
             preSaleItem.setQuantity(prodDTO.getQuantity());
-
             preSale.getItems().add(preSaleItem);
-            System.out.println("Item adicionado à pré-venda");
         }
 
-        System.out.println("=== SALVANDO PRÉ-VENDA ===");
-        PreSale savedPreSale = repository.save(preSale);
-        System.out.println("Pré-venda salva com ID: " + savedPreSale.getId());
-        System.out.println("=== MÉTODO FINALIZADO COM SUCESSO ===");
+        double totalPreSale = preSale.getItems().stream()
+                .mapToDouble(item -> item.getProduct().getValue() * item.getQuantity())
+                .sum();
+        preSale.setTotalPreSale(totalPreSale);
 
-        return savedPreSale;
+        return repository.save(preSale);
     }
 
     public void deleteById(Long id){
@@ -158,6 +147,59 @@ public class PreSaleService {
 
     public List<PreSale> listAllPreSales(Long inspectorId, PreSaleStatus status) {
         return repository.findByInspectorIdAndStatus(inspectorId, status);
+    }
+
+    public List<PreSale> getPreSalesBySeller(Long sellerId) {
+        return repository.findBySellerId(sellerId);
+    }
+
+    @Transactional
+    public SellerCommissionDTO getCommissionByPeriod(
+            Long sellerId,
+            LocalDate startDate,
+            LocalDate endDate,
+            boolean saveHistory) {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("A data final não pode ser anterior à data inicial.");
+        }
+
+        Seller seller = sellerService.findById(sellerId);
+
+        List<PreSale> preSales = getPreSalesBySeller(sellerId).stream()
+                .filter(preSale -> preSale.getStatus() == PreSaleStatus.APROVADA)
+                .filter(preSale -> preSale.getPreSaleDate() != null
+                        && !preSale.getPreSaleDate().isBefore(startDate)
+                        && !preSale.getPreSaleDate().isAfter(endDate))
+                .toList();
+
+        double totalCommission = preSales.stream()
+                .mapToDouble(preSale -> {
+                    double total = preSale.getTotalPreSale() != null ? preSale.getTotalPreSale() : 0.0;
+                    double rate = total <= 1000 ? 0.09 : 0.045;
+                    return total * rate;
+                })
+                .sum();
+
+        if (saveHistory) {
+            CommissionHistory history = new CommissionHistory();
+            history.setSeller(seller);
+            history.setGeneratedAt(now);
+            history.setStartDate(startDate);
+            history.setEndDate(endDate);
+            history.setAmount(totalCommission);
+            commissionHistoryRepository.save(history);
+        }
+
+        return new SellerCommissionDTO(
+                seller.getId(),
+                seller.getUser().getName(),
+                startDate,
+                endDate,
+                totalCommission
+        );
     }
 
 }

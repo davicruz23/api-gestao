@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.enums.PreSaleStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,9 @@ public class PreSale {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime preSaleDate;
+    private LocalDate preSaleDate;
+
+    private Double totalPreSale;
 
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
