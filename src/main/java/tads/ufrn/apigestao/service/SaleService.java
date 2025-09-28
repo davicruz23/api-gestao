@@ -62,7 +62,7 @@ public class SaleService {
     }
 
     @Transactional
-    public Sale approvePreSale(Long preSaleId, Inspector inspector, PaymentType paymentMethod, int installments) {
+    public Sale approvePreSale(Long preSaleId, Inspector inspector, PaymentType paymentMethod, int installments, Double cashPaid) {
         PreSale preSale = preSaleService.approvePreSale(preSaleId, inspector);
 
         Sale sale = new Sale();
@@ -77,21 +77,52 @@ public class SaleService {
                 .sum();
         sale.setTotal(total);
 
-        //preSale.setTotalPreSale(total);
-        preSaleRepository.save(preSale);
-
-
-
         repository.save(sale);
-        generateInstallments(sale);
+
+        // Pagamento à vista (se houver)
+        if (cashPaid != null && cashPaid > 0) {
+            Installment upfront = new Installment();
+            upfront.setSale(sale);
+            upfront.setAmount(cashPaid);
+            upfront.setPaid(true);
+            upfront.setPaymentDate(LocalDateTime.now());
+            upfront.setDueDate(LocalDateTime.now());
+            upfront.setPaymentType(PaymentType.CASH);
+            installmentRepository.save(upfront);
+        }
+
+        double remaining = total - (cashPaid != null ? cashPaid : 0.0);
+        if (remaining > 0 && installments > 0) {
+            double installmentValue = remaining / installments;
+            LocalDateTime firstDueDate = sale.getSaleDate().plusDays(30);
+
+            for (int i = 0; i < installments; i++) {
+                Installment inst = new Installment();
+                inst.setSale(sale);
+                inst.setAmount(installmentValue);
+                inst.setDueDate(firstDueDate.plusMonths(i));
+                inst.setPaid(false);
+                inst.setPaymentType(PaymentType.CREDIT);
+                installmentRepository.save(inst);
+            }
+        }
 
         return sale;
     }
 
-    public void generateInstallments(Sale sale) {
-        double installmentValue = sale.getTotal() / sale.getInstallments();
+
+
+    public void generateInstallments(Sale sale, double amountToParcel) {
+        // Se não tiver parcelas, não faz nada
+        if (sale.getInstallments() <= 0) {
+            return;
+        }
+
+        // Divide o valor restante igualmente entre as parcelas
+        double installmentValue = amountToParcel / sale.getInstallments();
         List<Installment> installments = new ArrayList<>();
 
+        // Primeira parcela para 30 dias após a data da venda
         LocalDateTime firstDueDate = sale.getSaleDate().plusDays(30);
 
         for (int i = 0; i < sale.getInstallments(); i++) {
@@ -104,6 +135,7 @@ public class SaleService {
 
         installmentRepository.saveAll(installments);
     }
+
 
     public List<SalesByCityDTO> getSalesGroupedByCity() {
         return repository.countSaleByCity();

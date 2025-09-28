@@ -14,5 +14,7 @@ public class ApprovePreSaleDTO {
     private Long inspectorId;
     private PaymentType paymentMethod;
     private int installments;
+    private Double cashPaid;
 }
+
 

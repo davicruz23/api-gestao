@@ -12,6 +12,7 @@ public class ChargingItemMapper {
                 .quantity(src.getQuantity())
                 .nameProduct(src.getProduct().getName())
                 .brand(src.getProduct().getBrand())
+                .priceProduct(src.getProduct().getValue())
                 .build();
     }
 }

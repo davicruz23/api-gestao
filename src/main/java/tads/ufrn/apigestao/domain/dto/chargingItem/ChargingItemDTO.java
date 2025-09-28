@@ -17,4 +17,5 @@ public class ChargingItemDTO {
     private Integer quantity;
     private String nameProduct;
     private String brand;
+    private Double priceProduct;
 }

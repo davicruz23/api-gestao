@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tads.ufrn.apigestao.enums.PaymentType;
 
 import java.time.LocalDateTime;
 
@@ -25,4 +26,7 @@ public class Installment {
     private Double amount;
     private boolean paid = false;
     private LocalDateTime paymentDate;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
 }

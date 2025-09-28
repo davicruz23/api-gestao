@@ -74,11 +74,13 @@ public class InspectorController {
                 preSaleId,
                 inspector,
                 dto.getPaymentMethod(),
-                dto.getInstallments()
+                dto.getInstallments(),
+                dto.getCashPaid()
         );
 
         return ResponseEntity.ok(SaleMapper.toDTO(sale));
     }
+
 
 
     @PostMapping("/pre-sales/{preSaleId}/reject")
