@@ -16,6 +16,6 @@ import java.util.List;
 public class CollectorDTO {
 
     private Long id;
-    private User user;
+    private String collectorName;
     private List<SaleDTO> sales;
 }

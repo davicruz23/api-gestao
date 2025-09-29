@@ -1,8 +1,10 @@
 package tads.ufrn.apigestao.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tads.ufrn.apigestao.controller.mapper.SaleMapper;
 import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.CommissionHistory;
 import tads.ufrn.apigestao.domain.Installment;
@@ -12,6 +14,7 @@ import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesAssignedDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
+import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.repository.CollectorRepository;
 import tads.ufrn.apigestao.repository.CommissionHistoryRepository;
 import tads.ufrn.apigestao.repository.InstallmentRepository;
@@ -31,6 +34,10 @@ public class CollectorService {
     private final SaleService saleService;
     private final InstallmentRepository installmentRepository;
     private final CommissionHistoryRepository commissionHistoryRepository;
+
+    public List<Collector> findAll() {
+        return repository.findAll();
+    }
 
     @Transactional
     public CollectorSalesAssignedDTO assignSalesByCity(Long collectorId, String city) {
@@ -141,6 +148,19 @@ public class CollectorService {
                 endDate,
                 commission
         );
+    }
+
+    public List<SaleCollectorDTO> findSalesByCollectorId(Long collectorId) {
+
+        if (!repository.existsById(collectorId)) {
+            throw new EntityNotFoundException("Collector com ID " + collectorId + " não encontrado.");
+        }
+
+        List<Sale> sales = saleRepository.findByCollectorId(collectorId);
+
+        return sales.stream()
+                .map(SaleMapper::saleCollector)
+                .toList();
     }
 
 

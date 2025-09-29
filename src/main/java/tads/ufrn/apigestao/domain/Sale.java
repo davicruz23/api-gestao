@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.enums.PaymentType;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class Sale {
     private Long id;
 
     private String numberSale;
-    private LocalDateTime saleDate;
+    private LocalDate saleDate;
 
     @OneToOne
     @JoinColumn(name = "pre_sale_id", nullable = false)

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.enums.PaymentType;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,7 +23,7 @@ public class Installment {
     @JoinColumn(name = "sale_id", nullable = false)
     private Sale sale;
 
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     private Double amount;
     private boolean paid = false;
     private LocalDateTime paymentDate;

@@ -13,6 +13,7 @@ import tads.ufrn.apigestao.repository.InstallmentRepository;
 import tads.ufrn.apigestao.repository.PreSaleRepository;
 import tads.ufrn.apigestao.repository.SaleRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,7 @@ public class SaleService {
 
         Sale sale = new Sale();
         sale.setPreSale(preSale);
-        sale.setSaleDate(LocalDateTime.now());
+        sale.setSaleDate(LocalDate.now());
         sale.setNumberSale(UUID.randomUUID().toString());
         sale.setInstallments(installments);
         sale.setPaymentMethod(paymentMethod);
@@ -86,7 +87,7 @@ public class SaleService {
             upfront.setAmount(cashPaid);
             upfront.setPaid(true);
             upfront.setPaymentDate(LocalDateTime.now());
-            upfront.setDueDate(LocalDateTime.now());
+            upfront.setDueDate(LocalDate.now());
             upfront.setPaymentType(PaymentType.CASH);
             installmentRepository.save(upfront);
         }
@@ -94,7 +95,7 @@ public class SaleService {
         double remaining = total - (cashPaid != null ? cashPaid : 0.0);
         if (remaining > 0 && installments > 0) {
             double installmentValue = remaining / installments;
-            LocalDateTime firstDueDate = sale.getSaleDate().plusDays(30);
+            LocalDate firstDueDate = sale.getSaleDate().plusDays(30);
 
             for (int i = 0; i < installments; i++) {
                 Installment inst = new Installment();
@@ -123,7 +124,7 @@ public class SaleService {
         List<Installment> installments = new ArrayList<>();
 
         // Primeira parcela para 30 dias após a data da venda
-        LocalDateTime firstDueDate = sale.getSaleDate().plusDays(30);
+        LocalDate firstDueDate = sale.getSaleDate().plusDays(30);
 
         for (int i = 0; i < sale.getInstallments(); i++) {
             Installment inst = new Installment();

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tads.ufrn.apigestao.domain.dto.client.ClientDTO;
+import tads.ufrn.apigestao.domain.dto.client.ClientSaleDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 
@@ -14,15 +16,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SaleDTO {
+public class SaleCollectorDTO {
 
     private Long id;
-    private String numberSale;
     private LocalDate saleDate;
-    private String paymentType;
-    private Integer nParcel;
-    private String clientName;
-    private Double total;
+    private ClientSaleDTO client;
     private List<ProductSaleDTO> products;
     private List<InstallmentDTO> installments;
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.domain.Sale;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class InstallmentDTO {
 
     private Long id;
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     private Double amount;
     private boolean paid = false;
 }

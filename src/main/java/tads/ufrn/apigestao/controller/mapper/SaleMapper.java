@@ -4,6 +4,7 @@ import tads.ufrn.apigestao.domain.Sale;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
+import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class SaleMapper {
                         src.getInstallments() != 0 && src.getId() != null ?
                                 src.getInstallmentsEntities().stream()
                                         .map(inst -> InstallmentDTO.builder()
+                                                .id(inst.getId())
                                                 .dueDate(inst.getDueDate())
                                                 .amount(inst.getAmount())
                                                 .paid(inst.isPaid())
@@ -49,4 +51,30 @@ public class SaleMapper {
                 .total(sale.getTotal())
                 .build();
     }
+
+    public static SaleCollectorDTO saleCollector(Sale src) {
+        return SaleCollectorDTO.builder()
+                .id(src.getId())
+                .saleDate(src.getSaleDate())
+                .client(src.getPreSale().getClient() != null
+                        ? ClientMapper.clientSale(src.getPreSale().getClient())
+                        : null)
+                .products(src.getPreSale().getItems().stream()
+                        .map(item -> ProductMapper.mapperProductSale(item.getProduct()))
+                        .toList())
+                .installments(
+                        src.getInstallments() != 0 && src.getId() != null ?
+                                src.getInstallmentsEntities().stream()
+                                        .map(inst -> InstallmentDTO.builder()
+                                                .id(inst.getId())
+                                                .dueDate(inst.getDueDate())
+                                                .amount(inst.getAmount())
+                                                .paid(inst.isPaid())
+                                                .build())
+                                        .toList()
+                                : List.of()
+                )
+                .build();
+    }
+
 }

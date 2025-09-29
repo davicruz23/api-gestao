@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CollectorSalesDTO {
     private Long saleId;
-    private LocalDateTime saleDate; // ADICIONADO
+    private LocalDate saleDate; // ADICIONADO
     private Double total;
     private Integer installmentsCount;
     private Boolean fullyPaid;

@@ -4,17 +4,19 @@ import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tads.ufrn.apigestao.controller.mapper.CollectorMapper;
 import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.Installment;
 import tads.ufrn.apigestao.domain.Sale;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
+import tads.ufrn.apigestao.domain.dto.collector.CollectorDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesAssignedDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
+import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.service.CollectorService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +39,11 @@ public class CollectorController {
     @GetMapping("/{collectorId}/salesssssss")
     public ResponseEntity<List<Sale>> getSales(@PathVariable Long collectorId) {
         return ResponseEntity.ok(service.getSales(collectorId));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<CollectorDTO>> findAll() {
+        return ResponseEntity.ok(service.findAll().stream().map(CollectorMapper::mapper).toList());
     }
 
     @GetMapping("/{collectorId}/sales")
@@ -66,6 +73,12 @@ public class CollectorController {
 
         CollectorCommissionDTO dto = service.getCommissionByPeriod(id, startDate, endDate, saveHistory);
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{collectorId}/sales/teste")
+    public ResponseEntity<List<SaleCollectorDTO>> getSalesByCollector(@PathVariable Long collectorId) {
+        List<SaleCollectorDTO> sales = service.findSalesByCollectorId(collectorId);
+        return ResponseEntity.ok(sales);
     }
 
 }
