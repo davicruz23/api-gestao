@@ -5,13 +5,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tads.ufrn.apigestao.controller.mapper.SaleMapper;
-import tads.ufrn.apigestao.domain.Collector;
-import tads.ufrn.apigestao.domain.CommissionHistory;
-import tads.ufrn.apigestao.domain.Installment;
-import tads.ufrn.apigestao.domain.Sale;
+import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
+import tads.ufrn.apigestao.domain.dto.collector.CollectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesAssignedDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesDTO;
+import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
@@ -156,12 +155,17 @@ public class CollectorService {
             throw new EntityNotFoundException("Collector com ID " + collectorId + " não encontrado.");
         }
 
-        List<Sale> sales = saleRepository.findByCollectorId(collectorId);
+        List<Sale> sales = saleRepository.findByCollectorIdWithPendingInstallments(collectorId);
 
         return sales.stream()
                 .map(SaleMapper::saleCollector)
                 .toList();
     }
 
+    public CollectorIdUserDTO getCollectorByUserId(Long userId) {
+        Collector collector = repository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Collector não encontrado para o usuário: " + userId));
 
+        return new CollectorIdUserDTO(collector.getId());
+    }
 }

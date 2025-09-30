@@ -8,10 +8,8 @@ import tads.ufrn.apigestao.controller.mapper.CollectorMapper;
 import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.Installment;
 import tads.ufrn.apigestao.domain.Sale;
-import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
-import tads.ufrn.apigestao.domain.dto.collector.CollectorDTO;
-import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesAssignedDTO;
-import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesDTO;
+import tads.ufrn.apigestao.domain.dto.collector.*;
+import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.service.CollectorService;
@@ -46,11 +44,11 @@ public class CollectorController {
         return ResponseEntity.ok(service.findAll().stream().map(CollectorMapper::mapper).toList());
     }
 
-    @GetMapping("/{collectorId}/sales")
-    public ResponseEntity<List<CollectorSalesDTO>> getCollectorSales(@PathVariable Long collectorId) {
-        List<CollectorSalesDTO> salesDTO = service.getSalesByCollectorDTO(collectorId);
-        return ResponseEntity.ok(salesDTO);
-    }
+//    @GetMapping("/{collectorId}/sales")
+//    public ResponseEntity<List<CollectorSalesDTO>> getCollectorSales(@PathVariable Long collectorId) {
+//        List<CollectorSalesDTO> salesDTO = service.getSalesByCollectorDTO(collectorId);
+//        return ResponseEntity.ok(salesDTO);
+//    }
 
     @PutMapping("/{id}/pay")
     public ResponseEntity<?> payInstallment(@PathVariable Long id) {
@@ -75,10 +73,17 @@ public class CollectorController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{collectorId}/sales/teste")
+    @GetMapping("/{collectorId}/sales")
     public ResponseEntity<List<SaleCollectorDTO>> getSalesByCollector(@PathVariable Long collectorId) {
         List<SaleCollectorDTO> sales = service.findSalesByCollectorId(collectorId);
         return ResponseEntity.ok(sales);
+    }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<CollectorIdUserDTO> getCollectorByUserId(@PathVariable Long userId) {
+        CollectorIdUserDTO dto = service.getCollectorByUserId(userId);
+        System.out.println("chamei o endpoint de seller user: "+ dto.toString());
+        return ResponseEntity.ok(dto);
     }
 
 }

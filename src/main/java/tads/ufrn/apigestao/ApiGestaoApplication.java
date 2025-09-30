@@ -75,24 +75,24 @@ public class ApiGestaoApplication {
                 products.add(new Product(null,"Jogo de Talheres","Tramontina",50,100.00, ProductStatus.DISPONIVEL,admin,null));
                 productRepository.saveAll(products);
 
-                List<Product> managedProducts = productRepository.findAll();
-
-                //salva o carregamento com o usuario
-                Charging charging = new Charging();
-                charging.setDescription("Carregamento do dia");
-                charging.setDate(LocalDate.now());
-                charging.setCreatedAt(LocalDate.now());
-                charging.setUser(carregador);
-
-                for (Product p : managedProducts) {
-                    charging.addItem(p, 10);
-                    p.setAmount(p.getAmount() - 10);
-                }
-
-                System.out.println("terminei de inserir os dados");
-
-                chargingRepository.save(charging);
-                productRepository.saveAll(managedProducts);
+//                List<Product> managedProducts = productRepository.findAll();
+//
+//                //salva o carregamento com o usuario
+//                Charging charging = new Charging();
+//                charging.setDescription("Carregamento do dia");
+//                charging.setDate(LocalDate.now());
+//                charging.setCreatedAt(LocalDate.now());
+//                charging.setUser(carregador);
+//
+//                for (Product p : managedProducts) {
+//                    charging.addItem(p, 10);
+//                    p.setAmount(p.getAmount() - 10);
+//                }
+//
+//                System.out.println("terminei de inserir os dados");
+//
+//                chargingRepository.save(charging);
+//                productRepository.saveAll(managedProducts);
 
                 //salva o id de um vendedor
                 Seller seller = new Seller();

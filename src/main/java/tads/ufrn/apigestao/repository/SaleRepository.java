@@ -32,4 +32,18 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     List<Sale> findUnassignedSalesByCity(String city);
 
     List<Sale> findByCollectorId(Long collectorId);
+
+    @Query("""
+    SELECT s
+    FROM Sale s
+    WHERE s.collector.id = :collectorId
+      AND EXISTS (
+          SELECT 1
+          FROM Installment i
+          WHERE i.sale.id = s.id
+            AND i.paid = false
+      )
+""")
+    List<Sale> findByCollectorIdWithPendingInstallments(@Param("collectorId") Long collectorId);
+
 }
