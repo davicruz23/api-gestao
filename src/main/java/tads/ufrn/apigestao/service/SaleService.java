@@ -28,7 +28,6 @@ public class SaleService {
     private final PreSaleService preSaleService;
     private final InstallmentRepository installmentRepository;
     private final ModelMapper mapper;
-    private final PreSaleRepository  preSaleRepository;
 
     public List<Sale> findAll(){
         return repository.findAll();
@@ -42,18 +41,6 @@ public class SaleService {
     public Sale store(UpsertSaleDTO sale) {
         return repository.save(mapper.map(sale, Sale.class));
     }
-
-    /*public Product update(ProductDTO product){
-        Product productId = repository.findById(product.getId())
-                .orElseThrow(()-> new RuntimeException("Produto não encontrado"));
-
-        Product p = new Product();
-        p.setName(product.getName());
-        p.setBrand(product.getBrand());
-        p.setAmount(product.getAmount());
-
-        return repository.save(p);
-    }*/
 
     public void deleteById(Long id){
         Sale sale = repository.findById(id)
@@ -110,33 +97,6 @@ public class SaleService {
 
         return sale;
     }
-
-
-
-    public void generateInstallments(Sale sale, double amountToParcel) {
-        // Se não tiver parcelas, não faz nada
-        if (sale.getInstallments() <= 0) {
-            return;
-        }
-
-        // Divide o valor restante igualmente entre as parcelas
-        double installmentValue = amountToParcel / sale.getInstallments();
-        List<Installment> installments = new ArrayList<>();
-
-        // Primeira parcela para 30 dias após a data da venda
-        LocalDate firstDueDate = sale.getSaleDate().plusDays(30);
-
-        for (int i = 0; i < sale.getInstallments(); i++) {
-            Installment inst = new Installment();
-            inst.setSale(sale);
-            inst.setAmount(installmentValue);
-            inst.setDueDate(firstDueDate.plusMonths(i));
-            installments.add(inst);
-        }
-
-        installmentRepository.saveAll(installments);
-    }
-
 
     public List<SalesByCityDTO> getSalesGroupedByCity() {
         return repository.countSaleByCity();

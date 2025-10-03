@@ -60,36 +60,6 @@ public class CollectorService {
         return saleService.getSalesByCollector(collectorId);
     }
 
-    public List<CollectorSalesDTO> getSalesByCollectorDTO(Long collectorId) {
-        List<Sale> sales = saleService.getSalesByCollector(collectorId);
-
-        return sales.stream().map(sale -> {
-            Integer installmentsCount = sale.getInstallments();
-            List<Installment> installments = installmentRepository.findBySaleId(sale.getId());
-
-            List<InstallmentDTO> installmentDTOs = installments.stream()
-                    .map(inst -> new InstallmentDTO(
-                            inst.getId(),
-                            inst.getDueDate(),
-                            inst.getAmount(),
-                            inst.isPaid()
-                    ))
-                    .toList();
-
-            // Verificar se todas as parcelas estão pagas
-            boolean fullyPaid = installmentDTOs.stream().allMatch(InstallmentDTO::isPaid);
-
-            return new CollectorSalesDTO(
-                    sale.getId(),
-                    sale.getSaleDate(),
-                    sale.getTotal(),
-                    installmentsCount,
-                    fullyPaid,
-                    installmentDTOs
-            );
-        }).toList();
-    }
-
     @Transactional
     public InstallmentPaidDTO markAsPaid(Long installmentId) {
         Installment installment = installmentRepository.findById(installmentId)

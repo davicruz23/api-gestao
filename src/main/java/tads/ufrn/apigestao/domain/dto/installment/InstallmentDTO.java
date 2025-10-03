@@ -20,4 +20,5 @@ public class InstallmentDTO {
     private LocalDate dueDate;
     private Double amount;
     private boolean paid = false;
+    private InstallmentStatusDTO status;
 }

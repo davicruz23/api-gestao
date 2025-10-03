@@ -1,10 +1,15 @@
 package tads.ufrn.apigestao.controller;
 
+import com.google.zxing.WriterException;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tads.ufrn.apigestao.controller.mapper.CollectorMapper;
+import tads.ufrn.apigestao.domain.CollectionAttempt;
 import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.Installment;
 import tads.ufrn.apigestao.domain.Sale;
@@ -12,9 +17,14 @@ import tads.ufrn.apigestao.domain.dto.collector.*;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
+import tads.ufrn.apigestao.enums.PaymentType;
+import tads.ufrn.apigestao.service.CollectionAttemptService;
 import tads.ufrn.apigestao.service.CollectorService;
+import tads.ufrn.apigestao.service.PixService;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +34,8 @@ import java.util.Map;
 public class CollectorController {
 
     private final CollectorService service;
+    private final CollectionAttemptService collectionAttemptService;
+    private final PixService pixService;
 
     @PostMapping("/{collectorId}/assign/{city}")
     public ResponseEntity<CollectorSalesAssignedDTO> assignSalesByCity(
@@ -84,6 +96,64 @@ public class CollectorController {
         CollectorIdUserDTO dto = service.getCollectorByUserId(userId);
         System.out.println("chamei o endpoint de seller user: "+ dto.toString());
         return ResponseEntity.ok(dto);
+    }
+
+
+
+    @PutMapping("/{collectorId}/installment/{installmentId}/collect")
+    public ResponseEntity<CollectionAttemptDTO> collectInstallment(
+            @PathVariable Long collectorId,
+            @PathVariable Long installmentId,
+            @RequestBody CollectionAttemptDTO dto
+    ) {
+        CollectionAttemptDTO attempt = collectionAttemptService.recordAttempt(
+                collectorId,
+                installmentId,
+                dto.getAmount(),
+                dto.getPaymentMethod(),
+                dto.getLatitude(),
+                dto.getLongitude(),
+                dto.getNote(),
+                dto.getNewDueDate()
+        );
+
+        return ResponseEntity.ok(attempt);
+    }
+
+    @GetMapping("/installment/{id}/pix")
+    public ResponseEntity<byte[]> getPixQrCode(@PathVariable Long id) {
+        try {
+            String brCode = pixService.generateBrCodeForInstallment(id);
+            byte[] qrImage = pixService.generateQrCodeImage(brCode, 300, 300);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_PNG)
+                    .cacheControl(CacheControl.noCache())
+                    .header("Content-Disposition", "inline; filename=\"qrcode.png\"")
+                    .body(qrImage);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/installment/{id}/pix/debug")
+    public ResponseEntity<String> getPixCodeDebug(@PathVariable Long id) {
+        try {
+            String brCode = pixService.generateBrCodeForInstallment(id);
+            return ResponseEntity.ok(brCode);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/collector/{collectorId}/sale/{saleId}/paid-attempts")
+    public ResponseEntity<List<CollectionAttemptMapsDTO>> getPaidAttemptsByCollectorAndSale(
+            @PathVariable Long collectorId,
+            @PathVariable Long saleId
+    ) {
+        List<CollectionAttemptMapsDTO> list = collectionAttemptService.findPaidAttemptsByCollectorAndSale(collectorId, saleId);
+        return ResponseEntity.ok(list);
     }
 
 }

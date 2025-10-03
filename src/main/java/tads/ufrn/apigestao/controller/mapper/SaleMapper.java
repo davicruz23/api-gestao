@@ -2,11 +2,13 @@ package tads.ufrn.apigestao.controller.mapper;
 
 import tads.ufrn.apigestao.domain.Sale;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
+import tads.ufrn.apigestao.domain.dto.installment.InstallmentStatusDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,22 +61,18 @@ public class SaleMapper {
                 .client(src.getPreSale().getClient() != null
                         ? ClientMapper.clientSale(src.getPreSale().getClient())
                         : null)
-                .products(src.getPreSale().getItems().stream()
-                        .map(item -> ProductMapper.mapperProductSale(item.getProduct()))
-                        .toList())
+                .products(
+                        src.getPreSale().getItems().stream()
+                                .map(item -> ProductMapper.mapperProductSale(item.getProduct()))
+                                .toList()
+                )
                 .installments(
-                        src.getInstallments() != 0 && src.getId() != null ?
-                                src.getInstallmentsEntities().stream()
-                                        .map(inst -> InstallmentDTO.builder()
-                                                .id(inst.getId())
-                                                .dueDate(inst.getDueDate())
-                                                .amount(inst.getAmount())
-                                                .paid(inst.isPaid())
-                                                .build())
-                                        .toList()
+                        src.getInstallments() != 0 && src.getId() != null
+                                ? src.getInstallmentsEntities().stream()
+                                .map(InstallmentMapper::mapperStatus)
+                                .toList()
                                 : List.of()
                 )
                 .build();
     }
-
 }
