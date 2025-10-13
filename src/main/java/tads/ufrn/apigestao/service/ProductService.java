@@ -1,8 +1,10 @@
 package tads.ufrn.apigestao.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.LifecycleState;
+import org.springframework.data.domain.Page;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.ChargingItem;
@@ -26,6 +28,11 @@ public class ProductService {
 
     public List<Product> findAll(){
         return repository.findAll();
+    }
+
+    public Page<Product> index(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return repository.findAll(pageable);
     }
 
     public Product findById(Long id) {

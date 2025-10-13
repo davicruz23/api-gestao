@@ -27,6 +27,7 @@ public class PreSaleDTO {
     private SellerDetailsDTO seller;
     private Client client;
     private String inspector;
+    private Double totalPreSale;
     private List<PreSaleItemDTO> items;
     private String status;
 }

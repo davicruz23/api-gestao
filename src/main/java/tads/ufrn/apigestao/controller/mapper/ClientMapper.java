@@ -2,6 +2,7 @@ package tads.ufrn.apigestao.controller.mapper;
 
 import tads.ufrn.apigestao.domain.Client;
 import tads.ufrn.apigestao.domain.dto.client.ClientDTO;
+import tads.ufrn.apigestao.domain.dto.client.ClientHistoryDTO;
 import tads.ufrn.apigestao.domain.dto.client.ClientSaleDTO;
 
 public class ClientMapper {
@@ -27,5 +28,13 @@ public class ClientMapper {
                                 : null
                 )
                 .build();
+    }
+
+    public static ClientHistoryDTO clientHistory(Client src) {
+            return ClientHistoryDTO.builder()
+                    .name(src.getName())
+                    .cpf(src.getCpf())
+                    .address(src.getAddress() != null ? AddressMapper.addressClientHistory(src.getAddress()) : null)
+                    .build();
     }
 }

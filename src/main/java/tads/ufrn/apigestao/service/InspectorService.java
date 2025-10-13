@@ -1,11 +1,14 @@
 package tads.ufrn.apigestao.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
+import tads.ufrn.apigestao.controller.mapper.InspectorMapper;
 import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
+import tads.ufrn.apigestao.domain.dto.inspector.InspectorHistoryPreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.inspector.UpsertInspectorDTO;
 import tads.ufrn.apigestao.domain.dto.seller.SellerIdUserDTO;

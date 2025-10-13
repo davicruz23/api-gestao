@@ -12,6 +12,7 @@ import tads.ufrn.apigestao.domain.Inspector;
 import tads.ufrn.apigestao.domain.PreSale;
 import tads.ufrn.apigestao.domain.Sale;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorDTO;
+import tads.ufrn.apigestao.domain.dto.inspector.InspectorHistoryPreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.inspector.UpsertInspectorDTO;
 import tads.ufrn.apigestao.domain.dto.preSale.PreSaleDTO;
@@ -81,8 +82,6 @@ public class InspectorController {
         return ResponseEntity.ok(SaleMapper.toDTO(sale));
     }
 
-
-
     @PostMapping("/pre-sales/{preSaleId}/reject")
     public ResponseEntity<PreSaleDTO> reject(@PathVariable Long preSaleId) {
         PreSale preSale = preSaleService.rejectPreSale(preSaleId);
@@ -94,6 +93,12 @@ public class InspectorController {
         InspectorIdUserDTO dto = service.getInspectorByUserId(userId);
         System.out.println("chamei o endpoint de seller user: "+ dto.toString());
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{inspectorId}/pre-sales-history")
+    public ResponseEntity<List<InspectorHistoryPreSaleDTO>> getPreSalesByInspector(@PathVariable Long inspectorId) {
+        List<InspectorHistoryPreSaleDTO> list = preSaleService.findPreSalesByInspector(inspectorId);
+        return ResponseEntity.ok(list);
     }
 
 }

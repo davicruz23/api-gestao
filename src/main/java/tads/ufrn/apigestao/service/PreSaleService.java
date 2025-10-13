@@ -5,7 +5,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
+import tads.ufrn.apigestao.controller.mapper.InspectorMapper;
 import tads.ufrn.apigestao.domain.*;
+import tads.ufrn.apigestao.domain.dto.inspector.InspectorHistoryPreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.preSale.UpsertPreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.preSaleItem.UpsertPreSaleItemDTO;
 import tads.ufrn.apigestao.domain.dto.seller.SellerCommissionDTO;
@@ -200,6 +202,14 @@ public class PreSaleService {
                 endDate,
                 totalCommission
         );
+    }
+
+    @Transactional
+    public List<InspectorHistoryPreSaleDTO> findPreSalesByInspector(Long inspectorId) {
+        List<PreSale> preSales = repository.findAllByInspectorId(inspectorId);
+        return preSales.stream()
+                .map(InspectorMapper::mapperHistory)
+                .toList();
     }
 
 }

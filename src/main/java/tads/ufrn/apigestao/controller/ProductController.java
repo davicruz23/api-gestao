@@ -1,6 +1,7 @@
 package tads.ufrn.apigestao.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,6 +27,17 @@ public class ProductController {
     @GetMapping("/all")
     public ResponseEntity<List<ProductDTO>> findAll(){
         return ResponseEntity.ok().body(service.findAll().stream().map(ProductMapper::mapper).toList());
+    }
+
+    @GetMapping("/index")
+    public ResponseEntity<Page<ProductDTO>> index(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<ProductDTO> result = service.index(page, size)
+                .map(ProductMapper::mapper);
+
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")

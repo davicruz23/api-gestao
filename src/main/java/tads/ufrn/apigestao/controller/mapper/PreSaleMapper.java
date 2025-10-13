@@ -14,6 +14,7 @@ public class PreSaleMapper {
                 .seller(SellerMapper.mapperDetails(src.getSeller()))
                 .client(src.getClient())
                 .inspector(src.getInspector().getUser().getName())
+                .totalPreSale(src.getTotalPreSale())
                 .status(src.getStatus().toString())
                 .items(src.getItems().stream().map(PreSaleItemMapper::mapper).collect(Collectors.toList()))
                 .build();
