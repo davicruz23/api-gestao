@@ -15,6 +15,8 @@ public class ApprovePreSaleDTO {
     private PaymentType paymentMethod;
     private int installments;
     private Double cashPaid;
+    private Double latitude;
+    private Double longitude;
 }
 
 

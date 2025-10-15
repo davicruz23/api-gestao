@@ -13,11 +13,13 @@ import tads.ufrn.apigestao.domain.CollectionAttempt;
 import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.Installment;
 import tads.ufrn.apigestao.domain.Sale;
+import tads.ufrn.apigestao.domain.dto.LocationSaleDTO;
 import tads.ufrn.apigestao.domain.dto.collector.*;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.enums.PaymentType;
+import tads.ufrn.apigestao.service.ApprovalLocationService;
 import tads.ufrn.apigestao.service.CollectionAttemptService;
 import tads.ufrn.apigestao.service.CollectorService;
 import tads.ufrn.apigestao.service.PixService;
@@ -25,6 +27,7 @@ import tads.ufrn.apigestao.service.PixService;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +39,7 @@ public class CollectorController {
     private final CollectorService service;
     private final CollectionAttemptService collectionAttemptService;
     private final PixService pixService;
+    private final ApprovalLocationService approvalLocationService;
 
     @PostMapping("/{collectorId}/assign/{city}")
     public ResponseEntity<CollectorSalesAssignedDTO> assignSalesByCity(
@@ -154,6 +158,23 @@ public class CollectorController {
     ) {
         List<CollectionAttemptMapsDTO> list = collectionAttemptService.findPaidAttemptsByCollectorAndSale(collectorId, saleId);
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/collector/sale/{saleId}/location-sale")
+    public ResponseEntity<List<LocationSaleDTO>> getLocationBySaleId(@PathVariable Long saleId) {
+        List<LocationSaleDTO> list = approvalLocationService.getLocationSale(saleId);
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/check-location/{installmentId}")
+    public ResponseEntity<Map<String, Object>> checkLocation(@PathVariable Long installmentId) {
+        boolean withinRadius = service.isAttemptWithinApprovalLocation(installmentId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("installmentId", installmentId);
+        response.put("withinRadius", withinRadius);
+
+        return ResponseEntity.ok(response);
     }
 
 }

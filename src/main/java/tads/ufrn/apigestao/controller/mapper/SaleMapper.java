@@ -7,6 +7,7 @@ import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
+import tads.ufrn.apigestao.domain.dto.sale.SaleLocationDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -73,6 +74,14 @@ public class SaleMapper {
                                 .toList()
                                 : List.of()
                 )
+                .build();
+    }
+
+    public static SaleLocationDTO mapperSaleLocation(Sale src) {
+        return SaleLocationDTO.builder()
+                .saleId(src.getId())
+                .idClient(src.getPreSale().getClient().getId())
+                .clientName(src.getPreSale().getClient().getName())
                 .build();
     }
 }

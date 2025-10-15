@@ -9,6 +9,7 @@ import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.sale.SalesByCityDTO;
 import tads.ufrn.apigestao.domain.dto.sale.UpsertSaleDTO;
 import tads.ufrn.apigestao.enums.PaymentType;
+import tads.ufrn.apigestao.repository.ApprovalLocationRepository;
 import tads.ufrn.apigestao.repository.InstallmentRepository;
 import tads.ufrn.apigestao.repository.PreSaleRepository;
 import tads.ufrn.apigestao.repository.SaleRepository;
@@ -27,6 +28,7 @@ public class SaleService {
     private final SaleRepository repository;
     private final PreSaleService preSaleService;
     private final InstallmentRepository installmentRepository;
+    private final ApprovalLocationRepository approvalLocationRepository;
     private final ModelMapper mapper;
 
     public List<Sale> findAll(){
@@ -50,7 +52,10 @@ public class SaleService {
     }
 
     @Transactional
-    public Sale approvePreSale(Long preSaleId, Inspector inspector, PaymentType paymentMethod, int installments, Double cashPaid) {
+    public Sale approvePreSale(Long preSaleId, Inspector inspector,
+                               PaymentType paymentMethod, int installments,
+                               Double cashPaid, Double latitude, Double longitude) {
+
         PreSale preSale = preSaleService.approvePreSale(preSaleId, inspector);
 
         Sale sale = new Sale();
@@ -67,7 +72,16 @@ public class SaleService {
 
         repository.save(sale);
 
-        // Pagamento à vista (se houver)
+        ApprovalLocation location = new ApprovalLocation();
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        location.setCapturedAt(LocalDateTime.now());
+        location.setInspector(inspector.getUser());
+        location.setSale(sale);
+        approvalLocationRepository.save(location);
+
+        sale.setApprovalLocation(location);
+
         if (cashPaid != null && cashPaid > 0) {
             Installment upfront = new Installment();
             upfront.setSale(sale);
@@ -97,6 +111,7 @@ public class SaleService {
 
         return sale;
     }
+
 
     public List<SalesByCityDTO> getSalesGroupedByCity() {
         return repository.countSaleByCity();

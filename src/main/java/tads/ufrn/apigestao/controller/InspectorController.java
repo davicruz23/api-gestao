@@ -76,7 +76,9 @@ public class InspectorController {
                 inspector,
                 dto.getPaymentMethod(),
                 dto.getInstallments(),
-                dto.getCashPaid()
+                dto.getCashPaid(),
+                dto.getLatitude(),
+                dto.getLongitude()
         );
 
         return ResponseEntity.ok(SaleMapper.toDTO(sale));

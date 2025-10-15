@@ -6,11 +6,12 @@ import org.springframework.data.repository.query.Param;
 import tads.ufrn.apigestao.domain.CollectionAttempt;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CollectionAttemptRepository extends JpaRepository<CollectionAttempt, Long> {
 
     List<CollectionAttempt> findByCollectorId(Long collectorId);
-    List<CollectionAttempt> findByInstallmentId(Long installmentId);
+    Optional<CollectionAttempt> findByInstallmentId(Long installmentId);
 
     @Query("""
     SELECT ca

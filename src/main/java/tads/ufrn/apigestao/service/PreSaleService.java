@@ -156,11 +156,7 @@ public class PreSaleService {
     }
 
     @Transactional
-    public SellerCommissionDTO getCommissionByPeriod(
-            Long sellerId,
-            LocalDate startDate,
-            LocalDate endDate,
-            boolean saveHistory) {
+    public SellerCommissionDTO getCommissionByPeriod(Long sellerId, LocalDate startDate, LocalDate endDate, boolean saveHistory) {
 
         LocalDateTime now = LocalDateTime.now();
 

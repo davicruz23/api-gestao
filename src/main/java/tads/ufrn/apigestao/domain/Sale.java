@@ -44,4 +44,7 @@ public class Sale {
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Installment> installmentsEntities = new ArrayList<>();
+
+    @OneToOne(mappedBy = "sale", cascade = CascadeType.ALL)
+    private ApprovalLocation approvalLocation;
 }
