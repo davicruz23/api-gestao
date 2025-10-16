@@ -23,4 +23,6 @@ public class SaleCollectorDTO {
     private ClientSaleDTO client;
     private List<ProductSaleDTO> products;
     private List<InstallmentDTO> installments;
+    private Double latitude;
+    private Double longitude;
 }
