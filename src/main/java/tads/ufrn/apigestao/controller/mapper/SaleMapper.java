@@ -56,17 +56,6 @@ public class SaleMapper {
     }
 
     public static SaleCollectorDTO saleCollector(Sale src) {
-        String mapsUrl = null;
-
-        if (src.getApprovalLocation() != null
-                && src.getApprovalLocation().getLatitude() != null
-                && src.getApprovalLocation().getLongitude() != null) {
-            mapsUrl = String.format(
-                    "https://www.google.com/maps/search/?api=1&query=%s,%s",
-                    src.getApprovalLocation().getLatitude(),
-                    src.getApprovalLocation().getLongitude()
-            );
-        }
 
         return SaleCollectorDTO.builder()
                 .id(src.getId())
@@ -86,8 +75,8 @@ public class SaleMapper {
                                 .toList()
                                 : List.of()
                 )
-                .latitude(src.getApprovalLocation().getLatitude())
-                .longitude(src.getApprovalLocation().getLongitude())
+                .latitude(src.getApprovalLocation() != null ? src.getApprovalLocation().getLatitude() : null)
+                .longitude(src.getApprovalLocation() != null ? src.getApprovalLocation().getLongitude() : null)
                 .build();
     }
 
