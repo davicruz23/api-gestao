@@ -1,5 +1,6 @@
 package tads.ufrn.apigestao.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -27,9 +28,14 @@ public class ChangingService {
     private final UserService userService;
     private final ProductService productService;
     private final ModelMapper mapper;
+    private final ChargingItemService chargingItemService;
 
     public List<Charging> findAll() {
         return repository.findAll();
+    }
+
+    public List<Charging> findChargingCurrent() {
+        return repository.findAllByDeletedAtIsNull();
     }
 
     public Charging findById(Long id) {
@@ -37,10 +43,15 @@ public class ChangingService {
         return obj.orElseThrow(() -> new NotFoundException("ChargingMapper não encontrado!"));
     }
 
-    //@Transactional
+    @Transactional
     public Charging store(UpsertChargingDTO chargingDTO) {
 
         User user = userService.findUserById(2L);
+
+        List<Charging> previousChargings = repository.findAllByUserIdAndDeletedAtIsNull(user.getId());
+        for (Charging oldCharging : previousChargings) {
+            deleteById(oldCharging.getId());
+        }
 
         Charging charging = new Charging();
         charging.setDescription(chargingDTO.getDescription());
@@ -65,15 +76,24 @@ public class ChangingService {
         return savedCharging;
     }
 
+
     public Charging update(UpsertChargingDTO model) {
         return repository.save(mapper.map(model, Charging.class));
     }
 
-    public void deleteById(Long id){
+    @Transactional
+    public void deleteById(Long id) {
         Charging charging = repository.findById(id)
-                .orElseThrow(()-> new NotFoundException("Charging not found"));
+                .orElseThrow(() -> new NotFoundException("Charging not found"));
+
+        for (ChargingItem item : charging.getItems()) {
+            productService.returnStock(item.getProduct().getId(), item.getQuantity());
+        }
+
+        chargingItemService.markItemsAsDeletedByChargingId(id);
+
         charging.delete();
         repository.save(charging);
-
     }
+
 }

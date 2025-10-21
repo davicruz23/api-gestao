@@ -6,17 +6,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class ChargingItem {
+public class ChargingItem extends AbstractEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "charging_id")
     private Charging charging;
 
@@ -25,9 +26,5 @@ public class ChargingItem {
     private Product product;
 
     private Integer quantity;
-
-    @ManyToOne
-    @JoinColumn(name = "pre_sale_id")
-    private PreSale preSale;
 }
 

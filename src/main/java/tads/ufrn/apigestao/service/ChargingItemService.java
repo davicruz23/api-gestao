@@ -1,5 +1,6 @@
 package tads.ufrn.apigestao.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -26,7 +27,13 @@ public class ChargingItemService {
         return preSale.orElseThrow(() -> new NotFoundException("User not found"));
     }
 
-    public void deleteById(Long id){
-        repository.deleteById(id);
+    @Transactional
+    public void markItemsAsDeletedByChargingId(Long chargingId) {
+        List<ChargingItem> items = repository.findByChargingId(chargingId);
+        for (ChargingItem item : items) {
+            item.delete();
+            repository.save(item);
+        }
     }
+
 }

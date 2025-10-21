@@ -9,6 +9,7 @@ public class PreSaleItemMapper {
                 .productId(src.getProduct().getId())
                 .productName(src.getProduct().getName())
                 .quantity(src.getQuantity())
+                .unitPrice(src.getProduct().getValue())
                 .build();
     }
 }

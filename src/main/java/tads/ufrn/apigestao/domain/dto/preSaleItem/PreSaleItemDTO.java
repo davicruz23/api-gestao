@@ -15,4 +15,5 @@ public class PreSaleItemDTO {
     private Long productId;
     private String productName;
     private Integer quantity;
+    private double unitPrice;
 }

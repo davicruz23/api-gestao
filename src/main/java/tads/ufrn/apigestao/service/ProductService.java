@@ -77,4 +77,16 @@ public class ProductService {
                 .toList();
         repository.saveAll(products);
     }
+
+    public void returnStock(Long productId, int quantity) {
+        try {
+            Product product = repository.findById(productId)
+                    .orElseThrow(() -> new NotFoundException("Product not found with id " + productId));
+            product.setAmount(product.getAmount() + quantity);
+            repository.save(product);
+        } catch (Exception e) {
+            System.err.println("Erro ao devolver estoque do produto " + productId + ": " + e.getMessage());
+            throw new RuntimeException("Erro ao devolver estoque", e);
+        }
+    }
 }

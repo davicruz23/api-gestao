@@ -27,6 +27,11 @@ public class ChargingController {
         return ResponseEntity.ok().body(service.findAll().stream().map(ChargingMapper::mapper).toList());
     }
 
+    @GetMapping("/current")
+    public ResponseEntity<List<ChargingDTO>> findCurrent(){
+        return ResponseEntity.ok().body(service.findChargingCurrent().stream().map(ChargingMapper::mapper).toList());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ChargingDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(ChargingMapper.mapper(service.findById(id)));
