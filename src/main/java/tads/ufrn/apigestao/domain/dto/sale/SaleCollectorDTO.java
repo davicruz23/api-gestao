@@ -19,7 +19,7 @@ import java.util.List;
 public class SaleCollectorDTO {
 
     private Long id;
-    private LocalDate saleDate;
+    private String saleDate;
     private ClientSaleDTO client;
     private List<ProductSaleDTO> products;
     private List<InstallmentDTO> installments;

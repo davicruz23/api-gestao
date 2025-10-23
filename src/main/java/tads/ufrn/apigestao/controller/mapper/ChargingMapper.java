@@ -4,6 +4,8 @@ import tads.ufrn.apigestao.domain.Charging;
 import tads.ufrn.apigestao.domain.dto.charging.ChargingDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class ChargingMapper {
@@ -11,9 +13,9 @@ public class ChargingMapper {
         return ChargingDTO.builder()
                 .id(src.getId())
                 .userName(src.getUser().getName())
-                .chargingDate(src.getCreatedAt())
+                .chargingDate(src.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
                 .description(src.getDescription())
-                .data(src.getCreatedAt())
+                .data(src.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
                 .chargingItems(src.getItems().stream().map(ChargingItemMapper::mapper).collect(Collectors.toList()))
                 .build();
     }

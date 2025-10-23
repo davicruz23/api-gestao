@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -120,7 +122,7 @@ public class CollectorService {
         );
     }
 
-    public List<SaleCollectorDTO> findSalesByCollectorId(Long collectorId) {
+    public Map<String, List<SaleCollectorDTO>> findSalesByCollectorId(Long collectorId) {
 
         if (!repository.existsById(collectorId)) {
             throw new EntityNotFoundException("Collector com ID " + collectorId + " não encontrado.");
@@ -128,10 +130,22 @@ public class CollectorService {
 
         List<Sale> sales = saleRepository.findByCollectorIdWithPendingInstallments(collectorId);
 
-        return sales.stream()
+        List<SaleCollectorDTO> saleDTOs = sales.stream()
                 .map(SaleMapper::saleCollector)
                 .toList();
+
+        return saleDTOs.stream()
+                .collect(Collectors.groupingBy(
+                        sale -> {
+                            if (sale.getClient() != null && sale.getClient().getAddress() != null) {
+                                return sale.getClient().getAddress().getCity();
+                            } else {
+                                return "Cidade não informada";
+                            }
+                        }
+                ));
     }
+
 
     public CollectorIdUserDTO getCollectorByUserId(Long userId) {
         Collector collector = repository.findByUserId(userId)

@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class InstallmentDTO {
 
     private Long id;
-    private LocalDate dueDate;
+    private String dueDate;
     private Double amount;
     private boolean paid = false;
     private InstallmentStatusDTO status;

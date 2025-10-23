@@ -10,7 +10,9 @@ import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleLocationDTO;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class SaleMapper {
@@ -18,7 +20,7 @@ public class SaleMapper {
         return SaleDTO.builder()
                 .id(src.getId())
                 .numberSale(src.getNumberSale())
-                .saleDate(src.getSaleDate())
+                .saleDate(src.getSaleDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
                 .clientName(src.getPreSale().getClient().getName())
                 .paymentType(src.getPaymentMethod().toString())
                 .nParcel(src.getInstallments())
@@ -31,7 +33,7 @@ public class SaleMapper {
                                 src.getInstallmentsEntities().stream()
                                         .map(inst -> InstallmentDTO.builder()
                                                 .id(inst.getId())
-                                                .dueDate(inst.getDueDate())
+                                                .dueDate(inst.getDueDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
                                                 .amount(inst.getAmount())
                                                 .paid(inst.isPaid())
                                                 .build())
@@ -47,7 +49,7 @@ public class SaleMapper {
 
         return SaleDTO.builder()
                 .numberSale(sale.getNumberSale())
-                .saleDate(sale.getSaleDate())
+                .saleDate(sale.getSaleDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
                 .paymentType(sale.getPaymentMethod().name())
                 .nParcel(sale.getInstallments())
                 .clientName(sale.getPreSale().getClient().getName())
@@ -59,7 +61,7 @@ public class SaleMapper {
 
         return SaleCollectorDTO.builder()
                 .id(src.getId())
-                .saleDate(src.getSaleDate())
+                .saleDate(src.getSaleDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
                 .client(src.getPreSale().getClient() != null
                         ? ClientMapper.clientSale(src.getPreSale().getClient())
                         : null)

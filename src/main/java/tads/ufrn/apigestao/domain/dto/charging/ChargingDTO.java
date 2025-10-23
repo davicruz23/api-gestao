@@ -18,9 +18,9 @@ import java.util.List;
 public class ChargingDTO {
 
     private Long id;
-    private LocalDate chargingDate;
+    private String chargingDate;
     private String userName;
     private String description;
-    private LocalDate data;
+    private String data;
     private List<ChargingItemDTO> chargingItems;
 }

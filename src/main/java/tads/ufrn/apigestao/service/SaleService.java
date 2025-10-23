@@ -90,8 +90,11 @@ public class SaleService {
             upfront.setPaymentDate(LocalDateTime.now());
             upfront.setDueDate(LocalDate.now());
             upfront.setPaymentType(PaymentType.CASH);
+            upfront.setCommissionable(false);
+
             installmentRepository.save(upfront);
         }
+
 
         double remaining = total - (cashPaid != null ? cashPaid : 0.0);
         if (remaining > 0 && installments > 0) {
@@ -104,7 +107,7 @@ public class SaleService {
                 inst.setAmount(installmentValue);
                 inst.setDueDate(firstDueDate.plusMonths(i));
                 inst.setPaid(false);
-                inst.setPaymentType(PaymentType.CREDIT);
+                inst.setPaymentType(PaymentType.PARCEL);
                 installmentRepository.save(inst);
             }
         }

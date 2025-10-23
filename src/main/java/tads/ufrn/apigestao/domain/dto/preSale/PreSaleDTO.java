@@ -23,7 +23,7 @@ import java.util.List;
 public class PreSaleDTO {
 
     private Long id;
-    private LocalDate preSaleDate;
+    private String preSaleDate;
     private SellerDetailsDTO seller;
     private Client client;
     private String inspector;

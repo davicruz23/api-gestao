@@ -27,7 +27,8 @@ public class Installment {
     private Double amount;
     private boolean paid = false;
     private LocalDateTime paymentDate;
-
+    @Column(nullable = false)
+    private boolean commissionable = true;
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 }

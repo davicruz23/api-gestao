@@ -5,11 +5,13 @@ import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentStatusDTO;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class InstallmentMapper {
     public static InstallmentDTO mapper(Installment src) {
         return InstallmentDTO.builder()
-                .dueDate(src.getDueDate())
+                .dueDate(src.getDueDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
                 .paid(src.isPaid())
                 .build();
     }
@@ -27,7 +29,7 @@ public class InstallmentMapper {
 
         return InstallmentDTO.builder()
                 .id(src.getId())
-                .dueDate(src.getDueDate())
+                .dueDate(src.getDueDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
                 .amount(src.getAmount())
                 .paid(src.isPaid())
                 .status(status)

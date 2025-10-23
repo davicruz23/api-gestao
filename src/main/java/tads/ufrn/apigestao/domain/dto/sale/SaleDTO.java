@@ -18,7 +18,7 @@ public class SaleDTO {
 
     private Long id;
     private String numberSale;
-    private LocalDate saleDate;
+    private String saleDate;
     private String paymentType;
     private Integer nParcel;
     private String clientName;

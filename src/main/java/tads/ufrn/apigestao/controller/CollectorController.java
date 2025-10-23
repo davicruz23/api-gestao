@@ -90,9 +90,9 @@ public class CollectorController {
     }
 
     @GetMapping("/{collectorId}/sales")
-    public ResponseEntity<List<SaleCollectorDTO>> getSalesByCollector(@PathVariable Long collectorId) {
-        List<SaleCollectorDTO> sales = service.findSalesByCollectorId(collectorId);
-        return ResponseEntity.ok(sales);
+    public ResponseEntity<Map<String, List<SaleCollectorDTO>>> getSalesByCollector(@PathVariable Long collectorId) {
+        Map<String, List<SaleCollectorDTO>> salesByCity = service.findSalesByCollectorId(collectorId);
+        return ResponseEntity.ok(salesByCity);
     }
 
     @GetMapping("/by-user/{userId}")
