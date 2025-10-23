@@ -96,6 +96,7 @@ public class CollectorService {
         double totalCollected = sales.stream()
                 .flatMap(sale -> installmentRepository.findBySaleId(sale.getId()).stream())
                 .filter(inst -> inst.isPaid()
+                        && inst.isCommissionable()
                         && inst.getPaymentDate() != null
                         && !inst.getPaymentDate().isBefore(startDate.atStartOfDay())
                         && !inst.getPaymentDate().isAfter(endDate.atTime(23, 59, 59)))
