@@ -28,5 +28,6 @@ public interface PreSaleRepository extends JpaRepository<PreSale, Long> {
 """)
     List<PreSale> findAllByInspectorId(@Param("inspectorId") Long inspectorId);
 
+    Long countByStatus(PreSaleStatus status);
 
 }

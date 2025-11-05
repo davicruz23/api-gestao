@@ -1,6 +1,7 @@
 package tads.ufrn.apigestao.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tads.ufrn.apigestao.domain.User;
@@ -8,6 +9,9 @@ import tads.ufrn.apigestao.domain.dto.loginDTO.LoginRequestDTO;
 import tads.ufrn.apigestao.domain.dto.loginDTO.LoginResponseDTO;
 import tads.ufrn.apigestao.security.TokenService;
 import tads.ufrn.apigestao.service.AuthService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @RestController
@@ -22,16 +26,22 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequest) {
-        System.out.println("usuario que tentou logar: "+ loginRequest.getCpf() + "   " + loginRequest.getPassword());
-        User user = authService.login(loginRequest);
+        System.out.println("Usuário que tentou logar: " + loginRequest.getCpf());
 
-        if (user != null) {
+        try {
+            User user = authService.login(loginRequest);
             String token = tokenService.generateToken(user);
+
             return ResponseEntity.ok(new LoginResponseDTO(token));
-        } else {
-            return ResponseEntity.status(401).body("Invalid credentials");
+        } catch (RuntimeException e) {
+            // Retorna JSON no corpo com a mensagem
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
+
 
     /*@PostMapping("/register")
     //@PreAuthorize("hasRole('authRegister')")

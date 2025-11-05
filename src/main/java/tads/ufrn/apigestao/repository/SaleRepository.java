@@ -5,9 +5,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import tads.ufrn.apigestao.domain.Sale;
+import tads.ufrn.apigestao.domain.dto.dashboard.DashboardSaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SalesByCityDTO;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, Long> {
@@ -45,5 +48,12 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
       )
 """)
     List<Sale> findByCollectorIdWithPendingInstallments(@Param("collectorId") Long collectorId);
+
+    @Query("SELECT s FROM Sale s " +
+            "WHERE (:startDate IS NULL OR s.saleDate >= :startDate) " +
+            "AND (:endDate IS NULL OR s.saleDate <= :endDate)")
+    List<Sale> findSalesByDateRange(@Param("startDate") LocalDate startDate,
+                                    @Param("endDate") LocalDate endDate);
+
 
 }

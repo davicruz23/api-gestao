@@ -20,17 +20,19 @@ public class AuthService {
     public User login(LoginRequestDTO loginDTO) {
         Optional<User> userOptional = userRepository.findByCpf(loginDTO.getCpf());
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            if (passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-                return user;
-            } else {
-                throw new RuntimeException("Invalid credentials");
-            }
-        } else {
-            throw new RuntimeException("User not found");
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("Usuário não encontrado.");
         }
+
+        User user = userOptional.get();
+
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Usuário ou senha incorretos.");
+        }
+
+        return user;
     }
+
 
 //    public User register(UserRequestDTO userRequestDTO) {
 //        if (userRepository.findByCpf(userRequestDTO.getCpf()).isPresent()) {
