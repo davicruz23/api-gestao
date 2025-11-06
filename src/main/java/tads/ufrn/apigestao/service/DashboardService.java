@@ -6,9 +6,7 @@ import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.Installment;
 import tads.ufrn.apigestao.domain.Sale;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
-import tads.ufrn.apigestao.domain.dto.dashboard.CollectorChargeSummaryDTO;
-import tads.ufrn.apigestao.domain.dto.dashboard.DashboardProductSalesDTO;
-import tads.ufrn.apigestao.domain.dto.dashboard.DashboardSaleDTO;
+import tads.ufrn.apigestao.domain.dto.dashboard.*;
 import tads.ufrn.apigestao.enums.PreSaleStatus;
 import tads.ufrn.apigestao.repository.*;
 
@@ -16,6 +14,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +30,10 @@ public class DashboardService {
     private final CollectorRepository collectorRepository;
     private final InstallmentRepository installmentRepository;
     private final PreSaleItemRepository preSaleItemRepository;
+    private final InstallmentRepository installmentItemRepository;
+    private final ClientRepository clientRepository;
+    private final AddressRepository addressRepository;
+    private final ChargingRepository chargingRepository;
     private final SaleService saleService;
 
     public DashboardSaleDTO getSalesDashboard(LocalDate startDate, LocalDate endDate) {
@@ -122,4 +126,67 @@ public class DashboardService {
     public List<DashboardProductSalesDTO> getTotalProductsSold(LocalDate startDate, LocalDate endDate) {
         return preSaleItemRepository.findTotalProductsSoldByDateRange(startDate, endDate);
     }
+
+    public DashboardTotalCobradoDTO getTotalCobrado() {
+
+        LocalDateTime inicioSemanaAtual = LocalDate.now()
+                .with(DayOfWeek.MONDAY)
+                .atStartOfDay();
+        LocalDateTime fimSemanaAtual = LocalDate.now()
+                .atTime(LocalTime.MAX);
+
+        LocalDateTime inicioSemanaAnterior = LocalDate.now()
+                .minusWeeks(1)
+                .with(DayOfWeek.MONDAY)
+                .atStartOfDay();
+        LocalDateTime fimSemanaAnterior = LocalDate.now()
+                .minusWeeks(1)
+                .with(DayOfWeek.SUNDAY)
+                .atTime(LocalTime.MAX);
+
+        BigDecimal totalSemanaAtual = installmentItemRepository.findTotalCobradoPorPeriodo(
+                inicioSemanaAtual, fimSemanaAtual
+        );
+
+        BigDecimal totalSemanaAnterior = installmentItemRepository.findTotalCobradoPorPeriodo(
+                inicioSemanaAnterior, fimSemanaAnterior
+        );
+
+        if (totalSemanaAtual == null) totalSemanaAtual = BigDecimal.ZERO;
+        if (totalSemanaAnterior == null) totalSemanaAnterior = BigDecimal.ZERO;
+
+        BigDecimal percentual = BigDecimal.ZERO;
+
+        if (totalSemanaAnterior.compareTo(BigDecimal.ZERO) != 0) {
+            percentual = totalSemanaAtual.subtract(totalSemanaAnterior)
+                    .divide(totalSemanaAnterior, 2, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+        }
+
+        return new DashboardTotalCobradoDTO(totalSemanaAtual, percentual);
+    }
+
+    public DashboardTotalClientsDTO getTotalClients() {
+        Long total = clientRepository.countTotalClients();
+        return new DashboardTotalClientsDTO(total);
+    }
+
+    public List<DashboardSalesPerMonthDTO> getSalesPerMonth(int meses) {
+        List<Object[]> rawData = saleRepository.findSalesPerMonth(meses);
+        return rawData.stream()
+                .map(row -> new DashboardSalesPerMonthDTO(
+                        row[0].toString(),
+                        ((Number) row[1]).longValue()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public Long getDistinctCityCount() {
+        return addressRepository.countDistinctCities();
+    }
+
+    public Long getCountChargins() {
+        return chargingRepository.countDistinctCities();
+    }
+
 }

@@ -26,19 +26,14 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequest) {
-        System.out.println("Usuário que tentou logar: " + loginRequest.getCpf());
+        System.out.println("usuario que tentou logar: "+ loginRequest.getCpf() + "   " + loginRequest.getPassword());
+        User user = authService.login(loginRequest);
 
-        try {
-            User user = authService.login(loginRequest);
+        if (user != null) {
             String token = tokenService.generateToken(user);
-
             return ResponseEntity.ok(new LoginResponseDTO(token));
-        } catch (RuntimeException e) {
-            // Retorna JSON no corpo com a mensagem
-            Map<String, String> error = new HashMap<>();
-            error.put("message", e.getMessage());
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        } else {
+            return ResponseEntity.status(401).body("Invalid credentials");
         }
     }
 

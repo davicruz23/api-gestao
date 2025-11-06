@@ -8,11 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
-import tads.ufrn.apigestao.domain.dto.dashboard.CollectorChargeSummaryDTO;
-import tads.ufrn.apigestao.domain.dto.dashboard.DashboardProductSalesDTO;
-import tads.ufrn.apigestao.domain.dto.dashboard.DashboardSaleDTO;
+import tads.ufrn.apigestao.domain.dto.dashboard.*;
 import tads.ufrn.apigestao.service.DashboardService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +24,7 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping("/count/sales")
-    public ResponseEntity<DashboardSaleDTO> getSalesDashboard(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<DashboardSaleDTO> getSalesDashboard(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
         DashboardSaleDTO dashboard = dashboardService.getSalesDashboard(startDate, endDate);
         return ResponseEntity.ok(dashboard);
@@ -40,29 +37,50 @@ public class DashboardController {
     }
 
     @GetMapping("/count/collector")
-    public ResponseEntity<List<CollectorChargeSummaryDTO>> getChargeSummary(
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate) {
+    public ResponseEntity<List<CollectorChargeSummaryDTO>> getChargeSummary(@RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate) {
 
         List<CollectorChargeSummaryDTO> summary = dashboardService.getCollectorsChargeSummary(startDate, endDate);
         return ResponseEntity.ok(summary);
     }
 
     @GetMapping("/commissions/collector")
-    public ResponseEntity<List<CollectorCommissionDTO>> getAllCommissions(
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate) {
+    public ResponseEntity<List<CollectorCommissionDTO>> getAllCommissions(@RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate) {
 
         List<CollectorCommissionDTO> commissions = dashboardService.getAllCommissionsByPeriod(startDate, endDate);
         return ResponseEntity.ok(commissions);
     }
 
     @GetMapping("/count/products-sold")
-    public ResponseEntity<List<DashboardProductSalesDTO>> getTotalProductsSold(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-    ) {
+    public ResponseEntity<List<DashboardProductSalesDTO>> getTotalProductsSold(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         List<DashboardProductSalesDTO> result = dashboardService.getTotalProductsSold(startDate, endDate);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/count/total-cobrado")
+    public ResponseEntity<DashboardTotalCobradoDTO> getTotalCobrado() {
+        return ResponseEntity.ok(dashboardService.getTotalCobrado());
+    }
+
+    @GetMapping("/count/total-clients")
+    public ResponseEntity<DashboardTotalClientsDTO> getTotalClients() {
+        DashboardTotalClientsDTO dto = dashboardService.getTotalClients();
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/sales-per-month")
+    public List<DashboardSalesPerMonthDTO> getSalesPerMonth(@RequestParam(defaultValue = "6") int meses) {
+        return dashboardService.getSalesPerMonth(meses);
+    }
+
+    @GetMapping("/count/cities")
+    public ResponseEntity<Long> getDistinctCityCount() {
+        Long count = dashboardService.getDistinctCityCount();
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/count/chargings")
+    public ResponseEntity<Long> getChargingCount() {
+        Long count = dashboardService.getCountChargins();
+        return ResponseEntity.ok(count);
     }
 }

@@ -55,5 +55,13 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     List<Sale> findSalesByDateRange(@Param("startDate") LocalDate startDate,
                                     @Param("endDate") LocalDate endDate);
 
-
+    @Query(value = """
+            SELECT DATE_FORMAT(s.sale_date, '%Y-%m') AS mes,
+                   COUNT(*) AS totalVendas
+            FROM sale s
+            WHERE s.sale_date >= DATE_SUB(CURDATE(), INTERVAL :meses MONTH)
+            GROUP BY DATE_FORMAT(s.sale_date, '%Y-%m')
+            ORDER BY mes
+            """, nativeQuery = true)
+    List<Object[]> findSalesPerMonth(int meses);
 }
