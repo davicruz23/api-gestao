@@ -10,6 +10,7 @@ import tads.ufrn.apigestao.controller.mapper.UserMapper;
 import tads.ufrn.apigestao.domain.Product;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.UpsertProductDTO;
+import tads.ufrn.apigestao.domain.dto.product.UptadeProductDTO;
 import tads.ufrn.apigestao.domain.dto.user.UpsertUserDTO;
 import tads.ufrn.apigestao.domain.dto.user.UserDTO;
 import tads.ufrn.apigestao.service.ProductService;
@@ -56,5 +57,11 @@ public class ProductController {
     public ResponseEntity<ProductDTO> deleteById(@PathVariable Long id){
         service.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UptadeProductDTO> updateProduct(@RequestBody UptadeProductDTO productDto) {
+        Product updated = service.updateProduct(productDto);
+        return ResponseEntity.ok(ProductMapper.mapperUptadeProduct(updated));
     }
 }

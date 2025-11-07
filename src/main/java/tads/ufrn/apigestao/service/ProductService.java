@@ -12,6 +12,7 @@ import tads.ufrn.apigestao.domain.Product;
 import tads.ufrn.apigestao.domain.User;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.UpsertProductDTO;
+import tads.ufrn.apigestao.domain.dto.product.UptadeProductDTO;
 import tads.ufrn.apigestao.enums.ProductStatus;
 import tads.ufrn.apigestao.enums.UserType;
 import tads.ufrn.apigestao.repository.ProductRepository;
@@ -51,16 +52,14 @@ public class ProductService {
         return repository.save(prod);
     }
 
-    public Product update(ProductDTO product){
-        Product productId = repository.findById(product.getId())
-                .orElseThrow(()-> new RuntimeException("Produto não encontrado"));
+    public Product updateProduct(UptadeProductDTO productDto) {
+        Product existingProduct = repository.findById(productDto.getId())
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
-        Product p = new Product();
-        p.setName(product.getName());
-        p.setBrand(product.getBrand());
-        p.setAmount(product.getAmount());
+        existingProduct.setAmount(productDto.getAmount());
+        existingProduct.setValue(productDto.getValue());
 
-        return repository.save(p);
+        return repository.save(existingProduct);
     }
 
     public void deleteById(Long id){
