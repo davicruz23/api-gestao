@@ -5,9 +5,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import tads.ufrn.apigestao.domain.Client;
 
+import java.util.List;
+
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
     @Query("SELECT COUNT(c) FROM Client c")
     Long countTotalClients();
+
+    List<Client> findByAddress_CityIgnoreCase(String city);
 }

@@ -37,6 +37,7 @@ public class SecurityConfigurations {
                         .requestMatchers("api/auth/**").permitAll()
                         .requestMatchers("api/collector/**").permitAll()
                         .requestMatchers("api/dashboard/**").permitAll()
+                        .requestMatchers("/api/report/**").permitAll()
                         .requestMatchers("api/user/**").permitAll()
                         .requestMatchers("api/product/**").permitAll()
                         .requestMatchers("api/seller/**").permitAll()
