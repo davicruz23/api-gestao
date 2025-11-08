@@ -11,4 +11,11 @@ public class CollectorMapper {
                 .sales(src.getSales().stream().map(SaleMapper::mapper).toList())
                 .build();
     }
+
+    public static CollectorDTO mapperName (Collector src){
+        return CollectorDTO.builder()
+                .id(src.getId())
+                .collectorName(src.getUser().getName())
+                .build();
+    }
 }

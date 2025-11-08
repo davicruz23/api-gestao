@@ -60,6 +60,10 @@ public class CollectorController {
         return ResponseEntity.ok(service.findAll().stream().map(CollectorMapper::mapper).toList());
     }
 
+    @GetMapping("/name/all")
+    public ResponseEntity<List<CollectorDTO>> findAllByName() {
+        return ResponseEntity.ok(service.findAll().stream().map(CollectorMapper::mapperName).toList());
+    }
 //    @GetMapping("/{collectorId}/sales")
 //    public ResponseEntity<List<CollectorSalesDTO>> getCollectorSales(@PathVariable Long collectorId) {
 //        List<CollectorSalesDTO> salesDTO = service.getSalesByCollectorDTO(collectorId);

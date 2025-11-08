@@ -41,6 +41,10 @@ public class CollectorService {
         return repository.findAll();
     }
 
+    public Collector findById(Long id) {
+        return repository.findById(id).orElseThrow();
+    }
+
     @Transactional
     public CollectorSalesAssignedDTO assignSalesByCity(Long collectorId, String city) {
         System.out.println("entrei no metodo");

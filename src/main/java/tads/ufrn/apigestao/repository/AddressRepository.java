@@ -15,4 +15,7 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     FROM Address a
 """)
     Long countDistinctCities();
+
+    @Query("SELECT DISTINCT a.city FROM Address a ORDER BY a.city ASC")
+    List<String> findAllDistinctCities();
 }
