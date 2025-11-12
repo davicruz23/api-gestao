@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import tads.ufrn.apigestao.domain.User;
 import tads.ufrn.apigestao.repository.UserRepository;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -24,33 +26,47 @@ public class SecurityFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
         String token = recoverToken(request);
+
         if (token != null) {
+
             String userCpf = tokenService.validateToken(token);
-            Optional<User> userOptional = userRepository.findByCpf(userCpf);
 
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            if (!userCpf.isBlank()) {
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                var user = userRepository.findByCpf(userCpf).orElse(null);
+
+                if (user != null) {
+
+                    String role = tokenService.extractRole(token);
+
+                    var authorities = List.of(new SimpleGrantedAuthority(role)); // IMPORTANTE
+
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    user,
+                                    null,
+                                    authorities // usando as roles do token agora
+                            );
+
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
         }
 
-        filterChain.doFilter(request, response);
+        chain.doFilter(request, response);
     }
+
 
     private String recoverToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer "))
             return null;
-        }
-        return authHeader.replace("Bearer ", "");
-    }
 
+        return authHeader.substring(7);
+    }
 }

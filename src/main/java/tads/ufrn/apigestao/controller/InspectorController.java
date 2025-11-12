@@ -3,6 +3,7 @@ package tads.ufrn.apigestao.controller;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.InspectorMapper;
@@ -36,16 +37,19 @@ public class InspectorController {
     private final PreSaleService preSaleService;
     private final SaleService saleService;
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/all")
     public ResponseEntity<List<InspectorDTO>> findAll(){
         return ResponseEntity.ok().body(service.findAll().stream().map(InspectorMapper::mapper).toList());
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/{id}")
     public ResponseEntity<InspectorDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(InspectorMapper.mapper(service.findById(id)));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @PostMapping
     public ResponseEntity<UpsertInspectorDTO> store(@RequestBody UpsertInspectorDTO model){
         URI uri = ServletUriComponentsBuilder
@@ -53,17 +57,20 @@ public class InspectorController {
         return ResponseEntity.created(uri).build();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @DeleteMapping("{id}/delete")
     public ResponseEntity<InspectorDTO> deleteById(@PathVariable Long id){
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/{inspectorId}/pre-sales/pending")
     public ResponseEntity<List<PreSaleDTO>> listPending(@PathVariable Long inspectorId) {
         return ResponseEntity.ok(preSaleService.listAllPreSales(inspectorId, PreSaleStatus.PENDENTE).stream().map(PreSaleMapper::mapper).toList());
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @PostMapping("/pre-sales/{preSaleId}/approve")
     public ResponseEntity<SaleDTO> approve(
             @PathVariable Long preSaleId,
@@ -84,11 +91,14 @@ public class InspectorController {
         return ResponseEntity.ok(SaleMapper.toDTO(sale));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @PostMapping("/pre-sales/{preSaleId}/reject")
     public ResponseEntity<PreSaleDTO> reject(@PathVariable Long preSaleId) {
         PreSale preSale = preSaleService.rejectPreSale(preSaleId);
         return ResponseEntity.ok(PreSaleMapper.mapper(preSale));
     }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
 
     @GetMapping("/by-user/{userId}")
     public ResponseEntity<InspectorIdUserDTO> getInspectorByUserId(@PathVariable Long userId) {
@@ -97,6 +107,7 @@ public class InspectorController {
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/{inspectorId}/pre-sales-history")
     public ResponseEntity<List<InspectorHistoryPreSaleDTO>> getPreSalesByInspector(@PathVariable Long inspectorId) {
         List<InspectorHistoryPreSaleDTO> list = preSaleService.findPreSalesByInspector(inspectorId);

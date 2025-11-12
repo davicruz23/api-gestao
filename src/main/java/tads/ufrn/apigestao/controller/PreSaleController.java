@@ -2,6 +2,7 @@ package tads.ufrn.apigestao.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.PreSaleMapper;
@@ -22,16 +23,19 @@ public class PreSaleController {
 
     private PreSaleService service;
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','FISCAL')")
     @GetMapping("/all")
     public ResponseEntity<List<PreSaleDTO>> findAll(){
         return ResponseEntity.ok().body(service.findAll().stream().map(PreSaleMapper::mapper).toList());
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','FISCAL')")
     @GetMapping("/{id}")
     public ResponseEntity<PreSaleDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(PreSaleMapper.mapper(service.findById(id)));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','FISCAL')")
     @PostMapping
     public ResponseEntity<?> store(@RequestBody UpsertPreSaleDTO model) {
         try {
@@ -50,6 +54,7 @@ public class PreSaleController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @DeleteMapping("{id}/delete")
     public ResponseEntity<PreSaleDTO> deleteById(@PathVariable Long id){
         service.deleteById(id);

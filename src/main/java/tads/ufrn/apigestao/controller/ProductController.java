@@ -3,6 +3,7 @@ package tads.ufrn.apigestao.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.ProductMapper;
@@ -25,11 +26,13 @@ public class ProductController {
 
     private ProductService service;
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','COBRADOR','FISCAL','FUNCIONARIO')")
     @GetMapping("/all")
     public ResponseEntity<List<ProductDTO>> findAll(){
         return ResponseEntity.ok().body(service.findAll().stream().map(ProductMapper::mapper).toList());
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','COBRADOR','FISCAL','FUNCIONARIO')")
     @GetMapping("/index")
     public ResponseEntity<Page<ProductDTO>> index(
             @RequestParam(defaultValue = "0") int page,
@@ -41,11 +44,13 @@ public class ProductController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','COBRADOR','FISCAL','FUNCIONARIO')")
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(ProductMapper.mapper(service.findById(id)));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @PostMapping
     public ResponseEntity<UpsertProductDTO> store(@RequestBody UpsertProductDTO model){
         URI uri = ServletUriComponentsBuilder
@@ -53,12 +58,14 @@ public class ProductController {
         return ResponseEntity.created(uri).build();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @DeleteMapping("{id}/delete")
     public ResponseEntity<ProductDTO> deleteById(@PathVariable Long id){
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<UptadeProductDTO> updateProduct(@RequestBody UptadeProductDTO productDto) {
         Product updated = service.updateProduct(productDto);

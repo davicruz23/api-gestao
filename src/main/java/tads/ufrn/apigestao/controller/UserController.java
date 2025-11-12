@@ -2,6 +2,7 @@ package tads.ufrn.apigestao.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.UserMapper;
@@ -19,16 +20,19 @@ public class UserController {
 
     private final UserService service;
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> findAll() {
         return ResponseEntity.ok().body(service.allUsers().stream().map(UserMapper::mapper).toList());
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(UserMapper.mapper(service.findUserById(id)));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @PostMapping
     public ResponseEntity<UpsertUserDTO> store(@RequestBody UpsertUserDTO model){
         URI uri = ServletUriComponentsBuilder
@@ -36,6 +40,7 @@ public class UserController {
         return ResponseEntity.created(uri).build();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @DeleteMapping("{id}/delete")
     public ResponseEntity<UserDTO> deleteById(@PathVariable Long id){
         service.delete(id);

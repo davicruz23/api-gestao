@@ -3,6 +3,7 @@ package tads.ufrn.apigestao.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tads.ufrn.apigestao.service.ReportService;
 
@@ -13,6 +14,7 @@ public class ReportController {
 
     private final ReportService service;
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @GetMapping("/{id}/chargings")
     public ResponseEntity<byte[]> gerarRelatorio(@PathVariable Long id) {
         byte[] pdfBytes = service.generateChargingReport(id);
@@ -23,6 +25,7 @@ public class ReportController {
                 .body(pdfBytes);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @GetMapping("/clients-by-city")
     public ResponseEntity<byte[]> gerarRelatorioClientes(@RequestParam String city) {
 

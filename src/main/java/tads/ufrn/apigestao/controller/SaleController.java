@@ -2,6 +2,7 @@ package tads.ufrn.apigestao.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.SaleMapper;
@@ -20,16 +21,19 @@ public class SaleController {
 
     private SaleService service;
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/all")
     public ResponseEntity<List<SaleDTO>> findAll(){
         return ResponseEntity.ok().body(service.findAll().stream().map(SaleMapper::mapper).toList());
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/{id}")
     public ResponseEntity<SaleDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(SaleMapper.mapper(service.findById(id)));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @PostMapping
     public ResponseEntity<UpsertSaleDTO> store(@RequestBody UpsertSaleDTO model){
         URI uri = ServletUriComponentsBuilder
@@ -37,12 +41,14 @@ public class SaleController {
         return ResponseEntity.created(uri).build();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @DeleteMapping("{id}/delete")
     public ResponseEntity<SaleDTO> deleteById(@PathVariable Long id){
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/sales/by-city")
     public List<SalesByCityDTO> getSalesByCity() {
         return service.getSalesGroupedByCity();

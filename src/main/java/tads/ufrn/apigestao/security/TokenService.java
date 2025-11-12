@@ -27,16 +27,14 @@ public class TokenService {
                     .withIssuer(ISSUER)
                     .withSubject(user.getCpf())
                     .withClaim("id", user.getId())
-                    .withClaim("name", user.getName())
-                    .withClaim("cpf", user.getCpf())
-                    .withClaim("position", user.getPosition().name())
+                    .withClaim("role", "ROLE_" + user.getPosition().name())// IMPORTANTE p/ role
+                    .withClaim("nome", user.getName())
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
-        } catch (JWTCreationException exception) {
-            throw new RuntimeException("Error while generating token", exception);
+        } catch (JWTCreationException ex) {
+            throw new RuntimeException("Error while generating token", ex);
         }
     }
-
 
     public String validateToken(String token) {
         try {
@@ -46,13 +44,24 @@ public class TokenService {
                     .build()
                     .verify(token)
                     .getSubject();
-        } catch (JWTVerificationException exception) {
-            System.out.println("Token invalid: " + exception.getMessage());
+        } catch (JWTVerificationException ex) {
             return "";
         }
     }
 
     private Instant genExpirationDate() {
-        return LocalDateTime.now().plusYears(1).toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }
+
+    public String extractRole(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+
+        return JWT.require(algorithm)
+                .withIssuer(ISSUER)
+                .build()
+                .verify(token)
+                .getClaim("role")
+                .asString();
+    }
+
 }

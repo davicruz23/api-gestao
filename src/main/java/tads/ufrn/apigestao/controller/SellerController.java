@@ -3,6 +3,7 @@ package tads.ufrn.apigestao.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.SellerMapper;
@@ -28,16 +29,19 @@ public class SellerController {
     private final SellerService service;
     private final PreSaleService preSaleService;
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR')")
     @GetMapping("/all")
     public ResponseEntity<List<SellerDTO>> findAll() {
         return ResponseEntity.ok().body(service.findAll().stream().map(SellerMapper::mapper).toList());
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR')")
     @GetMapping("{id}")
     public ResponseEntity<SellerDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(SellerMapper.mapper(service.findById(id)));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR')")
     @PostMapping
     public ResponseEntity<UpsertSellerDTO> store(@RequestBody UpsertSellerDTO model){
         URI uri = ServletUriComponentsBuilder
@@ -45,6 +49,7 @@ public class SellerController {
         return ResponseEntity.created(uri).build();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR')")
     @GetMapping("/by-user/{userId}")
     public ResponseEntity<SellerIdUserDTO> getSellerByUserId(@PathVariable Long userId) {
         SellerIdUserDTO dto = service.getSellerByUserId(userId);
@@ -52,6 +57,7 @@ public class SellerController {
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR')")
     @GetMapping("/{id}/commission")
     public ResponseEntity<SellerCommissionDTO> getCommissionByPeriod(
             @PathVariable Long id,

@@ -7,6 +7,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tads.ufrn.apigestao.controller.mapper.CollectorMapper;
 import tads.ufrn.apigestao.domain.CollectionAttempt;
@@ -41,25 +42,20 @@ public class CollectorController {
     private final PixService pixService;
     private final ApprovalLocationService approvalLocationService;
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @PostMapping("/{collectorId}/assign/{city}")
-    public ResponseEntity<CollectorSalesAssignedDTO> assignSalesByCity(
-            @PathVariable Long collectorId,
-            @PathVariable String city
-    ) {
-        System.out.println("entrei no metodo de cidade");
+    public ResponseEntity<CollectorSalesAssignedDTO> assignSalesByCity(@PathVariable Long collectorId, @PathVariable String city) {
+
         return ResponseEntity.ok(service.assignSalesByCity(collectorId, city));
     }
 
-    @GetMapping("/{collectorId}/salesssssss")
-    public ResponseEntity<List<Sale>> getSales(@PathVariable Long collectorId) {
-        return ResponseEntity.ok(service.getSales(collectorId));
-    }
-
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/all")
     public ResponseEntity<List<CollectorDTO>> findAll() {
         return ResponseEntity.ok(service.findAll().stream().map(CollectorMapper::mapper).toList());
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/name/all")
     public ResponseEntity<List<CollectorDTO>> findAllByName() {
         return ResponseEntity.ok(service.findAll().stream().map(CollectorMapper::mapperName).toList());
@@ -70,6 +66,7 @@ public class CollectorController {
 //        return ResponseEntity.ok(salesDTO);
 //    }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @PutMapping("/{id}/pay")
     public ResponseEntity<?> payInstallment(@PathVariable Long id) {
         try {
@@ -82,23 +79,22 @@ public class CollectorController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/{id}/commission")
-    public ResponseEntity<CollectorCommissionDTO> getCommissionByPeriod(
-            @PathVariable Long id,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(defaultValue = "false") boolean saveHistory) {
+    public ResponseEntity<CollectorCommissionDTO> getCommissionByPeriod(@PathVariable Long id, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate, @RequestParam(defaultValue = "false") boolean saveHistory) {
 
         CollectorCommissionDTO dto = service.getCommissionByPeriod(id, startDate, endDate, saveHistory);
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/{collectorId}/sales")
     public ResponseEntity<Map<String, List<SaleCollectorDTO>>> getSalesByCollector(@PathVariable Long collectorId) {
         Map<String, List<SaleCollectorDTO>> salesByCity = service.findSalesByCollectorId(collectorId);
         return ResponseEntity.ok(salesByCity);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/by-user/{userId}")
     public ResponseEntity<CollectorIdUserDTO> getCollectorByUserId(@PathVariable Long userId) {
         CollectorIdUserDTO dto = service.getCollectorByUserId(userId);
@@ -106,14 +102,9 @@ public class CollectorController {
         return ResponseEntity.ok(dto);
     }
 
-
-
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @PutMapping("/{collectorId}/installment/{installmentId}/collect")
-    public ResponseEntity<CollectionAttemptDTO> collectInstallment(
-            @PathVariable Long collectorId,
-            @PathVariable Long installmentId,
-            @RequestBody CollectionAttemptDTO dto
-    ) {
+    public ResponseEntity<CollectionAttemptDTO> collectInstallment(@PathVariable Long collectorId, @PathVariable Long installmentId, @RequestBody CollectionAttemptDTO dto) {
         CollectionAttemptDTO attempt = collectionAttemptService.recordAttempt(
                 collectorId,
                 installmentId,
@@ -128,6 +119,7 @@ public class CollectorController {
         return ResponseEntity.ok(attempt);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/installment/{id}/pix")
     public ResponseEntity<byte[]> getPixQrCode(@PathVariable Long id) {
         try {
@@ -145,6 +137,7 @@ public class CollectorController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/installment/{id}/pix/debug")
     public ResponseEntity<String> getPixCodeDebug(@PathVariable Long id) {
         try {
@@ -155,23 +148,28 @@ public class CollectorController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/collector/{collectorId}/sale/{saleId}/paid-attempts")
-    public ResponseEntity<List<CollectionAttemptMapsDTO>> getPaidAttemptsByCollectorAndSale(
-            @PathVariable Long collectorId,
-            @PathVariable Long saleId
-    ) {
+    public ResponseEntity<List<CollectionAttemptMapsDTO>> getPaidAttemptsByCollectorAndSale(@PathVariable Long collectorId, @PathVariable Long saleId) {
+
         List<CollectionAttemptMapsDTO> list = collectionAttemptService.findPaidAttemptsByCollectorAndSale(collectorId, saleId);
+
         return ResponseEntity.ok(list);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/collector/sale/{saleId}/location-sale")
     public ResponseEntity<List<LocationSaleDTO>> getLocationBySaleId(@PathVariable Long saleId) {
+
         List<LocationSaleDTO> list = approvalLocationService.getLocationSale(saleId);
+
         return ResponseEntity.ok(list);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/check-location/{installmentId}")
     public ResponseEntity<Map<String, Object>> checkLocation(@PathVariable Long installmentId) {
+
         boolean withinRadius = service.isAttemptWithinApprovalLocation(installmentId);
 
         Map<String, Object> response = new HashMap<>();
