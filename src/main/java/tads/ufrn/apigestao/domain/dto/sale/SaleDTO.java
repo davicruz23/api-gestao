@@ -23,6 +23,8 @@ public class SaleDTO {
     private Integer nParcel;
     private String clientName;
     private Double total;
+    private Double longitude;
+    private Double latitude;
     private List<ProductSaleDTO> products;
     private List<InstallmentDTO> installments;
 }

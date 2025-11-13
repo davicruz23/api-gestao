@@ -9,16 +9,13 @@ import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesAssignedDTO;
-import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesDTO;
-import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
-import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.repository.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,6 +36,34 @@ public class CollectorService {
 
     public List<Collector> findAll() {
         return repository.findAll();
+    }
+
+    public List<Collector> findAlll() {
+        List<Collector> collectors = repository.findAll();
+
+        for (Collector collector : collectors) {
+            if (collector.getSales() != null) {
+                for (Sale sale : collector.getSales()) {
+                    if (sale.getInstallments() != null) {
+                        for (Installment installment : sale.getInstallmentsEntities()) {
+
+                            if (installment.isPaid()) {
+                                try {
+                                    boolean valid = isAttemptWithinApprovalLocation(installment.getId());
+                                    installment.setIsValid(valid);
+                                } catch (Exception e) {
+                                    installment.setIsValid(null);
+                                }
+                            } else {
+                                installment.setIsValid(null);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return collectors;
     }
 
     public Collector findById(Long id) {
@@ -168,18 +193,31 @@ public class CollectorService {
         ApprovalLocation approvalLocation = approvalLocationRepository.findBySaleId(sale.getId())
                 .orElseThrow(() -> new RuntimeException("Local de aprovação não encontrado"));
 
-        CollectionAttempt attempt = collectionAttemptRepository.findByInstallmentId(installmentId)
-                .orElseThrow(() -> new RuntimeException("Tentativa de cobrança não encontrada"));
+        // usa o repositório já existente que retorna List<CollectionAttempt>
+        List<CollectionAttempt> attempts = collectionAttemptRepository.findPaidAttemptsByCollectorAndSale(
+                sale.getCollector() != null ? sale.getCollector().getId() : null,
+                sale.getId()
+        );
+
+        if (attempts == null || attempts.isEmpty()) {
+            throw new RuntimeException("Tentativa de cobrança não encontrada");
+        }
+
+        // pega a mais recente (supondo campo attemptDate em CollectionAttempt)
+        CollectionAttempt latestAttempt = attempts.stream()
+                .max(Comparator.comparing(CollectionAttempt::getAttemptAt))
+                .orElseThrow(() -> new RuntimeException("Nenhuma tentativa válida encontrada"));
 
         double distance = distanceInMeters(
                 approvalLocation.getLatitude(),
                 approvalLocation.getLongitude(),
-                attempt.getLatitude(),
-                attempt.getLongitude()
+                latestAttempt.getLatitude(),
+                latestAttempt.getLongitude()
         );
 
         return distance <= RADIUS_METERS;
     }
+
 
     private double distanceInMeters(double lat1, double lon1, double lat2, double lon2) {
         final int EARTH_RADIUS = 6371000; // metros

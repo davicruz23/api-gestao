@@ -31,4 +31,7 @@ public class Installment {
     private boolean commissionable = true;
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
+
+    @Transient
+    private Boolean isValid;
 }

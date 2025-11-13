@@ -42,7 +42,7 @@ public class Sale {
     @JoinColumn(name = "collector_id")
     private Collector collector;
 
-    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Installment> installmentsEntities = new ArrayList<>();
 
     @OneToOne(mappedBy = "sale", cascade = CascadeType.ALL)

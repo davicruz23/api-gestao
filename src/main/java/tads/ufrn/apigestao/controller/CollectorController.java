@@ -56,6 +56,12 @@ public class CollectorController {
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
+    @GetMapping("/all/sales")
+    public ResponseEntity<List<CollectorDTO>> findAlll() {
+        return ResponseEntity.ok(service.findAlll().stream().map(CollectorMapper::mapper).toList());
+    }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/name/all")
     public ResponseEntity<List<CollectorDTO>> findAllByName() {
         return ResponseEntity.ok(service.findAll().stream().map(CollectorMapper::mapperName).toList());

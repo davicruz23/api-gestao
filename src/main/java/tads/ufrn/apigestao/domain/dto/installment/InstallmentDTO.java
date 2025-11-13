@@ -21,4 +21,7 @@ public class InstallmentDTO {
     private Double amount;
     private boolean paid = false;
     private InstallmentStatusDTO status;
+    private Boolean isValid;
+    private Double attemptLatitude;
+    private Double attemptLongitude;
 }

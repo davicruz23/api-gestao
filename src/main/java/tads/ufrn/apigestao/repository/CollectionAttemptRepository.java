@@ -11,7 +11,11 @@ import java.util.Optional;
 public interface CollectionAttemptRepository extends JpaRepository<CollectionAttempt, Long> {
 
     List<CollectionAttempt> findByCollectorId(Long collectorId);
-    Optional<CollectionAttempt> findByInstallmentId(Long installmentId);
+    @Query("SELECT ca FROM CollectionAttempt ca " +
+            "WHERE ca.installment.id = :installmentId " +
+            "ORDER BY ca.attemptAt DESC LIMIT 1")
+    Optional<CollectionAttempt> findLatestByInstallmentId(@Param("installmentId") Long installmentId);
+
 
     @Query("""
     SELECT ca
