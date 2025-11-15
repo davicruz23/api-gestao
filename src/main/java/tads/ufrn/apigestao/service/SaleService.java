@@ -6,6 +6,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.*;
+import tads.ufrn.apigestao.domain.dto.sale.CitySalesDTO;
+import tads.ufrn.apigestao.domain.dto.sale.SaleItemDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SalesByCityDTO;
 import tads.ufrn.apigestao.domain.dto.sale.UpsertSaleDTO;
 import tads.ufrn.apigestao.enums.PaymentType;
@@ -14,12 +16,10 @@ import tads.ufrn.apigestao.repository.InstallmentRepository;
 import tads.ufrn.apigestao.repository.PreSaleRepository;
 import tads.ufrn.apigestao.repository.SaleRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -122,5 +122,47 @@ public class SaleService {
 
     public List<Sale> getSalesByCollector(Long collectorId) {
         return repository.findByCollectorId(collectorId);
+    }
+
+    public List<CitySalesDTO> salesGroupedByCityAssignment() {
+        List<Object[]> rows = repository.findSalesDetailedWithoutCollector();
+
+        Map<String, List<SaleItemDTO>> grouped = new LinkedHashMap<>();
+
+        for (Object[] row : rows) {
+
+            String city = (String) row[0];
+
+            SaleItemDTO sale = new SaleItemDTO(
+                    ((Number) row[1]).longValue(),
+                    ((Number) row[2]).longValue(),
+                    ((Number) row[3]).longValue(),
+                    (String) row[4],
+                    city,
+                    (String) row[5],
+                    (Double) row[6]
+            );
+
+            grouped.computeIfAbsent(city, c -> new ArrayList<>()).add(sale);
+        }
+
+        List<CitySalesDTO> result = new ArrayList<>();
+
+        for (var entry : grouped.entrySet()) {
+            result.add(new CitySalesDTO(
+                    entry.getKey(),
+                    entry.getValue().size(),
+                    entry.getValue()
+            ));
+        }
+
+        return result;
+    }
+
+    @Transactional
+    public void assignSalesToCollector(Long collectorId, List<Long> saleIds) {
+        if (saleIds == null || saleIds.isEmpty()) return;
+
+        repository.assignCollector(collectorId, saleIds);
     }
 }

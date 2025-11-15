@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.Address;
 import tads.ufrn.apigestao.domain.Client;
+import tads.ufrn.apigestao.domain.dto.client.ClientRecentDTO;
 import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
 import tads.ufrn.apigestao.repository.ClientRepository;
 
@@ -52,24 +53,23 @@ public class ClientService {
         return repository.save(client);
     }
 
-
-    /*public Product update(ProductDTO product){
-        Product productId = repository.findById(product.getId())
-                .orElseThrow(()-> new RuntimeException("Produto não encontrado"));
-
-        Product p = new Product();
-        p.setName(product.getName());
-        p.setBrand(product.getBrand());
-        p.setAmount(product.getAmount());
-
-        return repository.save(p);
-    }*/
-
     public void deleteById(Long id){
         Client client = repository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Product not found"));
         repository.save(client);
 
+    }
+
+    public List<ClientRecentDTO> findLastClients(){
+        return repository.findRecentClientsRaw()
+                .stream()
+                .map(r -> new ClientRecentDTO(
+                        ((Number) r[0]).longValue(),
+                        ((String) r[1]),
+                        ((String) r[2]),
+                        ((String) r[3])
+                ))
+                .toList();
     }
 
 }

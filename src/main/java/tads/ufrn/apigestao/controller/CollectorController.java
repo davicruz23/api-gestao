@@ -18,12 +18,11 @@ import tads.ufrn.apigestao.domain.dto.LocationSaleDTO;
 import tads.ufrn.apigestao.domain.dto.collector.*;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
+import tads.ufrn.apigestao.domain.dto.sale.AssignSalesCollectorRequest;
+import tads.ufrn.apigestao.domain.dto.sale.CitySalesDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.enums.PaymentType;
-import tads.ufrn.apigestao.service.ApprovalLocationService;
-import tads.ufrn.apigestao.service.CollectionAttemptService;
-import tads.ufrn.apigestao.service.CollectorService;
-import tads.ufrn.apigestao.service.PixService;
+import tads.ufrn.apigestao.service.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -41,12 +40,26 @@ public class CollectorController {
     private final CollectionAttemptService collectionAttemptService;
     private final PixService pixService;
     private final ApprovalLocationService approvalLocationService;
+    private final SaleService saleService;
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @PostMapping("/{collectorId}/assign/{city}")
     public ResponseEntity<CollectorSalesAssignedDTO> assignSalesByCity(@PathVariable Long collectorId, @PathVariable String city) {
 
         return ResponseEntity.ok(service.assignSalesByCity(collectorId, city));
+    }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @GetMapping("/grouped-by-city/assigment")
+    public ResponseEntity<List<CitySalesDTO>> salesGroupedByCityAssigment() {
+        return ResponseEntity.ok(saleService.salesGroupedByCityAssignment());
+    }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PostMapping("/assign-sales")
+    public ResponseEntity<Void> assignSalesToCollector(@RequestBody AssignSalesCollectorRequest request) {
+        saleService.assignSalesToCollector(request.collectorId(), request.saleIds());
+        return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")

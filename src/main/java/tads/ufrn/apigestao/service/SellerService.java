@@ -1,18 +1,13 @@
 package tads.ufrn.apigestao.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.*;
-import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
 import tads.ufrn.apigestao.domain.dto.seller.*;
-import tads.ufrn.apigestao.repository.CommissionHistoryRepository;
-import tads.ufrn.apigestao.repository.InstallmentRepository;
 import tads.ufrn.apigestao.repository.SellerRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +29,12 @@ public class SellerService {
 
     public Seller store(UpsertSellerDTO seller) {
         return repository.save(mapper.map(seller, Seller.class));
+    }
+
+    public void createFromUser(User user) {
+        Seller seller = new Seller();
+        seller.setUser(user);
+        repository.save(seller);
     }
 
 //    public void addCommission(Seller seller, double commissionValue) {

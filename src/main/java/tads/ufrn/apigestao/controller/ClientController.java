@@ -8,6 +8,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.ClientMapper;
 import tads.ufrn.apigestao.controller.mapper.ProductMapper;
 import tads.ufrn.apigestao.domain.dto.client.ClientDTO;
+import tads.ufrn.apigestao.domain.dto.client.ClientRecentDTO;
 import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.UpsertProductDTO;

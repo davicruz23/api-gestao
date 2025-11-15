@@ -37,6 +37,12 @@ public class InspectorService {
         return inspector.orElseThrow(() -> new NotFoundException("User not found"));
     }
 
+    public void createFromUser(User user) {
+        Inspector inspector = new Inspector();
+        inspector.setUser(user);
+        repository.save(inspector);
+    }
+
     public Inspector store(UpsertInspectorDTO inspector) {
         return repository.save(mapper.map(inspector, Inspector.class));
     }

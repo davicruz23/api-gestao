@@ -27,6 +27,7 @@ public interface PreSaleItemRepository extends JpaRepository<PreSaleItem, Long> 
       AND (:endDate IS NULL OR ps.preSaleDate <= :endDate)
     GROUP BY p.id, p.name
     ORDER BY SUM(i.quantity) DESC
+    LIMIT 5
 """)
     List<DashboardProductSalesDTO> findTotalProductsSoldByDateRange(
             @Param("startDate") LocalDate startDate,

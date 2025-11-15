@@ -6,6 +6,7 @@ import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.Installment;
 import tads.ufrn.apigestao.domain.Sale;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
+import tads.ufrn.apigestao.domain.dto.collector.CollectorTopDTO;
 import tads.ufrn.apigestao.domain.dto.dashboard.*;
 import tads.ufrn.apigestao.enums.PreSaleStatus;
 import tads.ufrn.apigestao.repository.*;
@@ -16,6 +17,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,6 +189,35 @@ public class DashboardService {
 
     public Long getCountChargins() {
         return chargingRepository.countDistinctCities();
+    }
+
+    public List<CollectorTopDTO> getTopCollectorsStatus() {
+
+        List<Object[]> rows = installmentRepository.findTopCollectorsStatus();
+        List<CollectorTopDTO> result = new ArrayList<>();
+
+        for (Object[] row : rows) {
+
+            Long collectorId = ((Number) row[0]).longValue();
+            String collectorName = ((String) row[1]);
+
+            Double totalCollectedToday = row[2] != null
+                    ? ((Number) row[2]).doubleValue()
+                    : 0.0;
+
+            Double totalToCollectThisMonth = row[3] != null
+                    ? ((Number) row[3]).doubleValue()
+                    : 0.0;
+
+            result.add(new CollectorTopDTO(
+                    collectorId,
+                    collectorName,
+                    totalCollectedToday,
+                    totalToCollectThisMonth
+            ));
+        }
+
+        return result;
     }
 
 }

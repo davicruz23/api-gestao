@@ -3,10 +3,14 @@ package tads.ufrn.apigestao.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import tads.ufrn.apigestao.controller.mapper.UserMapper;
 import tads.ufrn.apigestao.domain.User;
 import tads.ufrn.apigestao.domain.dto.loginDTO.LoginRequestDTO;
 import tads.ufrn.apigestao.domain.dto.loginDTO.LoginResponseDTO;
+import tads.ufrn.apigestao.domain.dto.user.UpsertUserDTO;
+import tads.ufrn.apigestao.domain.dto.user.UserDTO;
 import tads.ufrn.apigestao.security.TokenService;
 import tads.ufrn.apigestao.service.AuthService;
 
@@ -38,10 +42,10 @@ public class AuthController {
     }
 
 
-    /*@PostMapping("/register")
-    //@PreAuthorize("hasRole('authRegister')")
-    public ResponseEntity<UserListingtDTO> register(@RequestBody UserRequestDTO userRequestDTO) {
-        return ResponseEntity.ok(UserMapper.mapper(authService.register(userRequestDTO)));
-    }*/
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> register(@RequestBody UpsertUserDTO userDTO) {
+        return ResponseEntity.ok(UserMapper.mapper(authService.register(userDTO)));
+    }
 
 }

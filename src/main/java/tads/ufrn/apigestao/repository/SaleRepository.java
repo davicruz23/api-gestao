@@ -1,6 +1,7 @@
 package tads.ufrn.apigestao.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -64,4 +65,48 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             ORDER BY mes
             """, nativeQuery = true)
     List<Object[]> findSalesPerMonth(int meses);
+
+    @Query(value = """
+        SELECT
+            a.city AS city,
+            COUNT(s.id) AS total_sales,
+            GROUP_CONCAT(s.id) AS sale_ids
+        FROM sale s
+        JOIN pre_sale p  ON p.id = s.pre_sale_id
+        JOIN client cl   ON cl.id = p.client_id
+        JOIN address a   ON a.id = cl.address_id
+        WHERE s.collector_id IS NULL
+        GROUP BY a.city
+        ORDER BY a.city
+        """,
+            nativeQuery = true)
+    List<Object[]> findSalesGroupedByCity();
+
+    @Query(value = """
+        SELECT
+            a.city AS city,
+            s.id AS sale_id,
+            s.pre_sale_id,
+            cl.id AS client_id,
+            cl.name as client_name,
+            a.state,
+            s.total
+        FROM sale s
+        JOIN pre_sale p  ON p.id = s.pre_sale_id
+        JOIN client cl   ON cl.id = p.client_id
+        JOIN address a   ON a.id = cl.address_id
+        WHERE s.collector_id IS NULL
+        ORDER BY a.city, s.id
+        """,
+            nativeQuery = true)
+    List<Object[]> findSalesDetailedWithoutCollector();
+
+    @Modifying
+    @Query(value = """
+    UPDATE sale 
+    SET collector_id = :collectorId
+    WHERE id IN (:saleIds)
+""", nativeQuery = true)
+    void assignCollector(Long collectorId, List<Long> saleIds);
+
 }

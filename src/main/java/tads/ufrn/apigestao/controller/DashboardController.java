@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import tads.ufrn.apigestao.domain.dto.client.ClientRecentDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
+import tads.ufrn.apigestao.domain.dto.collector.CollectorTopDTO;
 import tads.ufrn.apigestao.domain.dto.dashboard.*;
+import tads.ufrn.apigestao.service.ClientService;
 import tads.ufrn.apigestao.service.DashboardService;
 
 import java.math.BigDecimal;
@@ -23,6 +26,7 @@ import java.util.Map;
 public class DashboardController {
 
     private final DashboardService dashboardService;
+    private final ClientService clientService;
 
     @PreAuthorize("hasRole('SUPERADMIN')")
     @GetMapping("/count/sales")
@@ -93,5 +97,17 @@ public class DashboardController {
     public ResponseEntity<Long> getChargingCount() {
         Long count = dashboardService.getCountChargins();
         return ResponseEntity.ok(count);
+    }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @GetMapping("/recents")
+    public List<ClientRecentDTO> getRecentClients(){
+        return clientService.findLastClients();
+    }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @GetMapping("/collector/top-today-status")
+    public ResponseEntity<List<CollectorTopDTO>> getTopCollectorsStatus() {
+        return ResponseEntity.ok(dashboardService.getTopCollectorsStatus());
     }
 }

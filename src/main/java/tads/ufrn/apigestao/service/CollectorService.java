@@ -9,12 +9,14 @@ import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesAssignedDTO;
+import tads.ufrn.apigestao.domain.dto.collector.CollectorTopDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.repository.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +70,12 @@ public class CollectorService {
 
     public Collector findById(Long id) {
         return repository.findById(id).orElseThrow();
+    }
+
+    public void createFromUser(User user) {
+        Collector collector = new Collector();
+        collector.setUser(user);
+        repository.save(collector);
     }
 
     @Transactional
