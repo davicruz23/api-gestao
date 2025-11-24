@@ -6,13 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tads.ufrn.apigestao.controller.mapper.CollectorMapper;
 import tads.ufrn.apigestao.controller.mapper.SellerMapper;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
-import tads.ufrn.apigestao.domain.dto.seller.SellerCommissionDTO;
-import tads.ufrn.apigestao.domain.dto.seller.SellerDTO;
-import tads.ufrn.apigestao.domain.dto.seller.SellerIdUserDTO;
-import tads.ufrn.apigestao.domain.dto.seller.UpsertSellerDTO;
+import tads.ufrn.apigestao.domain.dto.collector.CollectorDTO;
+import tads.ufrn.apigestao.domain.dto.seller.*;
 import tads.ufrn.apigestao.service.PreSaleService;
 import tads.ufrn.apigestao.service.SellerService;
 
@@ -35,7 +34,13 @@ public class SellerController {
         return ResponseEntity.ok().body(service.findAll().stream().map(SellerMapper::mapper).toList());
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
+    @GetMapping("/name/all")
+    public ResponseEntity<List<SellerDetailsDTO>> findAllByName() {
+        return ResponseEntity.ok(service.findAll().stream().map(SellerMapper::mapperDetails).toList());
+    }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("{id}")
     public ResponseEntity<SellerDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(SellerMapper.mapper(service.findById(id)));

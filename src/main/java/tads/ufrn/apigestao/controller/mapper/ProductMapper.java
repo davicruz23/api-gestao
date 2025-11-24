@@ -17,10 +17,11 @@ public class ProductMapper {
                 .build();
     }
 
-    public static ProductSaleDTO mapperProductSale(Product product){
+    public static ProductSaleDTO mapperProductSale(Product product, Integer quantity){
         return ProductSaleDTO.builder()
                 .id(product.getId())
                 .nameProduct(product.getName())
+                .quantity(quantity)
                 .build();
     }
 

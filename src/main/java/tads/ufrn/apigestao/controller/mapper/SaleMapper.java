@@ -43,7 +43,10 @@ public class SaleMapper {
                 .latitude(src.getApprovalLocation().getLatitude())
                 .longitude(src.getApprovalLocation().getLongitude())
                 .products(src.getPreSale().getItems().stream()
-                        .map(item -> ProductMapper.mapperProductSale(item.getProduct()))
+                        .map(item -> ProductMapper.mapperProductSale(
+                                item.getProduct(),
+                                item.getQuantity()
+                        ))
                         .toList())
                 .installments(
                         src.getInstallmentsEntities().stream()
@@ -99,11 +102,12 @@ public class SaleMapper {
                 .client(src.getPreSale().getClient() != null
                         ? ClientMapper.clientSale(src.getPreSale().getClient())
                         : null)
-                .products(
-                        src.getPreSale().getItems().stream()
-                                .map(item -> ProductMapper.mapperProductSale(item.getProduct()))
-                                .toList()
-                )
+                .products(src.getPreSale().getItems().stream()
+                        .map(item -> ProductMapper.mapperProductSale(
+                                item.getProduct(),
+                                item.getQuantity()
+                        ))
+                        .toList())
                 .installments(
                         src.getInstallments() != 0 && src.getId() != null
                                 ? src.getInstallmentsEntities().stream()

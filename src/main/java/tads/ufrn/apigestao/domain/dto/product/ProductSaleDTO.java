@@ -13,4 +13,5 @@ public class ProductSaleDTO {
 
     private Long id;
     private String nameProduct;
+    private Integer quantity;
 }
