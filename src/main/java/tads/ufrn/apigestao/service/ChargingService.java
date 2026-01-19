@@ -1,8 +1,8 @@
 package tads.ufrn.apigestao.service;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.controller.mapper.ChargingMapper;
@@ -13,37 +13,52 @@ import tads.ufrn.apigestao.domain.User;
 import tads.ufrn.apigestao.domain.dto.charging.ChargingDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 import tads.ufrn.apigestao.domain.dto.chargingItem.UpsertChargingItemDTO;
-import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.repository.ChargingRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class ChangingService {
+public class ChargingService {
 
     private final ChargingRepository repository;
     private final UserService userService;
     private final ProductService productService;
-    private final ModelMapper mapper;
     private final ChargingItemService chargingItemService;
+    private final ModelMapper mapper;
 
-    public List<Charging> findAll() {
-        return repository.findAll();
+    @Transactional(readOnly = true)
+    public List<ChargingDTO> findAll() {
+        return repository.findAllWithItems()
+                .stream()
+                .map(ChargingMapper::mapper)
+                .toList();
     }
 
-    public List<Charging> findChargingCurrent() {
-        return repository.findAllByDeletedAtIsNull();
+    @Transactional(readOnly = true)
+    public List<ChargingDTO> findCurrent() {
+        return repository.findAllCurrentWithItems()
+                .stream()
+                .map(ChargingMapper::mapper)
+                .toList();
     }
 
-    public Charging findById(Long id) {
-        Optional<Charging> obj = repository.findById(id);
-        return obj.orElseThrow(() -> new NotFoundException("ChargingMapper não encontrado!"));
+    @Transactional(readOnly = true)
+    public ChargingDTO findById(Long id) {
+        Charging charging = repository.findByIdWithItems(id)
+                .orElseThrow(() -> new NotFoundException("Charging não encontrado"));
+
+        return ChargingMapper.mapper(charging);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
+    public Charging findEntityById(Long id) {
+        return repository.findByIdWithItems(id)
+                .orElseThrow(() -> new NotFoundException("Charging não encontrado"));
+    }
+
+    @jakarta.transaction.Transactional
     public Charging store(UpsertChargingDTO chargingDTO) {
 
         User user = userService.findUserById(2L);
@@ -81,7 +96,7 @@ public class ChangingService {
         return repository.save(mapper.map(model, Charging.class));
     }
 
-    @Transactional
+    @jakarta.transaction.Transactional
     public void deleteById(Long id) {
         Charging charging = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Charging not found"));

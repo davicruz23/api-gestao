@@ -13,7 +13,21 @@ import java.util.List;
 @Repository
 public interface PreSaleRepository extends JpaRepository<PreSale, Long> {
 
-    List<PreSale> findByInspectorIdAndStatus(Long inspectorId, PreSaleStatus status);
+    //List<PreSale> findByInspectorIdAndStatus(Long inspectorId, PreSaleStatus status);
+
+    @Query("""
+    select distinct ps
+    from PreSale ps
+    left join fetch ps.items i
+    left join fetch i.product
+    where ps.inspector.id = :inspectorId
+      and ps.status = :status
+""")
+    List<PreSale> findByInspectorIdAndStatus(
+            @Param("inspectorId") Long inspectorId,
+            @Param("status") PreSaleStatus status
+    );
+
 
     List<PreSale> findBySellerId(Long sellerId);
 

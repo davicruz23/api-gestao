@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class SaleDTO {
     private String paymentType;
     private Integer nParcel;
     private String clientName;
-    private Double total;
+    private BigDecimal total;
     private Double longitude;
     private Double latitude;
     private List<ProductSaleDTO> products;

@@ -40,26 +40,28 @@ public class InspectorController {
     @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/all")
     public ResponseEntity<List<InspectorDTO>> findAll(){
-        return ResponseEntity.ok().body(service.findAll().stream().map(InspectorMapper::mapper).toList());
+        return ResponseEntity.ok(service.findAllDTO());
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/{id}")
     public ResponseEntity<InspectorDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(InspectorMapper.mapper(service.findById(id)));
+        return ResponseEntity.ok(service.findByIdDTO(id));
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @PostMapping
-    public ResponseEntity<UpsertInspectorDTO> store(@RequestBody UpsertInspectorDTO model){
+    public ResponseEntity<Void> store(@RequestBody UpsertInspectorDTO model){
         URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}").buildAndExpand(service.store(model).getId()).toUri();
+                .fromCurrentRequest().path("/{id}")
+                .buildAndExpand(service.store(model).getId())
+                .toUri();
         return ResponseEntity.created(uri).build();
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @DeleteMapping("{id}/delete")
-    public ResponseEntity<InspectorDTO> deleteById(@PathVariable Long id){
+    public ResponseEntity<Void> deleteById(@PathVariable Long id){
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
@@ -67,7 +69,14 @@ public class InspectorController {
     @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/{inspectorId}/pre-sales/pending")
     public ResponseEntity<List<PreSaleDTO>> listPending(@PathVariable Long inspectorId) {
-        return ResponseEntity.ok(preSaleService.listAllPreSales(inspectorId, PreSaleStatus.PENDENTE).stream().map(PreSaleMapper::mapper).toList());
+
+        List<PreSaleDTO> list = preSaleService
+                .listAllPreSales(inspectorId, PreSaleStatus.PENDENTE)
+                .stream()
+                .map(PreSaleMapper::mapper)
+                .toList();
+
+        return ResponseEntity.ok(list);
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
@@ -76,7 +85,7 @@ public class InspectorController {
             @PathVariable Long preSaleId,
             @RequestBody @Valid ApprovePreSaleDTO dto) {
 
-        Inspector inspector = service.findById(dto.getInspectorId());
+        Inspector inspector = service.findEntityById(dto.getInspectorId());
 
         Sale sale = saleService.approvePreSale(
                 preSaleId,
@@ -99,12 +108,9 @@ public class InspectorController {
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
-
     @GetMapping("/by-user/{userId}")
     public ResponseEntity<InspectorIdUserDTO> getInspectorByUserId(@PathVariable Long userId) {
-        InspectorIdUserDTO dto = service.getInspectorByUserId(userId);
-        System.out.println("chamei o endpoint de seller user: "+ dto.toString());
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(service.getInspectorByUserId(userId));
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
@@ -113,5 +119,4 @@ public class InspectorController {
         List<InspectorHistoryPreSaleDTO> list = preSaleService.findPreSalesByInspector(inspectorId);
         return ResponseEntity.ok(list);
     }
-
 }

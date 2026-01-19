@@ -1,5 +1,6 @@
 package tads.ufrn.apigestao.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,24 +15,23 @@ import java.util.List;
 public interface PreSaleItemRepository extends JpaRepository<PreSaleItem, Long> {
 
     @Query("""
-    SELECT new tads.ufrn.apigestao.domain.dto.dashboard.DashboardProductSalesDTO(
-        p.id,
-        p.name,
-        SUM(i.quantity),
-        SUM(i.quantity * p.value)
-    )
-    FROM PreSaleItem i
-    JOIN i.product p
-    JOIN i.preSale ps
-    WHERE (:startDate IS NULL OR ps.preSaleDate >= :startDate)
-      AND (:endDate IS NULL OR ps.preSaleDate <= :endDate)
-    GROUP BY p.id, p.name
-    ORDER BY SUM(i.quantity) DESC
-    LIMIT 5
-""")
+        SELECT new tads.ufrn.apigestao.domain.dto.dashboard.DashboardProductSalesDTO(
+            p.id,
+            p.name,
+            SUM(i.quantity),
+            SUM(p.value)
+        )
+        FROM PreSaleItem i
+        JOIN i.product p
+        JOIN i.preSale ps
+        WHERE (:startDate IS NULL OR ps.preSaleDate >= :startDate)
+          AND (:endDate IS NULL OR ps.preSaleDate <= :endDate)
+        GROUP BY p.id, p.name
+        ORDER BY SUM(i.quantity) DESC
+    """)
     List<DashboardProductSalesDTO> findTotalProductsSoldByDateRange(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
-
 }
+

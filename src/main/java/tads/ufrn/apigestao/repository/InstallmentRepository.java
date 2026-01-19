@@ -4,11 +4,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import tads.ufrn.apigestao.domain.Installment;
+import tads.ufrn.apigestao.domain.Sale;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface InstallmentRepository extends JpaRepository<Installment, Long> {
@@ -50,5 +52,8 @@ public interface InstallmentRepository extends JpaRepository<Installment, Long> 
             nativeQuery = true)
     List<Object[]> findTopCollectorsStatus();
 
-
+    Optional<Installment> findFirstBySaleAndDueDateAfterOrderByDueDateAsc(
+            Sale sale,
+            LocalDate dueDate
+    );
 }

@@ -4,6 +4,7 @@ import tads.ufrn.apigestao.domain.Installment;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentStatusDTO;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -27,12 +28,23 @@ public class InstallmentMapper {
             status = InstallmentStatusDTO.EM_DIA;
         }
 
+        BigDecimal amount = src.isPaid()
+                ? src.getPaidAmount()
+                : src.getAmount();
+
         return InstallmentDTO.builder()
                 .id(src.getId())
-                .dueDate(src.getDueDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
-                .amount(src.getAmount())
+                .dueDate(
+                        src.getDueDate()
+                                .format(DateTimeFormatter.ofPattern(
+                                        "dd/MM/yyyy",
+                                        new Locale("pt", "BR")
+                                ))
+                )
+                .amount(amount)
                 .paid(src.isPaid())
                 .status(status)
                 .build();
     }
+
 }

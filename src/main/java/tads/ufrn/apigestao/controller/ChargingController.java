@@ -6,39 +6,36 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.ChargingMapper;
-import tads.ufrn.apigestao.controller.mapper.ProductMapper;
 import tads.ufrn.apigestao.domain.dto.charging.ChargingDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
-import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
-import tads.ufrn.apigestao.domain.dto.product.UpsertProductDTO;
-import tads.ufrn.apigestao.service.ChangingService;
+import tads.ufrn.apigestao.service.ChargingService;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
 @RequestMapping("/api/charging")
+@AllArgsConstructor
 public class ChargingController {
 
-    private final ChangingService service;
+    private final ChargingService service;
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','FUNCIONARIO')")
     @GetMapping("/all")
-    public ResponseEntity<List<ChargingDTO>> findAll(){
-        return ResponseEntity.ok().body(service.findAll().stream().map(ChargingMapper::mapper).toList());
+    public ResponseEntity<List<ChargingDTO>> findAll() {
+        return ResponseEntity.ok(service.findAll());
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','FUNCIONARIO')")
     @GetMapping("/current")
-    public ResponseEntity<List<ChargingDTO>> findCurrent(){
-        return ResponseEntity.ok().body(service.findChargingCurrent().stream().map(ChargingMapper::mapper).toList());
+    public ResponseEntity<List<ChargingDTO>> findCurrent() {
+        return ResponseEntity.ok(service.findCurrent());
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','FUNCIONARIO')")
     @GetMapping("/{id}")
     public ResponseEntity<ChargingDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(ChargingMapper.mapper(service.findById(id)));
+        return ResponseEntity.ok().body(ChargingMapper.mapper(service.findEntityById(id)));
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','FUNCIONARIO')")

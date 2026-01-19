@@ -15,6 +15,8 @@ import tads.ufrn.apigestao.enums.PreSaleStatus;
 import tads.ufrn.apigestao.repository.CommissionHistoryRepository;
 import tads.ufrn.apigestao.repository.PreSaleRepository;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ public class PreSaleService {
     private final PreSaleRepository repository;
     private final ClientService clientService;
     private final SellerService sellerService;
-    private final ChangingService changingService;
+    private final ChargingService changingService;
     private final InspectorService inspectorService;
     private final CommissionHistoryRepository commissionHistoryRepository;
 
@@ -63,7 +65,7 @@ public class PreSaleService {
             throw new RuntimeException("Vendedor não encontrado: " + dto.getSellerId());
         }
 
-        Inspector inspector = inspectorService.findById(1L);
+        Inspector inspector = inspectorService.findEntityById(1L);
 
         PreSale preSale = new PreSale();
         preSale.setPreSaleDate(dto.getPreSaleDate());
@@ -74,7 +76,7 @@ public class PreSaleService {
         preSale.setItems(new ArrayList<>());
         System.out.println("Pré-venda criada com seller: " + seller.getId() + " e client: " + client.getId());
 
-        Charging charging = changingService.findById(dto.getChargingId());
+        Charging charging = changingService.findEntityById(dto.getChargingId());
 
         for (UpsertPreSaleItemDTO prodDTO : dto.getProducts()) {
             assert charging != null;
@@ -101,10 +103,16 @@ public class PreSaleService {
             preSale.getItems().add(preSaleItem);
         }
 
-        double totalPreSale = preSale.getItems().stream()
-                .mapToDouble(item -> item.getProduct().getValue() * item.getQuantity())
-                .sum();
+        BigDecimal totalPreSale = preSale.getItems().stream()
+                .map(item ->
+                        item.getProduct().getValue()
+                                .multiply(BigDecimal.valueOf(item.getQuantity()))
+                )
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+
         preSale.setTotalPreSale(totalPreSale);
+
 
         return repository.save(preSale);
     }
@@ -156,7 +164,12 @@ public class PreSaleService {
     }
 
     @Transactional
-    public SellerCommissionDTO getCommissionByPeriod(Long sellerId, LocalDate startDate, LocalDate endDate, boolean saveHistory) {
+    public SellerCommissionDTO getCommissionByPeriod(
+            Long sellerId,
+            LocalDate startDate,
+            LocalDate endDate,
+            boolean saveHistory
+    ) {
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -173,13 +186,21 @@ public class PreSaleService {
                         && !preSale.getPreSaleDate().isAfter(endDate))
                 .toList();
 
-        double totalCommission = preSales.stream()
-                .mapToDouble(preSale -> {
-                    double total = preSale.getTotalPreSale() != null ? preSale.getTotalPreSale() : 0.0;
-                    double rate = total <= 1000 ? 0.09 : 0.045;
-                    return total * rate;
+        BigDecimal totalCommission = preSales.stream()
+                .map(preSale -> {
+
+                    BigDecimal total = preSale.getTotalPreSale() != null
+                            ? preSale.getTotalPreSale()
+                            : BigDecimal.ZERO;
+
+                    BigDecimal rate = total.compareTo(BigDecimal.valueOf(1000)) <= 0
+                            ? new BigDecimal("0.09")
+                            : new BigDecimal("0.045");
+
+                    return total.multiply(rate);
                 })
-                .sum();
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
 
         if (saveHistory) {
             CommissionHistory history = new CommissionHistory();
@@ -199,6 +220,7 @@ public class PreSaleService {
                 totalCommission
         );
     }
+
 
     @Transactional
     public List<InspectorHistoryPreSaleDTO> findPreSalesByInspector(Long inspectorId) {

@@ -30,7 +30,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequest) {
-        System.out.println("usuario que tentou logar: "+ loginRequest.getCpf() + "   " + loginRequest.getPassword());
         User user = authService.login(loginRequest);
 
         if (user != null) {

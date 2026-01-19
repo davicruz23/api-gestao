@@ -25,6 +25,7 @@ import tads.ufrn.apigestao.enums.PaymentType;
 import tads.ufrn.apigestao.service.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -71,8 +72,9 @@ public class CollectorController {
     @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/all/sales")
     public ResponseEntity<List<CollectorDTO>> findAlll() {
-        return ResponseEntity.ok(service.findAlll().stream().map(CollectorMapper::mapper).toList());
+        return ResponseEntity.ok(service.findAlll());
     }
+
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/name/all")
@@ -87,16 +89,22 @@ public class CollectorController {
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @PutMapping("/{id}/pay")
-    public ResponseEntity<?> payInstallment(@PathVariable Long id) {
+    public ResponseEntity<?> payInstallment(@PathVariable Long id, @RequestParam BigDecimal amount) {
+
+        System.out.println("recebi isso aqui: parcela: "+ id + "valor recebido: " + amount);
         try {
-            InstallmentPaidDTO paidInstallment = service.markAsPaid(id);
+            InstallmentPaidDTO paidInstallment =
+                    service.markAsPaid(id, amount);
+
             return ResponseEntity.ok(paidInstallment);
+
         } catch (RuntimeException e) {
             return ResponseEntity
                     .badRequest()
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @GetMapping("/{id}/commission")

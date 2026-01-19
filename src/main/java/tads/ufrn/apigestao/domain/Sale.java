@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.enums.PaymentType;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class Sale {
 
     @Min(1)
     private Integer installments;
-    private Double total;
+    private BigDecimal total;
 
     @ManyToOne
     @JoinColumn(name = "collector_id")

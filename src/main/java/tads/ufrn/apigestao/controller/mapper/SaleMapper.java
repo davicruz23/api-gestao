@@ -13,6 +13,7 @@ import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleLocationDTO;
 import tads.ufrn.apigestao.repository.CollectionAttemptRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -32,54 +33,79 @@ public class SaleMapper {
     }
 
     public static SaleDTO mapper(Sale src) {
+
         return SaleDTO.builder()
                 .id(src.getId())
                 .numberSale(src.getNumberSale())
-                .saleDate(src.getSaleDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
+                .saleDate(
+                        src.getSaleDate()
+                                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR")))
+                )
                 .clientName(src.getPreSale().getClient().getName())
                 .paymentType(src.getPaymentMethod().toString())
                 .nParcel(src.getInstallments())
                 .total(src.getTotal())
+
+                // LOCAL DA APROVAÇÃO DA VENDA (NÃO MEXE)
                 .latitude(src.getApprovalLocation().getLatitude())
                 .longitude(src.getApprovalLocation().getLongitude())
-                .products(src.getPreSale().getItems().stream()
-                        .map(item -> ProductMapper.mapperProductSale(
-                                item.getProduct(),
-                                item.getQuantity()
-                        ))
-                        .toList())
+
+                .products(
+                        src.getPreSale().getItems().stream()
+                                .map(item ->
+                                        ProductMapper.mapperProductSale(
+                                                item.getProduct(),
+                                                item.getQuantity()
+                                        )
+                                )
+                                .toList()
+                )
+
                 .installments(
                         src.getInstallmentsEntities().stream()
                                 .map(inst -> {
-                                    Double attemptLat = null;
-                                    Double attemptLon = null;
+
+                                    Double attemptLatitude = null;
+                                    Double attemptLongitude = null;
 
                                     if (inst.isPaid() && attemptRepository != null) {
-                                        Optional<CollectionAttempt> attempts = attemptRepository.findLatestByInstallmentId(inst.getId());
-                                        if (attempts.isPresent()) {
-                                            CollectionAttempt latestAttempt = attempts.stream()
-                                                    .max(Comparator.comparing(CollectionAttempt::getAttemptAt))
-                                                    .orElse(null);
-                                            attemptLat = latestAttempt.getLatitude();
-                                            attemptLon = latestAttempt.getLongitude();
+
+                                        Optional<CollectionAttempt> attemptOpt =
+                                                attemptRepository
+                                                        .findTopByInstallmentIdOrderByAttemptAtDesc(inst.getId());
+
+                                        if (attemptOpt.isPresent()) {
+                                            CollectionAttempt attempt = attemptOpt.get();
+                                            attemptLatitude = attempt.getLatitude();
+                                            attemptLongitude = attempt.getLongitude();
                                         }
                                     }
 
+                                    BigDecimal amount = inst.isPaid() && inst.getPaidAmount() != null
+                                            ? inst.getPaidAmount()
+                                            : inst.getAmount();
+
                                     return InstallmentDTO.builder()
                                             .id(inst.getId())
-                                            .dueDate(inst.getDueDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
-                                            .amount(inst.getAmount())
+                                            .dueDate(
+                                                    inst.getDueDate()
+                                                            .format(DateTimeFormatter.ofPattern(
+                                                                    "dd/MM/yyyy", new Locale("pt", "BR")))
+                                            )
+                                            .amount(amount)
                                             .paid(inst.isPaid())
                                             .isValid(inst.getIsValid())
-                                            .attemptLatitude(attemptLat)
-                                            .attemptLongitude(attemptLon)
+                                            // LOCAL ONDE O USUÁRIO MARCOU COMO PAGO
+                                            .attemptLatitude(attemptLatitude)
+                                            .attemptLongitude(attemptLongitude)
                                             .build();
                                 })
                                 .toList()
                 )
-                .build();
 
+                .build();
     }
+
 
     public static SaleDTO toDTO(Sale sale) {
         if (sale == null) return null;

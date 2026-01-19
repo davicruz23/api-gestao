@@ -29,4 +29,28 @@ public interface ChargingRepository extends JpaRepository<Charging, Long> {
     """)
     Optional<Charging> findWithItems(Long id);
 
+    @Query("""
+    SELECT DISTINCT c
+    FROM Charging c
+    LEFT JOIN FETCH c.items
+""")
+    List<Charging> findAllWithItems();
+
+    @Query("""
+    SELECT DISTINCT c
+    FROM Charging c
+    LEFT JOIN FETCH c.items
+    WHERE c.deletedAt IS NULL
+""")
+    List<Charging> findAllCurrentWithItems();
+
+    @Query("""
+    SELECT DISTINCT c
+    FROM Charging c
+    LEFT JOIN FETCH c.items
+    WHERE c.id = :id
+""")
+    Optional<Charging> findByIdWithItems(Long id);
+
+
 }

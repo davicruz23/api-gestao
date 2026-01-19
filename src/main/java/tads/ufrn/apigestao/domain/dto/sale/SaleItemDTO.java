@@ -16,6 +16,6 @@ public class SaleItemDTO {
     private String clientName;
     private String city;
     private String state;
-    private Double amount;
+    private BigDecimal amount;
 }
 

@@ -13,6 +13,7 @@ import tads.ufrn.apigestao.repository.InstallmentRepository;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,15 +30,14 @@ public class PixService {
         String chavePix = "+5584994611450";
         String nomeBeneficiario = "DAVI SOUZA";
         String cidade = "MACAIBA";
-        double valor = installment.getAmount();
+        BigDecimal valor = installment.getAmount();
 
         return generatePixPayload(chavePix, nomeBeneficiario, cidade, valor);
     }
 
-    private String generatePixPayload(String chavePix, String nomeBeneficiario, String cidade, double valor) {
+    private String generatePixPayload(String chavePix, String nomeBeneficiario, String cidade, BigDecimal valor) {
         StringBuilder payload = new StringBuilder();
 
-        // Payload Format Indicator (versão dinâmica)
         payload.append("000201"); // 00 (ID) + 02 (tamanho) + 01 (versão)
 
         // Point of Initiation Method (01 = estático, 12 = dinâmico)
@@ -48,7 +48,7 @@ public class PixService {
         String gui = "0014br.gov.bcb.pix";
         String key = "01" + formatField(chavePix);
         String merchantAccount = gui + key;
-        payload.append("26" + formatField(merchantAccount));
+        payload.append("26").append(formatField(merchantAccount));
 
         // Merchant Category Code
         payload.append("52040000");
@@ -57,28 +57,28 @@ public class PixService {
         payload.append("5303986");
 
         // Transaction Amount
-        if (valor > 0) {
+        if (valor.compareTo(BigDecimal.ZERO) > 0) {
             String valorStr = String.format("%.2f", valor).replace(",", ".");
-            payload.append("54" + formatField(valorStr));
+            payload.append("54").append(formatField(valorStr));
         }
 
         // Country Code
         payload.append("5802BR");
 
         // Merchant Name
-        payload.append("59" + formatField(nomeBeneficiario));
+        payload.append("59").append(formatField(nomeBeneficiario));
 
         // Merchant City
-        payload.append("60" + formatField(cidade));
+        payload.append("60").append(formatField(cidade));
 
         // Additional Data Field Template (campo de referência)
         String additionalData = "0503***"; // *** indica campo livre
-        payload.append("62" + formatField(additionalData));
+        payload.append("62").append(formatField(additionalData));
 
         // CRC16
         String dataWithoutCrc = payload.toString() + "6304";
         String crc = calculateCRC16(dataWithoutCrc);
-        payload.append("6304" + crc);
+        payload.append("6304").append(crc);
 
         return payload.toString();
     }

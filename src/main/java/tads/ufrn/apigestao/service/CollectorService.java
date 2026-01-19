@@ -1,25 +1,22 @@
 package tads.ufrn.apigestao.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tads.ufrn.apigestao.controller.mapper.CollectorMapper;
 import tads.ufrn.apigestao.controller.mapper.SaleMapper;
 import tads.ufrn.apigestao.domain.*;
-import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
-import tads.ufrn.apigestao.domain.dto.collector.CollectorIdUserDTO;
-import tads.ufrn.apigestao.domain.dto.collector.CollectorSalesAssignedDTO;
-import tads.ufrn.apigestao.domain.dto.collector.CollectorTopDTO;
+import tads.ufrn.apigestao.domain.dto.collector.*;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.repository.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,33 +37,43 @@ public class CollectorService {
         return repository.findAll();
     }
 
-    public List<Collector> findAlll() {
+    @Transactional(readOnly = true)
+    public List<CollectorDTO> findAlll() {
+
         List<Collector> collectors = repository.findAll();
 
         for (Collector collector : collectors) {
-            if (collector.getSales() != null) {
-                for (Sale sale : collector.getSales()) {
-                    if (sale.getInstallments() != null) {
-                        for (Installment installment : sale.getInstallmentsEntities()) {
+            if (collector.getSales() == null) {
+                continue;
+            }
 
-                            if (installment.isPaid()) {
-                                try {
-                                    boolean valid = isAttemptWithinApprovalLocation(installment.getId());
-                                    installment.setIsValid(valid);
-                                } catch (Exception e) {
-                                    installment.setIsValid(null);
-                                }
-                            } else {
-                                installment.setIsValid(null);
-                            }
+            for (Sale sale : collector.getSales()) {
+                if (sale.getInstallmentsEntities() == null) {
+                    continue;
+                }
+
+                for (Installment installment : sale.getInstallmentsEntities()) {
+
+                    if (installment.isPaid()) {
+                        try {
+                            installment.setIsValid(
+                                    isAttemptWithinApprovalLocation(installment.getId())
+                            );
+                        } catch (Exception e) {
+                            installment.setIsValid(null);
                         }
+                    } else {
+                        installment.setIsValid(null);
                     }
                 }
             }
         }
 
-        return collectors;
+        return collectors.stream()
+                .map(CollectorMapper::mapper)
+                .toList();
     }
+
 
     public Collector findById(Long id) {
         return repository.findById(id).orElseThrow();
@@ -101,7 +108,8 @@ public class CollectorService {
     }
 
     @Transactional
-    public InstallmentPaidDTO markAsPaid(Long installmentId) {
+    public InstallmentPaidDTO markAsPaid(Long installmentId, BigDecimal amountPaid) {
+
         Installment installment = installmentRepository.findById(installmentId)
                 .orElseThrow(() -> new RuntimeException("Parcela não encontrada"));
 
@@ -109,37 +117,89 @@ public class CollectorService {
             throw new RuntimeException("Parcela já está marcada como paga");
         }
 
+        BigDecimal installmentAmount = installment.getAmount();
+        BigDecimal remaining = installmentAmount.subtract(amountPaid);
+
         installment.setPaid(true);
         installment.setPaymentDate(LocalDateTime.now());
+        installment.setPaidAmount(amountPaid);
         installmentRepository.save(installment);
+
+        if (remaining.compareTo(BigDecimal.ZERO) > 0) {
+            handleRemainingBalance(installment, remaining);
+        }
 
         return new InstallmentPaidDTO(
                 installment.getId(),
                 installment.getDueDate(),
-                installment.getAmount(),
+                installment.getPaidAmount(),
                 installment.isPaid(),
                 installment.getPaymentDate()
         );
     }
 
-    public CollectorCommissionDTO getCommissionByPeriod(Long collectorId, LocalDate startDate, LocalDate endDate, boolean saveHistory) {
+    private void handleRemainingBalance(Installment current, BigDecimal remaining) {
+
+        Optional<Installment> nextOpt =
+                installmentRepository.findFirstBySaleAndDueDateAfterOrderByDueDateAsc(
+                        current.getSale(),
+                        current.getDueDate()
+                );
+
+        if (nextOpt.isPresent() && !nextOpt.get().isPaid()) {
+
+            Installment next = nextOpt.get();
+
+            next.setAmount(
+                    next.getAmount().add(remaining)
+            );
+            next.setPaymentType(next.getPaymentType());
+            next.setPaymentType(next.getPaymentType());
+
+            installmentRepository.save(next);
+
+        } else {
+            Installment newInstallment = new Installment();
+            newInstallment.setSale(current.getSale());
+            newInstallment.setDueDate(current.getDueDate().plusMonths(1));
+            newInstallment.setAmount(remaining);
+            newInstallment.setPaid(false);
+            newInstallment.setCommissionable(true);
+
+            installmentRepository.save(newInstallment);
+        }
+    }
+
+    public CollectorCommissionDTO getCommissionByPeriod(
+            Long collectorId,
+            LocalDate startDate,
+            LocalDate endDate,
+            boolean saveHistory
+    ) {
 
         if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("A data final não pode ser anterior à data inicial.");
         }
+
         Collector collector = repository.findById(collectorId)
                 .orElseThrow(() -> new RuntimeException("Cobrador não encontrado"));
+
         List<Sale> sales = saleService.getSalesByCollector(collectorId);
-        double totalCollected = sales.stream()
+
+        BigDecimal totalCollected = sales.stream()
                 .flatMap(sale -> installmentRepository.findBySaleId(sale.getId()).stream())
                 .filter(inst -> inst.isPaid()
                         && inst.isCommissionable()
                         && inst.getPaymentDate() != null
                         && !inst.getPaymentDate().isBefore(startDate.atStartOfDay())
                         && !inst.getPaymentDate().isAfter(endDate.atTime(23, 59, 59)))
-                .mapToDouble(Installment::getAmount)
-                .sum();
-        double commission = totalCollected * 0.01;
+                .map(Installment::getPaidAmount)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal commission = totalCollected
+                .multiply(BigDecimal.valueOf(0.01))
+                .setScale(2, RoundingMode.HALF_UP);
 
         if (saveHistory) {
             CommissionHistory history = new CommissionHistory();
@@ -160,6 +220,7 @@ public class CollectorService {
         );
     }
 
+    @Transactional(readOnly = true)
     public Map<String, List<SaleCollectorDTO>> findSalesByCollectorId(Long collectorId) {
 
         if (!repository.existsById(collectorId)) {
@@ -193,39 +254,35 @@ public class CollectorService {
     }
 
     public boolean isAttemptWithinApprovalLocation(Long installmentId) {
+
         Installment installment = installmentRepository.findById(installmentId)
                 .orElseThrow(() -> new RuntimeException("Parcela não encontrada"));
 
-        Sale sale = installment.getSale();
-
-        ApprovalLocation approvalLocation = approvalLocationRepository.findBySaleId(sale.getId())
-                .orElseThrow(() -> new RuntimeException("Local de aprovação não encontrado"));
-
-        // usa o repositório já existente que retorna List<CollectionAttempt>
-        List<CollectionAttempt> attempts = collectionAttemptRepository.findPaidAttemptsByCollectorAndSale(
-                sale.getCollector() != null ? sale.getCollector().getId() : null,
-                sale.getId()
-        );
-
-        if (attempts == null || attempts.isEmpty()) {
-            throw new RuntimeException("Tentativa de cobrança não encontrada");
+        // Fonte da verdade
+        if (!installment.isPaid()) {
+            return false;
         }
 
-        // pega a mais recente (supondo campo attemptDate em CollectionAttempt)
-        CollectionAttempt latestAttempt = attempts.stream()
-                .max(Comparator.comparing(CollectionAttempt::getAttemptAt))
-                .orElseThrow(() -> new RuntimeException("Nenhuma tentativa válida encontrada"));
+        Sale sale = installment.getSale();
+
+        ApprovalLocation approvalLocation =
+                approvalLocationRepository.findBySaleId(sale.getId())
+                        .orElseThrow(() -> new RuntimeException("Local de aprovação não encontrado"));
+
+        CollectionAttempt attempt =
+                collectionAttemptRepository
+                        .findTopByInstallmentIdOrderByAttemptAtDesc(installmentId)
+                        .orElseThrow(() -> new RuntimeException("Tentativa não encontrada"));
 
         double distance = distanceInMeters(
                 approvalLocation.getLatitude(),
                 approvalLocation.getLongitude(),
-                latestAttempt.getLatitude(),
-                latestAttempt.getLongitude()
+                attempt.getLatitude(),
+                attempt.getLongitude()
         );
 
         return distance <= RADIUS_METERS;
     }
-
 
     private double distanceInMeters(double lat1, double lon1, double lat2, double lon2) {
         final int EARTH_RADIUS = 6371000; // metros

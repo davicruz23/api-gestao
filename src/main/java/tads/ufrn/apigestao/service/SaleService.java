@@ -17,6 +17,7 @@ import tads.ufrn.apigestao.repository.PreSaleRepository;
 import tads.ufrn.apigestao.repository.SaleRepository;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -54,7 +55,7 @@ public class SaleService {
     @Transactional
     public Sale approvePreSale(Long preSaleId, Inspector inspector,
                                PaymentType paymentMethod, int installments,
-                               Double cashPaid, Double latitude, Double longitude) {
+                               BigDecimal cashPaid, Double latitude, Double longitude) {
 
         PreSale preSale = preSaleService.approvePreSale(preSaleId, inspector);
 
@@ -65,11 +66,15 @@ public class SaleService {
         sale.setInstallments(installments);
         sale.setPaymentMethod(paymentMethod);
 
-        double total = preSale.getItems().stream()
-                .mapToDouble(item -> item.getProduct().getValue() * item.getQuantity())
-                .sum();
-        sale.setTotal(total);
+        BigDecimal total = preSale.getItems().stream()
+                .map(item ->
+                        item.getProduct().getValue()
+                                .multiply(BigDecimal.valueOf(item.getQuantity()))
+                )
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
 
+        sale.setTotal(total);
         repository.save(sale);
 
         ApprovalLocation location = new ApprovalLocation();
@@ -82,7 +87,7 @@ public class SaleService {
 
         sale.setApprovalLocation(location);
 
-        if (cashPaid != null && cashPaid > 0) {
+        if (cashPaid != null && cashPaid.compareTo(BigDecimal.ZERO) > 0) {
             Installment upfront = new Installment();
             upfront.setSale(sale);
             upfront.setAmount(cashPaid);
@@ -95,10 +100,17 @@ public class SaleService {
             installmentRepository.save(upfront);
         }
 
+        BigDecimal paid = cashPaid != null ? cashPaid : BigDecimal.ZERO;
+        BigDecimal remaining = total.subtract(paid);
 
-        double remaining = total - (cashPaid != null ? cashPaid : 0.0);
-        if (remaining > 0 && installments > 0) {
-            double installmentValue = remaining / installments;
+        if (remaining.compareTo(BigDecimal.ZERO) > 0 && installments > 0) {
+
+            BigDecimal installmentValue = remaining.divide(
+                    BigDecimal.valueOf(installments),
+                    2,
+                    RoundingMode.HALF_UP
+            );
+
             LocalDate firstDueDate = sale.getSaleDate().plusDays(30);
 
             for (int i = 0; i < installments; i++) {
@@ -108,13 +120,13 @@ public class SaleService {
                 inst.setDueDate(firstDueDate.plusMonths(i));
                 inst.setPaid(false);
                 inst.setPaymentType(PaymentType.PARCEL);
+
                 installmentRepository.save(inst);
             }
         }
 
         return sale;
     }
-
 
     public List<SalesByCityDTO> getSalesGroupedByCity() {
         return repository.countSaleByCity();
@@ -140,7 +152,7 @@ public class SaleService {
                     (String) row[4],
                     city,
                     (String) row[5],
-                    (Double) row[6]
+                    (BigDecimal) row[6]
             );
 
             grouped.computeIfAbsent(city, c -> new ArrayList<>()).add(sale);

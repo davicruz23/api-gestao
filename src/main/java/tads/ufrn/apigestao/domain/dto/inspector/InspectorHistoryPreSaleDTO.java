@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.domain.Client;
 import tads.ufrn.apigestao.domain.dto.client.ClientHistoryDTO;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,6 +18,6 @@ public class InspectorHistoryPreSaleDTO {
     private Long id;
     private String preSaleDate;
     private String status;
-    private Double totalPreSale;
+    private BigDecimal totalPreSale;
     private ClientHistoryDTO client;
 }

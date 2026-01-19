@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -29,5 +30,7 @@ public class CommissionHistory {
     private LocalDateTime generatedAt;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Double amount;
+
+    @Column(precision = 15, scale = 2, nullable = false)
+    private BigDecimal amount;
 }

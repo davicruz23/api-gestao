@@ -13,5 +13,5 @@ public class DashboardProductSalesDTO {
     private Long productId;
     private String productName;
     private Long totalQuantity;
-    private Double totalValue;
+    private BigDecimal totalValue;
 }

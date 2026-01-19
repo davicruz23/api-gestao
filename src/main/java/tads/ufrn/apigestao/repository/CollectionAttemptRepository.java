@@ -28,5 +28,10 @@ public interface CollectionAttemptRepository extends JpaRepository<CollectionAtt
             @Param("collectorId") Long collectorId,
             @Param("saleId") Long saleId
     );
+
+    Optional<CollectionAttempt> findTopByInstallmentIdOrderByAttemptAtDesc(
+            Long installmentId
+    );
+
 }
 

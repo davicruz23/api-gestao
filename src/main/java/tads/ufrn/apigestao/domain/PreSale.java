@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.enums.PreSaleStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class PreSale {
 
     private LocalDate preSaleDate;
 
-    private Double totalPreSale;
+    private BigDecimal totalPreSale;
 
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)

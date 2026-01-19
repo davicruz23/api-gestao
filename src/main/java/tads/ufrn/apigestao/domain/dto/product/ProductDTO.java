@@ -9,6 +9,8 @@ import tads.ufrn.apigestao.domain.Charging;
 import tads.ufrn.apigestao.domain.Client;
 import tads.ufrn.apigestao.domain.Sale;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,7 +21,7 @@ public class ProductDTO {
     private String name;
     private String brand;
     private Integer amount;
-    private Double value;
+    private BigDecimal value;
     private String status;
 
 }

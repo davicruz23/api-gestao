@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.domain.Sale;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -18,7 +19,7 @@ public class InstallmentDTO {
 
     private Long id;
     private String dueDate;
-    private Double amount;
+    private BigDecimal amount;
     private boolean paid = false;
     private InstallmentStatusDTO status;
     private Boolean isValid;

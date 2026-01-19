@@ -13,5 +13,5 @@ public class DashboardSaleDTO {
 
     private Long total;
     private BigDecimal totalSale;
-    private Double percentual;
+    private BigDecimal percentual;
 }

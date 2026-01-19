@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.enums.ProductStatus;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,8 @@ public class Product extends AbstractEntity {
     private String name;
     private String brand;
     private Integer amount;
-    private Double value;
-
+    @Column(precision = 15, scale = 2, nullable = false)
+    private BigDecimal value;
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 

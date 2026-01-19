@@ -17,10 +17,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +36,7 @@ public class DashboardService {
     private final SaleService saleService;
 
     public DashboardSaleDTO getSalesDashboard(LocalDate startDate, LocalDate endDate) {
+
         if (startDate == null || endDate == null) {
             LocalDate hoje = LocalDate.now();
             startDate = hoje.withDayOfMonth(1);
@@ -50,29 +48,37 @@ public class DashboardService {
         Long totalVendas = (long) sales.size();
 
         BigDecimal totalValor = sales.stream()
-                .filter(s -> s.getTotal() != null)
-                .map(s -> BigDecimal.valueOf(s.getTotal()))
+                .map(Sale::getTotal)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         LocalDate startPrev = startDate.minusMonths(1);
         LocalDate endPrev = startPrev.withDayOfMonth(startPrev.lengthOfMonth());
 
         List<Sale> prevSales = saleRepository.findSalesByDateRange(startPrev, endPrev);
+
         BigDecimal totalValorAnterior = prevSales.stream()
-                .filter(s -> s.getTotal() != null)
-                .map(s -> BigDecimal.valueOf(s.getTotal()))
+                .map(Sale::getTotal)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        double percentual = 0.0;
+        BigDecimal percentual = BigDecimal.ZERO;
+
         if (totalValorAnterior.compareTo(BigDecimal.ZERO) > 0) {
-            percentual = totalValor.subtract(totalValorAnterior)
+            percentual = totalValor
+                    .subtract(totalValorAnterior)
                     .divide(totalValorAnterior, 4, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100))
-                    .doubleValue();
+                    .setScale(2, RoundingMode.HALF_UP);
         }
 
-        return new DashboardSaleDTO(totalVendas, totalValor, percentual);
+        return new DashboardSaleDTO(
+                totalVendas,
+                totalValor.setScale(2, RoundingMode.HALF_UP),
+                percentual
+        );
     }
+
 
     public Map<String, Long> getSalesStatusCount() {
         Long pending = preSaleRepository.countByStatus(PreSaleStatus.fromValue(1));
@@ -99,21 +105,39 @@ public class DashboardService {
         }).collect(Collectors.toList());
     }
 
-    public List<CollectorCommissionDTO> getAllCommissionsByPeriod(LocalDate startDate, LocalDate endDate) {
+    public List<CollectorCommissionDTO> getAllCommissionsByPeriod(
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+
         List<Collector> collectors = collectorRepository.findAll();
 
         return collectors.stream().map(collector -> {
+
             List<Sale> sales = saleService.getSalesByCollector(collector.getId());
-            double totalCollected = sales.stream()
-                    .flatMap(sale -> installmentRepository.findBySaleId(sale.getId()).stream())
-                    .filter(inst -> inst.isPaid()
-                            && inst.isCommissionable()
-                            && inst.getPaymentDate() != null
-                            && (startDate == null || !inst.getPaymentDate().isBefore(startDate.atStartOfDay()))
-                            && (endDate == null || !inst.getPaymentDate().isAfter(endDate.atTime(23, 59, 59))))
-                    .mapToDouble(Installment::getAmount)
-                    .sum();
-            double commission = totalCollected * 0.01;
+
+            BigDecimal totalCollected = sales.stream()
+                    .flatMap(sale ->
+                            installmentRepository.findBySaleId(sale.getId()).stream()
+                    )
+                    .filter(inst ->
+                            inst.isPaid()
+                                    && inst.isCommissionable()
+                                    && inst.getPaymentDate() != null
+                                    && (startDate == null
+                                    || !inst.getPaymentDate()
+                                    .isBefore(startDate.atStartOfDay()))
+                                    && (endDate == null
+                                    || !inst.getPaymentDate()
+                                    .isAfter(endDate.atTime(23, 59, 59)))
+                    )
+                    .map(Installment::getAmount)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal commission = totalCollected
+                    .multiply(BigDecimal.valueOf(0.01))
+                    .setScale(2, RoundingMode.HALF_UP);
 
             return new CollectorCommissionDTO(
                     collector.getId(),
@@ -122,8 +146,10 @@ public class DashboardService {
                     endDate,
                     commission
             );
+
         }).collect(Collectors.toList());
     }
+
 
     public List<DashboardProductSalesDTO> getTotalProductsSold(LocalDate startDate, LocalDate endDate) {
         return preSaleItemRepository.findTotalProductsSoldByDateRange(startDate, endDate);

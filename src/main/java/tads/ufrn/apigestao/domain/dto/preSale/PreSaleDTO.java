@@ -12,6 +12,7 @@ import tads.ufrn.apigestao.domain.dto.preSaleItem.PreSaleItemDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.seller.SellerDetailsDTO;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +28,7 @@ public class PreSaleDTO {
     private SellerDetailsDTO seller;
     private Client client;
     private String inspector;
-    private Double totalPreSale;
+    private BigDecimal totalPreSale;
     private List<PreSaleItemDTO> items;
     private String status;
 }
