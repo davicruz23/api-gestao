@@ -52,5 +52,8 @@ public interface ChargingRepository extends JpaRepository<Charging, Long> {
 """)
     Optional<Charging> findByIdWithItems(Long id);
 
+    Optional<Charging> findFirstByUserIdAndDeletedAtIsNull(Long userId);
+
+    Optional<Charging> findFirstBy();
 
 }

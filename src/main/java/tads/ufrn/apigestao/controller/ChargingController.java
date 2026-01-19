@@ -6,6 +6,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.ChargingMapper;
+import tads.ufrn.apigestao.domain.Charging;
+import tads.ufrn.apigestao.domain.dto.charging.AddChargingItemDTO;
 import tads.ufrn.apigestao.domain.dto.charging.ChargingDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 import tads.ufrn.apigestao.service.ChargingService;
@@ -52,4 +54,10 @@ public class ChargingController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/add")
+    public ResponseEntity<ChargingDTO> addProducts(@RequestBody List<AddChargingItemDTO> items) {
+        return ResponseEntity.ok(service.addProductsToCharging(items));
+    }
+
 }

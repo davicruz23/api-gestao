@@ -68,11 +68,10 @@ public class SaleMapper {
                                     Double attemptLatitude = null;
                                     Double attemptLongitude = null;
 
+                                    // Pega localização do pagamento apenas se estiver pago
                                     if (inst.isPaid() && attemptRepository != null) {
-
                                         Optional<CollectionAttempt> attemptOpt =
-                                                attemptRepository
-                                                        .findTopByInstallmentIdOrderByAttemptAtDesc(inst.getId());
+                                                attemptRepository.findTopByInstallmentIdOrderByAttemptAtDesc(inst.getId());
 
                                         if (attemptOpt.isPresent()) {
                                             CollectionAttempt attempt = attemptOpt.get();
@@ -81,9 +80,13 @@ public class SaleMapper {
                                         }
                                     }
 
-                                    BigDecimal amount = inst.isPaid() && inst.getPaidAmount() != null
-                                            ? inst.getPaidAmount()
-                                            : inst.getAmount();
+                                    // Garante que amount nunca seja null
+                                    BigDecimal amount;
+                                    if (inst.isPaid()) {
+                                        amount = inst.getPaidAmount() != null ? inst.getPaidAmount() : inst.getAmount();
+                                    } else {
+                                        amount = inst.getAmount();
+                                    }
 
                                     return InstallmentDTO.builder()
                                             .id(inst.getId())
@@ -95,13 +98,13 @@ public class SaleMapper {
                                             .amount(amount)
                                             .paid(inst.isPaid())
                                             .isValid(inst.getIsValid())
-                                            // LOCAL ONDE O USUÁRIO MARCOU COMO PAGO
                                             .attemptLatitude(attemptLatitude)
                                             .attemptLongitude(attemptLongitude)
                                             .build();
                                 })
                                 .toList()
                 )
+
 
                 .build();
     }

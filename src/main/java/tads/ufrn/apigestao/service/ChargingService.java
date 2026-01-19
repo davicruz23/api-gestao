@@ -10,7 +10,9 @@ import tads.ufrn.apigestao.domain.Charging;
 import tads.ufrn.apigestao.domain.ChargingItem;
 import tads.ufrn.apigestao.domain.Product;
 import tads.ufrn.apigestao.domain.User;
+import tads.ufrn.apigestao.domain.dto.charging.AddChargingItemDTO;
 import tads.ufrn.apigestao.domain.dto.charging.ChargingDTO;
+import tads.ufrn.apigestao.domain.dto.charging.UpdateChargingItemDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 import tads.ufrn.apigestao.domain.dto.chargingItem.UpsertChargingItemDTO;
 import tads.ufrn.apigestao.repository.ChargingRepository;
@@ -58,31 +60,54 @@ public class ChargingService {
                 .orElseThrow(() -> new NotFoundException("Charging não encontrado"));
     }
 
-    @jakarta.transaction.Transactional
+    @Transactional
     public Charging store(UpsertChargingDTO chargingDTO) {
 
-        User user = userService.findUserById(2L);
+        User userCharging = userService.findUserById(1L);
 
-        List<Charging> previousChargings = repository.findAllByUserIdAndDeletedAtIsNull(user.getId());
-        for (Charging oldCharging : previousChargings) {
-            deleteById(oldCharging.getId());
-        }
-
-        Charging charging = new Charging();
-        charging.setDescription(chargingDTO.getDescription());
-        charging.setDate(chargingDTO.getDate());
-        charging.setCreatedAt(LocalDate.now());
-        charging.setUser(user);
+        Charging charging = repository.findFirstBy()
+                .orElseGet(Charging::new);
 
         for (UpsertChargingItemDTO itemDTO : chargingDTO.getItems()) {
+
             Product product = productService.findById(itemDTO.getProductId());
+            int newQuantity = itemDTO.getQuantity();
 
-            if (product.getAmount() < itemDTO.getQuantity()) {
-                throw new RuntimeException("Estoque insuficiente para o produto: " + product.getId());
+            ChargingItem item = charging.getItems()
+                    .stream()
+                    .filter(i -> i.getProduct().getId().equals(product.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (item != null) {
+
+                int diff = newQuantity - item.getQuantity();
+
+                if (diff > 0 && product.getAmount() < diff) {
+                    throw new RuntimeException(
+                            "Estoque insuficiente para o produto: " + product.getId()
+                    );
+                }
+
+                product.setAmount(product.getAmount() - diff);
+                item.setQuantity(newQuantity);
+
+            } else {
+
+                if (product.getAmount() < newQuantity) {
+                    throw new RuntimeException(
+                            "Estoque insuficiente para o produto: " + product.getId()
+                    );
+                }
+
+                product.setAmount(product.getAmount() - newQuantity);
+                charging.addItem(product, newQuantity);
+                charging.setDescription(chargingDTO.getDescription());
+                charging.setDate(LocalDate.now());
+                charging.setUser(userCharging);
+                charging.setCreatedAt(LocalDate.now());
+                charging.setDescription("MERCADORIAS");
             }
-            product.setAmount(product.getAmount() - itemDTO.getQuantity());
-
-            charging.addItem(product, itemDTO.getQuantity());
         }
 
         Charging savedCharging = repository.save(charging);
@@ -91,12 +116,50 @@ public class ChargingService {
         return savedCharging;
     }
 
+    @Transactional
+    public ChargingDTO addProductsToCharging(List<AddChargingItemDTO> itemsToAdd) {
+
+        Charging charging = repository.findFirstBy()
+                .orElseThrow(() -> new RuntimeException("Carregamento não encontrado"));
+
+        for (AddChargingItemDTO dto : itemsToAdd) {
+
+            if (dto.quantity() <= 0) {
+                throw new RuntimeException("Quantidade inválida para o produto " + dto.productId());
+            }
+
+            Product product = productService.findById(dto.productId());
+
+            if (product.getAmount() < dto.quantity()) {
+                throw new RuntimeException(
+                        "Estoque insuficiente para o produto: " + dto.productId()
+                );
+            }
+
+            ChargingItem item = charging.getItems()
+                    .stream()
+                    .filter(i -> i.getProduct().getId().equals(dto.productId()))
+                    .findFirst()
+                    .orElse(null);
+
+            product.setAmount(product.getAmount() - dto.quantity());
+
+            if (item != null) {
+                item.setQuantity(item.getQuantity() + dto.quantity());
+            } else {
+                charging.addItem(product, dto.quantity());
+            }
+        }
+
+        return ChargingMapper.mapper(charging);
+    }
+
 
     public Charging update(UpsertChargingDTO model) {
         return repository.save(mapper.map(model, Charging.class));
     }
 
-    @jakarta.transaction.Transactional
+    @Transactional
     public void deleteById(Long id) {
         Charging charging = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Charging not found"));
