@@ -16,6 +16,7 @@ import tads.ufrn.apigestao.domain.dto.charging.UpdateChargingItemDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 import tads.ufrn.apigestao.domain.dto.chargingItem.UpsertChargingItemDTO;
 import tads.ufrn.apigestao.repository.ChargingRepository;
+import tads.ufrn.apigestao.repository.ProductRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ChargingService {
     private final UserService userService;
     private final ProductService productService;
     private final ChargingItemService chargingItemService;
-    private final ModelMapper mapper;
+    private final ProductRepository productRepository;
 
     @Transactional(readOnly = true)
     public List<ChargingDTO> findAll() {
@@ -119,6 +120,8 @@ public class ChargingService {
     @Transactional
     public ChargingDTO addProductsToCharging(List<AddChargingItemDTO> itemsToAdd) {
 
+        System.out.println("Print: " + itemsToAdd);
+
         Charging charging = repository.findFirstBy()
                 .orElseThrow(() -> new RuntimeException("Carregamento não encontrado"));
 
@@ -143,20 +146,19 @@ public class ChargingService {
                     .orElse(null);
 
             product.setAmount(product.getAmount() - dto.quantity());
+            productRepository.save(product);
 
             if (item != null) {
                 item.setQuantity(item.getQuantity() + dto.quantity());
             } else {
                 charging.addItem(product, dto.quantity());
+
             }
         }
 
+        repository.save(charging);
+
         return ChargingMapper.mapper(charging);
-    }
-
-
-    public Charging update(UpsertChargingDTO model) {
-        return repository.save(mapper.map(model, Charging.class));
     }
 
     @Transactional

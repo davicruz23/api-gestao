@@ -18,7 +18,7 @@ public interface InstallmentRepository extends JpaRepository<Installment, Long> 
     List<Installment> findBySaleId(Long saleId);
 
     @Query("""
-        SELECT COALESCE(SUM(i.amount), 0)
+        SELECT COALESCE(SUM(i.paidAmount), 0)
         FROM Installment i
         WHERE i.paid = TRUE
           AND i.paymentDate BETWEEN :inicio AND :fim
