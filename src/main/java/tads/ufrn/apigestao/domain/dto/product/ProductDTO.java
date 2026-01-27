@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.domain.Charging;
 import tads.ufrn.apigestao.domain.Client;
 import tads.ufrn.apigestao.domain.Sale;
+import tads.ufrn.apigestao.enums.ProductStatus;
 
 import java.math.BigDecimal;
 
@@ -22,6 +23,6 @@ public class ProductDTO {
     private String brand;
     private Integer amount;
     private BigDecimal value;
-    private String status;
+    private int status;
 
 }

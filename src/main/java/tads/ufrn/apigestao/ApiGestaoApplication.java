@@ -70,10 +70,10 @@ public class ApiGestaoApplication {
 
                 //salva os produtos
                 List<Product> products = new ArrayList<>();
-                products.add(new Product(null,"Panela Inox","Tramontina",100, BigDecimal.valueOf(50.00), ProductStatus.DISPONIVEL,admin,null));
-                products.add(new Product(null,"Travesseiro","Coteminas",100,BigDecimal.valueOf(30.00), ProductStatus.DISPONIVEL,admin,null));
-                products.add(new Product(null,"Ventilador","Arno",50,BigDecimal.valueOf(200.00), ProductStatus.DISPONIVEL,admin,null));
-                products.add(new Product(null,"Jogo de Talheres","Tramontina",50,BigDecimal.valueOf(100.00), ProductStatus.DISPONIVEL,admin,null));
+                products.add(new Product(null,"Panela Inox","Tramontina",100, BigDecimal.valueOf(50.00),admin,null));
+                products.add(new Product(null,"Travesseiro","Coteminas",100,BigDecimal.valueOf(30.00),admin,null));
+                products.add(new Product(null,"Ventilador","Arno",50,BigDecimal.valueOf(200.00),admin,null));
+                products.add(new Product(null,"Jogo de Talheres","Tramontina",50,BigDecimal.valueOf(100.00),admin,null));
                 productRepository.saveAll(products);
 
 //                List<Product> managedProducts = productRepository.findAll();

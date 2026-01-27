@@ -7,9 +7,9 @@ public enum ProductStatus {
 
     DISPONIVEL(1),
     INDISPONIVEL(2),
-    RESERVADA(3),
-    ENTREGUE(4),
-    PERDIDO(5);
+    ZERADO(3),
+    POUCO(4),
+    MUITOPOUCO(5);
 
     private final int value;
 

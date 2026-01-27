@@ -26,8 +26,6 @@ public class Product extends AbstractEntity {
     private Integer amount;
     @Column(precision = 15, scale = 2, nullable = false)
     private BigDecimal value;
-    @Enumerated(EnumType.STRING)
-    private ProductStatus status;
 
     @ManyToOne
     @JoinColumn(name = "created_by_id")

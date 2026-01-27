@@ -43,10 +43,6 @@ public class ProductService {
 
     public Product store(UpsertProductDTO product){
         Product prod =  mapper.map(product, Product.class);
-
-        if (product.getStatus() != null) {
-            prod.setStatus(ProductStatus.fromValue(product.getStatus()));
-        }
         prod.create();
 
         return repository.save(prod);

@@ -20,4 +20,5 @@ public class ChargingItemDTO {
     private String nameProduct;
     private String brand;
     private BigDecimal priceProduct;
+    private int status;
 }
