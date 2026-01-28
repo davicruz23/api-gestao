@@ -12,6 +12,7 @@ import tads.ufrn.apigestao.domain.Address;
 import tads.ufrn.apigestao.domain.Charging;
 import tads.ufrn.apigestao.domain.ChargingItem;
 import tads.ufrn.apigestao.domain.Client;
+import tads.ufrn.apigestao.exception.BusinessException;
 import tads.ufrn.apigestao.repository.ChargingRepository;
 import tads.ufrn.apigestao.repository.ClientRepository;
 
@@ -30,7 +31,7 @@ public class ReportService {
 
     public byte[] generateChargingReport(Long id) {
         Charging charging = chargingRepository.findWithItems(id)
-                .orElseThrow(() -> new RuntimeException("Carregamento não encontrado"));
+                .orElseThrow(() -> new BusinessException("Carregamento não encontrado"));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -98,7 +99,7 @@ public class ReportService {
         List<Client> clients = clientRepository.findByAddress_CityIgnoreCase(city);
 
         if (clients.isEmpty()) {
-            throw new RuntimeException("Nenhum cliente encontrado na cidade: " + city);
+            throw new BusinessException("Nenhum cliente encontrado na cidade: " + city);
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

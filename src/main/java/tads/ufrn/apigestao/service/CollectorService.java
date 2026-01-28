@@ -10,6 +10,8 @@ import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.collector.*;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
+import tads.ufrn.apigestao.exception.BusinessException;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.*;
 
 import java.math.BigDecimal;
@@ -111,10 +113,10 @@ public class CollectorService {
     public InstallmentPaidDTO markAsPaid(Long installmentId, BigDecimal amountPaid) {
 
         Installment installment = installmentRepository.findById(installmentId)
-                .orElseThrow(() -> new RuntimeException("Parcela não encontrada"));
+                .orElseThrow(() -> new BusinessException("Parcela não encontrada"));
 
         if (installment.isPaid()) {
-            throw new RuntimeException("Parcela já está marcada como paga");
+            throw new BusinessException("Parcela já está marcada como paga");
         }
 
         BigDecimal installmentAmount = installment.getAmount();
@@ -178,11 +180,11 @@ public class CollectorService {
     ) {
 
         if (endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("A data final não pode ser anterior à data inicial.");
+            throw new BusinessException("A data final não pode ser anterior à data inicial.");
         }
 
         Collector collector = repository.findById(collectorId)
-                .orElseThrow(() -> new RuntimeException("Cobrador não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cobrador não encontrado"));
 
         List<Sale> sales = saleService.getSalesByCollector(collectorId);
 
@@ -224,7 +226,7 @@ public class CollectorService {
     public Map<String, List<SaleCollectorDTO>> findSalesByCollectorId(Long collectorId) {
 
         if (!repository.existsById(collectorId)) {
-            throw new EntityNotFoundException("Collector com ID " + collectorId + " não encontrado.");
+            throw new BusinessException("Cobrador com ID " + collectorId + " não encontrado.");
         }
 
         List<Sale> sales = saleRepository.findByCollectorIdWithPendingInstallments(collectorId);
@@ -248,7 +250,7 @@ public class CollectorService {
 
     public CollectorIdUserDTO getCollectorByUserId(Long userId) {
         Collector collector = repository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Collector não encontrado para o usuário: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cobrador não encontrado para o usuário: " + userId));
 
         return new CollectorIdUserDTO(collector.getId());
     }
@@ -256,7 +258,7 @@ public class CollectorService {
     public boolean isAttemptWithinApprovalLocation(Long installmentId) {
 
         Installment installment = installmentRepository.findById(installmentId)
-                .orElseThrow(() -> new RuntimeException("Parcela não encontrada"));
+                .orElseThrow(() -> new BusinessException("Parcela não encontrada"));
 
         // Fonte da verdade
         if (!installment.isPaid()) {
@@ -267,12 +269,12 @@ public class CollectorService {
 
         ApprovalLocation approvalLocation =
                 approvalLocationRepository.findBySaleId(sale.getId())
-                        .orElseThrow(() -> new RuntimeException("Local de aprovação não encontrado"));
+                        .orElseThrow(() -> new BusinessException("Local de aprovação não encontrado"));
 
         CollectionAttempt attempt =
                 collectionAttemptRepository
                         .findTopByInstallmentIdOrderByAttemptAtDesc(installmentId)
-                        .orElseThrow(() -> new RuntimeException("Tentativa não encontrada"));
+                        .orElseThrow(() -> new BusinessException("Tentativa não encontrada"));
 
         double distance = distanceInMeters(
                 approvalLocation.getLatitude(),

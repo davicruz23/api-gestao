@@ -9,6 +9,8 @@ import com.google.zxing.common.BitMatrix;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tads.ufrn.apigestao.domain.Installment;
+import tads.ufrn.apigestao.exception.BusinessException;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.InstallmentRepository;
 
 import java.io.ByteArrayOutputStream;
@@ -25,7 +27,7 @@ public class PixService {
 
     public String generateBrCodeForInstallment(Long installmentId) {
         Installment installment = installmentRepository.findById(installmentId)
-                .orElseThrow(() -> new RuntimeException("Parcela não encontrada: " + installmentId));
+                .orElseThrow(() -> new BusinessException("Parcela não encontrada: " + installmentId));
 
         String chavePix = "+5584994611450";
         String nomeBeneficiario = "DAVI SOUZA";

@@ -4,23 +4,15 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.controller.mapper.InspectorMapper;
 import tads.ufrn.apigestao.domain.*;
-import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorDTO;
-import tads.ufrn.apigestao.domain.dto.inspector.InspectorHistoryPreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.inspector.UpsertInspectorDTO;
-import tads.ufrn.apigestao.domain.dto.seller.SellerIdUserDTO;
-import tads.ufrn.apigestao.domain.dto.user.UpsertUserDTO;
-import tads.ufrn.apigestao.enums.PreSaleStatus;
-import tads.ufrn.apigestao.enums.UserType;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.InspectorRepository;
-import tads.ufrn.apigestao.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +20,6 @@ public class InspectorService {
 
     private final InspectorRepository repository;
     private final ModelMapper mapper;
-
-    /* =========================
-       MÉTODOS PARA CONTROLLER
-       ========================= */
 
     @Transactional(readOnly = true)
     public List<InspectorDTO> findAllDTO() {
@@ -55,14 +43,10 @@ public class InspectorService {
         return new InspectorIdUserDTO(inspector.getId());
     }
 
-    /* =========================
-       MÉTODOS INTERNOS (ENTITY)
-       ========================= */
-
     @Transactional(readOnly = true)
     public Inspector findEntityById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Inspector não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Fiscal não encontrado!"));
     }
 
     @Transactional

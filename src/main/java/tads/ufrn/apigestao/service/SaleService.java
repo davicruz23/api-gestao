@@ -4,13 +4,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.sale.CitySalesDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleItemDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SalesByCityDTO;
 import tads.ufrn.apigestao.domain.dto.sale.UpsertSaleDTO;
 import tads.ufrn.apigestao.enums.PaymentType;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.ApprovalLocationRepository;
 import tads.ufrn.apigestao.repository.InstallmentRepository;
 import tads.ufrn.apigestao.repository.PreSaleRepository;
@@ -38,7 +38,7 @@ public class SaleService {
 
     public Sale findById(Long id) {
         Optional<Sale> sale = repository.findById(id);
-        return sale.orElseThrow(() -> new NotFoundException("Sale not found"));
+        return sale.orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada!"));
     }
 
     public Sale store(UpsertSaleDTO sale) {
@@ -47,7 +47,7 @@ public class SaleService {
 
     public void deleteById(Long id){
         Sale sale = repository.findById(id)
-                .orElseThrow(()-> new NotFoundException("Sale not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Venda não encontrada!"));
         repository.save(sale);
 
     }

@@ -6,15 +6,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.ChargingItem;
 import tads.ufrn.apigestao.domain.Product;
-import tads.ufrn.apigestao.domain.User;
-import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.UpsertProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.UptadeProductDTO;
-import tads.ufrn.apigestao.enums.ProductStatus;
-import tads.ufrn.apigestao.enums.UserType;
+import tads.ufrn.apigestao.exception.BusinessException;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.ProductRepository;
 
 import java.util.List;
@@ -38,7 +35,7 @@ public class ProductService {
 
     public Product findById(Long id) {
         Optional<Product> product = repository.findById(id);
-        return product.orElseThrow(() -> new NotFoundException("Product not found"));
+        return product.orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado!"));
     }
 
     public Product store(UpsertProductDTO product){
@@ -50,7 +47,7 @@ public class ProductService {
 
     public Product updateProduct(UptadeProductDTO productDto) {
         Product existingProduct = repository.findById(productDto.getId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado!"));
 
         existingProduct.setAmount(productDto.getAmount());
         existingProduct.setValue(productDto.getValue());
@@ -60,7 +57,7 @@ public class ProductService {
 
     public void deleteById(Long id){
         Product product = repository.findById(id)
-                        .orElseThrow(()-> new NotFoundException("Product not found"));
+                        .orElseThrow(()-> new ResourceNotFoundException("Produto não encontrado!"));
         product.delete();
         repository.save(product);
 
@@ -76,12 +73,11 @@ public class ProductService {
     public void returnStock(Long productId, int quantity) {
         try {
             Product product = repository.findById(productId)
-                    .orElseThrow(() -> new NotFoundException("Product not found with id " + productId));
+                    .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado: "+ productId));
             product.setAmount(product.getAmount() + quantity);
             repository.save(product);
         } catch (Exception e) {
-            System.err.println("Erro ao devolver estoque do produto " + productId + ": " + e.getMessage());
-            throw new RuntimeException("Erro ao devolver estoque", e);
+            throw new BusinessException("Erro ao devolver estoque");
         }
     }
 }

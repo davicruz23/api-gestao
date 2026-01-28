@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.Inspector;
 import tads.ufrn.apigestao.domain.Seller;
@@ -12,6 +11,7 @@ import tads.ufrn.apigestao.domain.User;
 import tads.ufrn.apigestao.domain.dto.user.UpsertUserDTO;
 import tads.ufrn.apigestao.domain.dto.user.UserDTO;
 import tads.ufrn.apigestao.enums.UserType;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.CollectorRepository;
 import tads.ufrn.apigestao.repository.InspectorRepository;
 import tads.ufrn.apigestao.repository.SellerRepository;
@@ -37,7 +37,7 @@ public class UserService {
 
     public User findUserById(Long id) {
         Optional<User> user = repository.findById(id);
-        return user.orElseThrow(() -> new NotFoundException("User not found"));
+        return user.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado!"));
     }
 
     public User store(UpsertUserDTO userDTO) {

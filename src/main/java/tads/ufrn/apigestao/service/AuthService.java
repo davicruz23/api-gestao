@@ -8,6 +8,8 @@ import tads.ufrn.apigestao.domain.dto.loginDTO.LoginRequestDTO;
 import tads.ufrn.apigestao.domain.dto.loginDTO.LoginResponseDTO;
 import tads.ufrn.apigestao.domain.dto.user.UpsertUserDTO;
 import tads.ufrn.apigestao.enums.UserType;
+import tads.ufrn.apigestao.exception.BusinessException;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.UserRepository;
 
 import java.util.Optional;
@@ -30,17 +32,17 @@ public class AuthService {
             if (passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
                 return user;
             } else {
-                throw new RuntimeException("Invalid credentials");
+                throw new BusinessException("Senha incorreta!");
             }
         } else {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("Usuário não existe!");
         }
     }
 
 
     public User register(UpsertUserDTO store) {
         if (userRepository.findByCpf(store.getCpf()).isPresent()) {
-            throw new RuntimeException("CPF already registered");
+            throw new BusinessException("CPF já cadastrado!");
         }
 
         User user = new User();

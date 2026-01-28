@@ -9,6 +9,8 @@ import tads.ufrn.apigestao.domain.dto.collector.CollectionAttemptDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectionAttemptMapsDTO;
 import tads.ufrn.apigestao.enums.AttemptType;
 import tads.ufrn.apigestao.enums.PaymentType;
+import tads.ufrn.apigestao.exception.BusinessException;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.*;
 
 import java.time.LocalDate;
@@ -35,10 +37,10 @@ public class CollectionAttemptService {
             LocalDateTime newDueDate
     ) {
         Collector collector = collectorRepository.findById(collectorId)
-                .orElseThrow(() -> new RuntimeException("Collector não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cobrador não encontrado!"));
 
         Installment installment = installmentRepository.findById(installmentId)
-                .orElseThrow(() -> new RuntimeException("Installment não encontrado"));
+                .orElseThrow(() -> new BusinessException("Parcela não encontrada!"));
 
         CollectionAttempt attempt = new CollectionAttempt();
         attempt.setCollector(collector);

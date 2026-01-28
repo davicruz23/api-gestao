@@ -3,9 +3,10 @@ package tads.ufrn.apigestao.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.seller.*;
+import tads.ufrn.apigestao.exception.BusinessException;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.SellerRepository;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class SellerService {
 
     public Seller findById(Long id) {
         Optional<Seller> seller = repository.findById(id);
-        return seller.orElseThrow(() -> new NotFoundException("Seller not found"));
+        return seller.orElseThrow(() -> new ResourceNotFoundException("Vendedor não encontrado!"));
     }
 
     public Seller store(UpsertSellerDTO seller) {
@@ -44,7 +45,7 @@ public class SellerService {
 
     public SellerIdUserDTO getSellerByUserId(Long userId) {
         Seller seller = repository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Seller não encontrado para o usuário: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Vendedor não encontrado para o usuário: " + userId));
 
         return new SellerIdUserDTO(seller.getId());
     }

@@ -4,7 +4,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.controller.mapper.ChargingMapper;
 import tads.ufrn.apigestao.domain.Charging;
 import tads.ufrn.apigestao.domain.ChargingItem;
@@ -15,6 +14,7 @@ import tads.ufrn.apigestao.domain.dto.charging.ChargingDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpdateChargingItemDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 import tads.ufrn.apigestao.domain.dto.chargingItem.UpsertChargingItemDTO;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.ChargingRepository;
 import tads.ufrn.apigestao.repository.ProductRepository;
 
@@ -50,7 +50,7 @@ public class ChargingService {
     @Transactional(readOnly = true)
     public ChargingDTO findById(Long id) {
         Charging charging = repository.findByIdWithItems(id)
-                .orElseThrow(() -> new NotFoundException("Charging não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Carregamento não encontrado!"));
 
         return ChargingMapper.mapper(charging);
     }
@@ -58,7 +58,7 @@ public class ChargingService {
     @Transactional(readOnly = true)
     public Charging findEntityById(Long id) {
         return repository.findByIdWithItems(id)
-                .orElseThrow(() -> new NotFoundException("Charging não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Carregamento não encontrado!"));
     }
 
     @Transactional
@@ -164,7 +164,7 @@ public class ChargingService {
     @Transactional
     public void deleteById(Long id) {
         Charging charging = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Charging not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Carregamento não encontrado!"));
 
         for (ChargingItem item : charging.getItems()) {
             productService.returnStock(item.getProduct().getId(), item.getQuantity());

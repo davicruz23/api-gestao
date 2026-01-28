@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import tads.ufrn.apigestao.domain.dto.cep.CepResponse;
 import tads.ufrn.apigestao.domain.dto.cep.ViaCepResponse;
+import tads.ufrn.apigestao.exception.BusinessException;
 
 @Service
 public class CepService {
@@ -18,7 +19,7 @@ public class CepService {
                 .body(ViaCepResponse.class);
 
         if (viaCep == null || viaCep.getLogradouro() == null) {
-            throw new RuntimeException("CEP não encontrado");
+            throw new BusinessException("CEP não encontrado");
         }
 
         String streetComBairro = viaCep.getLogradouro();

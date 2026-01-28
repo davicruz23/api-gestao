@@ -4,11 +4,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.domain.Address;
 import tads.ufrn.apigestao.domain.Client;
 import tads.ufrn.apigestao.domain.dto.client.ClientRecentDTO;
 import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.ClientRepository;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class ClientService {
 
     public Client findById(Long id) {
         Optional<Client> client = repository.findById(id);
-        return client.orElseThrow(() -> new NotFoundException("User not found"));
+        return client.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado!"));
     }
 
     @Transactional
@@ -55,7 +55,7 @@ public class ClientService {
 
     public void deleteById(Long id){
         Client client = repository.findById(id)
-                .orElseThrow(()-> new NotFoundException("Product not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Usuário não encontrado!"));
         repository.save(client);
 
     }

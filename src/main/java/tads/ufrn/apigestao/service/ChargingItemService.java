@@ -3,10 +3,8 @@ package tads.ufrn.apigestao.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
-import tads.ufrn.apigestao.domain.Charging;
 import tads.ufrn.apigestao.domain.ChargingItem;
-import tads.ufrn.apigestao.domain.PreSale;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.ChargingItemRepository;
 
 import java.util.List;
@@ -24,7 +22,7 @@ public class ChargingItemService {
 
     public ChargingItem findById(Long id) {
         Optional<ChargingItem> preSale = repository.findById(id);
-        return preSale.orElseThrow(() -> new NotFoundException("User not found"));
+        return preSale.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado!"));
     }
 
     @Transactional

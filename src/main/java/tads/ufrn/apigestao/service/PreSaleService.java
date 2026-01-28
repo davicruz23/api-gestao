@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.webjars.NotFoundException;
 import tads.ufrn.apigestao.controller.mapper.InspectorMapper;
 import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorHistoryPreSaleDTO;
@@ -12,6 +11,8 @@ import tads.ufrn.apigestao.domain.dto.preSale.UpsertPreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.preSaleItem.UpsertPreSaleItemDTO;
 import tads.ufrn.apigestao.domain.dto.seller.SellerCommissionDTO;
 import tads.ufrn.apigestao.enums.PreSaleStatus;
+import tads.ufrn.apigestao.exception.BusinessException;
+import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.CommissionHistoryRepository;
 import tads.ufrn.apigestao.repository.PreSaleRepository;
 
@@ -40,7 +41,7 @@ public class PreSaleService {
 
     public PreSale findById(Long id) {
         Optional<PreSale> preSale = repository.findById(id);
-        return preSale.orElseThrow(() -> new NotFoundException("User not found"));
+        return preSale.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado!"));
     }
 
     @Transactional
@@ -119,7 +120,7 @@ public class PreSaleService {
 
     public void deleteById(Long id){
         PreSale client = repository.findById(id)
-                .orElseThrow(()-> new NotFoundException("Product not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Produto não encontrado!"));
         repository.save(client);
 
     }
@@ -136,18 +137,13 @@ public class PreSaleService {
         PreSale preSale = findById(preSaleId);
 
         preSale.setStatus(PreSaleStatus.RECUSADA);
-        //preSale.setInspector(inspector);
-
-        // Para cada item da pré-venda
         for (PreSaleItem item : preSale.getItems()) {
             int quantity = item.getQuantity();
 
             ChargingItem chargingItem = item.getChargingItem();
             if (chargingItem != null) {
-                // devolve a quantidade reservada
                 chargingItem.setQuantity(chargingItem.getQuantity() + quantity);
             }
-            // não mexe no Product.amount global
         }
 
         repository.save(preSale);
@@ -174,7 +170,7 @@ public class PreSaleService {
         LocalDateTime now = LocalDateTime.now();
 
         if (endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("A data final não pode ser anterior à data inicial.");
+            throw new BusinessException("A data final não pode ser anterior à data inicial.");
         }
 
         Seller seller = sellerService.findById(sellerId);
