@@ -46,24 +46,13 @@ public class PreSaleService {
 
     @Transactional
     public PreSale store(UpsertPreSaleDTO dto) {
-        System.out.println("=== INICIANDO MÉTODO STORE ===");
-        System.out.println("DTO recebido: " + dto.toString());
-        System.out.println("UserID do DTO: " + dto.getSellerId());
 
-        // Busca ou cria o cliente
-        System.out.println("=== BUSCANDO/CRIANDO CLIENTE ===");
         Client client = clientService.store(dto.getClient());
-        System.out.println("Cliente criado/encontrado: " + client.getId() + " - " + client.getName());
 
-        // Busca o vendedor - agora usando o ID do DTO
-        System.out.println("=== BUSCANDO VENDEDOR ===");
-        System.out.println("Buscando seller com ID: " + dto.getSellerId());
         Seller seller = sellerService.findById(dto.getSellerId());
-        System.out.println("Seller encontrado: " + (seller != null ? seller.getId() + " - " + seller.getUser().getName() : "NULL"));
 
         if (seller == null) {
-            System.out.println("=== ERRO: VENDEDOR NÃO ENCONTRADO ===");
-            throw new RuntimeException("Vendedor não encontrado: " + dto.getSellerId());
+            throw new BusinessException("Vendedor não encontrado: " + dto.getSellerId());
         }
 
         Inspector inspector = inspectorService.findEntityById(1L);
@@ -75,7 +64,6 @@ public class PreSaleService {
         preSale.setInspector(inspector);
         preSale.setStatus(PreSaleStatus.PENDENTE);
         preSale.setItems(new ArrayList<>());
-        System.out.println("Pré-venda criada com seller: " + seller.getId() + " e client: " + client.getId());
 
         Charging charging = changingService.findEntityById(dto.getChargingId());
 
@@ -84,14 +72,10 @@ public class PreSaleService {
             ChargingItem ci = charging.getItems().stream()
                     .filter(item -> item.getProduct().getId().equals(prodDTO.getProductId()))
                     .findFirst()
-                    .orElseThrow(() -> {
-                        System.out.println("ERRO: Produto não encontrado no carregamento: " + prodDTO.getProductId());
-                        return new RuntimeException("Produto não encontrado no carregamento: " + prodDTO.getProductId());
-                    });
+                    .orElseThrow(() -> new BusinessException("Produto não encontrado no carregamento: " + prodDTO.getProductId()));
 
             if (ci.getQuantity() < prodDTO.getQuantity()) {
-                System.out.println("ERRO: Quantidade insuficiente. Disponível: " + ci.getQuantity() + ", Solicitado: " + prodDTO.getQuantity());
-                throw new RuntimeException("Quantidade insuficiente no carregamento para o produto: " + ci.getProduct().getName());
+                throw new BusinessException("Quantidade insuficiente no carregamento para o produto: " + ci.getProduct().getName());
             }
 
             ci.setQuantity(ci.getQuantity() - prodDTO.getQuantity());
@@ -120,7 +104,7 @@ public class PreSaleService {
 
     public void deleteById(Long id){
         PreSale client = repository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Produto não encontrado!"));
+                .orElseThrow(()-> new BusinessException("Produto não encontrado!"));
         repository.save(client);
 
     }

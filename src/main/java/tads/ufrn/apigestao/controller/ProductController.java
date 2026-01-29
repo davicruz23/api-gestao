@@ -26,10 +26,20 @@ public class ProductController {
 
     private ProductService service;
 
+//    @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','COBRADOR','FISCAL','FUNCIONARIO')")
+//    @GetMapping("/all")
+//    public ResponseEntity<List<ProductDTO>> findAll(){
+//        return ResponseEntity.ok().body(service.findAll().stream().map(ProductMapper::mapper).toList());
+//    }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','COBRADOR','FISCAL','FUNCIONARIO')")
     @GetMapping("/all")
-    public ResponseEntity<List<ProductDTO>> findAll(){
-        return ResponseEntity.ok().body(service.findAll().stream().map(ProductMapper::mapper).toList());
+    public ResponseEntity<Page<ProductDTO>> getAll(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(service.getAll(name, page, size));
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR','COBRADOR','FISCAL','FUNCIONARIO')")

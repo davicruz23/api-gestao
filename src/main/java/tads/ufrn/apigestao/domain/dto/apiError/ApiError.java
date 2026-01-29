@@ -1,4 +1,5 @@
 package tads.ufrn.apigestao.domain.dto.apiError;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 
@@ -9,6 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiError {
 
     private Integer status;

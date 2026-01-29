@@ -89,9 +89,8 @@ public class CollectorService {
 
     @Transactional
     public CollectorSalesAssignedDTO assignSalesByCity(Long collectorId, String city) {
-        System.out.println("entrei no metodo");
         Collector collector = repository.findById(collectorId)
-                .orElseThrow(() -> new RuntimeException("Collector não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Collector não encontrado"));
         List<Sale> sales = saleRepository.findUnassignedSalesByCity(city);
         for (Sale sale : sales) {
             sale.setCollector(collector);

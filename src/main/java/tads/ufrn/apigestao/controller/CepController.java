@@ -17,7 +17,6 @@ public class CepController {
 
     @GetMapping("/{cep}")
     public CepResponse buscarCpf ( @PathVariable String cep ) {
-        System.out.println("recebi do front: "+ cep);
         return service.buscarPorCep(cep);
     }
 }

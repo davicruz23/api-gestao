@@ -91,7 +91,6 @@ public class CollectorController {
     @PutMapping("/{id}/pay")
     public ResponseEntity<?> payInstallment(@PathVariable Long id, @RequestParam BigDecimal amount) {
 
-        System.out.println("recebi isso aqui: parcela: "+ id + "valor recebido: " + amount);
         try {
             InstallmentPaidDTO paidInstallment =
                     service.markAsPaid(id, amount);
@@ -125,7 +124,6 @@ public class CollectorController {
     @GetMapping("/by-user/{userId}")
     public ResponseEntity<CollectorIdUserDTO> getCollectorByUserId(@PathVariable Long userId) {
         CollectorIdUserDTO dto = service.getCollectorByUserId(userId);
-        System.out.println("chamei o endpoint de seller user: "+ dto.toString());
         return ResponseEntity.ok(dto);
     }
 

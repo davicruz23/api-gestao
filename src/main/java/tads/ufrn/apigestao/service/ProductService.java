@@ -6,10 +6,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tads.ufrn.apigestao.domain.ChargingItem;
 import tads.ufrn.apigestao.domain.Product;
+import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.UpsertProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.UptadeProductDTO;
+import tads.ufrn.apigestao.enums.ProductStatus;
 import tads.ufrn.apigestao.exception.BusinessException;
 import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.ProductRepository;
@@ -26,6 +29,46 @@ public class ProductService {
 
     public List<Product> findAll(){
         return repository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductDTO> getAll(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        String filter = (name == null || name.isBlank()) ? null : name.trim();
+
+        Page<Product> result = repository.findAllByFilter(filter, pageable);
+
+        return result.map(this::toDTO);
+    }
+
+    private ProductDTO toDTO(Product p) {
+        return new ProductDTO(
+                p.getId(),
+                p.getName(),
+                p.getBrand(),
+                p.getAmount(),
+                p.getValue(),
+                resolveStatus(p.getAmount())
+        );
+    }
+
+
+    private int resolveStatus(Integer amount) {
+
+        if (amount == 0) {
+            return ProductStatus.ZERADO.getValue();
+        }
+
+        if (amount <= 10) {
+            return ProductStatus.MUITOPOUCO.getValue();
+        }
+
+        if (amount <= 30) {
+            return ProductStatus.POUCO.getValue();
+        }
+
+        return ProductStatus.DISPONIVEL.getValue();
     }
 
     public Page<Product> index(int page, int size) {

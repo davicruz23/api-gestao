@@ -1,6 +1,12 @@
 package tads.ufrn.apigestao.service;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,12 +20,17 @@ import tads.ufrn.apigestao.domain.dto.charging.ChargingDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpdateChargingItemDTO;
 import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 import tads.ufrn.apigestao.domain.dto.chargingItem.UpsertChargingItemDTO;
+import tads.ufrn.apigestao.exception.BusinessException;
 import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.ChargingRepository;
 import tads.ufrn.apigestao.repository.ProductRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +42,38 @@ public class ChargingService {
     private final ChargingItemService chargingItemService;
     private final ProductRepository productRepository;
 
+    private static final Logger log = LoggerFactory.getLogger(ChargingService.class);
+
     @Transactional(readOnly = true)
-    public List<ChargingDTO> findAll() {
-        return repository.findAllWithItems()
-                .stream()
+    public Page<ChargingDTO> findAll(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        String searchTerm = (name == null || name.isBlank()) ? null : name.trim();
+
+        Page<Long> idsPage = repository.findIdsByFilter(searchTerm, pageable);
+
+        if (idsPage.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        // Passa o searchTerm também para a segunda query
+        List<Charging> chargings = repository.findAllByIdInWithItems(
+                idsPage.getContent(),
+                searchTerm
+        );
+
+        Map<Long, Charging> map = chargings.stream()
+                .collect(Collectors.toMap(Charging::getId, Function.identity()));
+
+        List<ChargingDTO> dtoList = idsPage.getContent().stream()
+                .map(map::get)
+                .filter(Objects::nonNull)
                 .map(ChargingMapper::mapper)
                 .toList();
+
+        return new PageImpl<>(dtoList, pageable, idsPage.getTotalElements());
     }
+
 
     @Transactional(readOnly = true)
     public List<ChargingDTO> findCurrent() {
@@ -120,21 +156,19 @@ public class ChargingService {
     @Transactional
     public ChargingDTO addProductsToCharging(List<AddChargingItemDTO> itemsToAdd) {
 
-        System.out.println("Print: " + itemsToAdd);
-
         Charging charging = repository.findFirstBy()
-                .orElseThrow(() -> new RuntimeException("Carregamento não encontrado"));
+                .orElseThrow(() -> new BusinessException("Carregamento não encontrado"));
 
         for (AddChargingItemDTO dto : itemsToAdd) {
 
             if (dto.quantity() <= 0) {
-                throw new RuntimeException("Quantidade inválida para o produto " + dto.productId());
+                throw new BusinessException("Quantidade inválida para o produto " + dto.productId());
             }
 
             Product product = productService.findById(dto.productId());
 
             if (product.getAmount() < dto.quantity()) {
-                throw new RuntimeException(
+                throw new BusinessException(
                         "Estoque insuficiente para o produto: " + dto.productId()
                 );
             }

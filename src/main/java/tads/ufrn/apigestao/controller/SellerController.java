@@ -58,7 +58,6 @@ public class SellerController {
     @GetMapping("/by-user/{userId}")
     public ResponseEntity<SellerIdUserDTO> getSellerByUserId(@PathVariable Long userId) {
         SellerIdUserDTO dto = service.getSellerByUserId(userId);
-        System.out.println("chamei o endpoint de seller user: "+ dto.toString());
         return ResponseEntity.ok(dto);
     }
 
