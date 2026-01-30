@@ -16,6 +16,7 @@ import tads.ufrn.apigestao.service.*;
 
 import java.math.BigDecimal;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,6 +88,12 @@ public class ApiGestaoApplication {
                 Collector collector1 = new Collector();
                 collector1.setUser(cobrador);
                 collectorRepository.save(collector1);
+
+                Charging charging1 = new Charging();
+                charging1.setUser(carregador);
+                charging1.setDescription("CARREGAMENTO ATUAL");
+                charging1.setDate(LocalDate.now());
+                chargingRepository.save(charging1);
 
             }
         };
