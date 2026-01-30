@@ -16,11 +16,22 @@ public class ReportController {
 
     @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @GetMapping("/{id}/chargings")
-    public ResponseEntity<byte[]> gerarRelatorio(@PathVariable Long id) {
+    public ResponseEntity<byte[]> gerarRelatorioCarregamento(@PathVariable Long id) {
         byte[] pdfBytes = service.generateChargingReport(id);
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=carregamento_" + id + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
+    }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @GetMapping("/products")
+    public ResponseEntity<byte[]> gerarRelatorioProdutos() {
+        byte[] pdfBytes = service.generateProductReport();
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=produtos.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfBytes);
     }

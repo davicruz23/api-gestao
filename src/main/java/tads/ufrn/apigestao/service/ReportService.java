@@ -15,6 +15,7 @@ import tads.ufrn.apigestao.repository.ClientRepository;
 import tads.ufrn.apigestao.repository.ProductRepository;
 
 import java.awt.*;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -71,12 +72,18 @@ public class ReportService {
         PdfPCell header2 = new PdfPCell(new Phrase("Marca", headerFont));
         PdfPCell header3 = new PdfPCell(new Phrase("Qtd", headerFont));
 
-        Stream.of(header1, header2, header3).forEach(cell -> {
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            cell.setBackgroundColor(new Color(230, 230, 230)); // cinza claro
+        Stream.of(header1, header2).forEach(cell -> {
+            cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            cell.setBackgroundColor(new Color(230, 230, 230));
             cell.setPadding(8f);
             table.addCell(cell);
         });
+
+        header3.setHorizontalAlignment(Element.ALIGN_CENTER);
+        header3.setBackgroundColor(new Color(230, 230, 230));
+        header3.setPadding(8f);
+        table.addCell(header3);
+
 
         for (ChargingItem item : charging.getItems()) {
             PdfPCell c1 = new PdfPCell(new Phrase(item.getProduct().getName()));
@@ -100,69 +107,74 @@ public class ReportService {
         return baos.toByteArray();
     }
 
-//    public byte[] generateProductReport() {
-//
-//        List<Product> products = productRepository.findAll();
-//
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//
-//        com.lowagie.text.Document document = new com.lowagie.text.Document();
-//        PdfWriter.getInstance(document, baos);
-//
-//        document.open();
-//
-//        Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
-//        Paragraph title = new Paragraph("ESTOQUE DISPONÍVEL\n\n", titleFont);
-//        title.setAlignment(Element.ALIGN_CENTER);
-//        document.add(title);
-//
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-//                .withLocale(new Locale("pt", "BR"));
-//
-//        String dataFormatada = LocalDate.now().format(formatter);
-//        document.add(new Paragraph("Data: " + dataFormatada));
-//        document.add(new Paragraph("\n"));
-//
-//        // Tabela
-//        PdfPTable table = new PdfPTable(new float[]{4f, 3f, 1.5f});
-//        table.setWidthPercentage(100);
-//        table.setSpacingBefore(10f);
-//
-//        Font headerFont = new Font(Font.HELVETICA, 12, Font.BOLD);
-//
-//        PdfPCell header1 = new PdfPCell(new Phrase("Produto", headerFont));
-//        PdfPCell header2 = new PdfPCell(new Phrase("Marca", headerFont));
-//        PdfPCell header3 = new PdfPCell(new Phrase("Qtd", headerFont));
-//
-//        Stream.of(header1, header2, header3).forEach(cell -> {
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            cell.setBackgroundColor(new Color(230, 230, 230));
-//            cell.setPadding(8f);
-//            table.addCell(cell);
-//        });
-//
-//        Font rowFont = new Font(Font.HELVETICA, 11);
-//
-//        for (Product product : products) {
-//            PdfPCell c1 = new PdfPCell(new Phrase(product.getName(), rowFont));
-//            PdfPCell c2 = new PdfPCell(new Phrase(product.getBrand(), rowFont));
-//            PdfPCell c3 = new PdfPCell(new Phrase(String.valueOf(product.getQuantity()), rowFont));
-//
-//            c1.setPadding(6f);
-//            c2.setPadding(6f);
-//            c3.setPadding(6f);
-//            c3.setHorizontalAlignment(Element.ALIGN_CENTER);
-//
-//            table.addCell(c1);
-//            table.addCell(c2);
-//            table.addCell(c3);
-//        }
-//
-//        document.add(table);
-//        document.close();
-//
-//        return baos.toByteArray();
-//    }
+    public byte[] generateProductReport() {
+
+        List<Product> products = productRepository.findAll();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        com.lowagie.text.Document document = new com.lowagie.text.Document();
+        PdfWriter.getInstance(document, baos);
+
+        document.open();
+
+        Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
+        Paragraph title = new Paragraph("ESTOQUE DISPONÍVEL\n\n", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                .withLocale(new Locale("pt", "BR"));
+
+        String dataFormatada = LocalDate.now().format(formatter);
+        document.add(new Paragraph("Data: " + dataFormatada));
+        document.add(new Paragraph("\n"));
+
+        // Tabela
+        PdfPTable table = new PdfPTable(new float[]{4f, 3f, 1.5f});
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(10f);
+
+        Font headerFont = new Font(Font.HELVETICA, 12, Font.BOLD);
+
+        PdfPCell header1 = new PdfPCell(new Phrase("Produto", headerFont));
+        PdfPCell header2 = new PdfPCell(new Phrase("Marca", headerFont));
+        PdfPCell header3 = new PdfPCell(new Phrase("Qtd", headerFont));
+
+        Stream.of(header1, header2).forEach(cell -> {
+            cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            cell.setBackgroundColor(new Color(230, 230, 230));
+            cell.setPadding(8f);
+            table.addCell(cell);
+        });
+
+        header3.setHorizontalAlignment(Element.ALIGN_CENTER);
+        header3.setBackgroundColor(new Color(230, 230, 230));
+        header3.setPadding(8f);
+        table.addCell(header3);
+
+        Font rowFont = new Font(Font.HELVETICA, 11);
+
+        for (Product product : products) {
+            PdfPCell c1 = new PdfPCell(new Phrase(product.getName(), rowFont));
+            PdfPCell c2 = new PdfPCell(new Phrase(product.getBrand(), rowFont));
+            PdfPCell c3 = new PdfPCell(new Phrase(String.valueOf(product.getAmount()), rowFont));
+
+            c1.setPadding(6f);
+            c2.setPadding(6f);
+            c3.setPadding(6f);
+            c3.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+            table.addCell(c1);
+            table.addCell(c2);
+            table.addCell(c3);
+        }
+
+        document.add(table);
+        document.close();
+
+        return baos.toByteArray();
+    }
 
 
     public byte[] generateClientsByCityReport(String city) {
