@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
+import tads.ufrn.apigestao.enums.SaleStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,4 +29,6 @@ public class SaleDTO {
     private Double latitude;
     private List<ProductSaleDTO> products;
     private List<InstallmentDTO> installments;
+    private SaleStatus saleStatus;
+    private Long idProductDevolvido;
 }

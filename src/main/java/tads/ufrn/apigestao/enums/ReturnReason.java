@@ -3,21 +3,22 @@ package tads.ufrn.apigestao.enums;
 import lombok.Getter;
 
 @Getter
-public enum PreSaleStatus {
+public enum ReturnReason {
 
-    PENDENTE(1),
-    APROVADA(2),
-    RECUSADA(3),
-    DEVOLVIDO(4);
+    DEFEITO(1),
+    DESISTENCIA(2),
+    ATRASO(3),
+    AVARIA(4),
+    OUTROS(5);
 
     private final int value;
 
-    PreSaleStatus(int value){
+    ReturnReason(int value){
         this.value = value;
     }
 
-    public static PreSaleStatus fromValue(int value){
-        for (PreSaleStatus type : PreSaleStatus.values()){
+    public static ReturnReason fromValue(int value){
+        for (ReturnReason type : ReturnReason.values()){
             if (type.getValue() == value){
                 return type;
             }

@@ -10,6 +10,7 @@ import tads.ufrn.apigestao.domain.dto.sale.SaleItemDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SalesByCityDTO;
 import tads.ufrn.apigestao.domain.dto.sale.UpsertSaleDTO;
 import tads.ufrn.apigestao.enums.PaymentType;
+import tads.ufrn.apigestao.enums.SaleStatus;
 import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.ApprovalLocationRepository;
 import tads.ufrn.apigestao.repository.InstallmentRepository;
@@ -65,6 +66,7 @@ public class SaleService {
         sale.setNumberSale(UUID.randomUUID().toString());
         sale.setInstallments(installments);
         sale.setPaymentMethod(paymentMethod);
+        sale.setStatus(SaleStatus.ATIVO);
 
         BigDecimal total = preSale.getItems().stream()
                 .map(item ->

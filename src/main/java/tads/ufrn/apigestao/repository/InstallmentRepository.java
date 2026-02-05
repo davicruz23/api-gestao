@@ -1,7 +1,9 @@
 package tads.ufrn.apigestao.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import tads.ufrn.apigestao.domain.Installment;
 import tads.ufrn.apigestao.domain.Sale;
@@ -9,6 +11,7 @@ import tads.ufrn.apigestao.domain.Sale;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,4 +59,40 @@ public interface InstallmentRepository extends JpaRepository<Installment, Long> 
             Sale sale,
             LocalDate dueDate
     );
+
+    @Modifying
+    @Query("""
+    UPDATE Installment i
+       SET i.deletedAt = :deletedAt
+     WHERE i.sale.id = :saleId
+       AND i.deletedAt IS NULL
+""")
+    void softDeleteAllBySaleId(@Param("saleId") Long saleId,
+                              @Param("deletedAt") OffsetDateTime deletedAt);
+
+
+        @Modifying
+        @Query("""
+        update Installment i
+           set i.deletedAt = :deletedAt
+         where i.sale.id = :saleId
+           and i.paid = false
+           and i.deletedAt is null
+    """)
+        void softDeleteAllFutureBySaleId(@Param("saleId") Long saleId,
+                                         @Param("deletedAt") OffsetDateTime deletedAt);
+
+        List<Installment> findAllBySaleIdAndPaidFalseOrderByDueDateAsc(Long saleId);
+
+    @Modifying
+    @Query("""
+    update Installment i
+       set i.deletedAt = :deletedAt
+     where i.sale.id = :saleId
+       and i.paid = false
+       and i.deletedAt is null
+""")
+    void softDeleteAllBySaleIdAndPaidFalse(Long saleId, OffsetDateTime deletedAt);
+
+
 }

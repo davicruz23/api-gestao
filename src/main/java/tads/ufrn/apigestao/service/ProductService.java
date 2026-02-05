@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tads.ufrn.apigestao.domain.ChargingItem;
 import tads.ufrn.apigestao.domain.Product;
+import tads.ufrn.apigestao.domain.User;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.UpsertProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.UptadeProductDTO;
@@ -25,6 +26,7 @@ import java.util.Optional;
 public class ProductService {
 
     private final ProductRepository repository;
+    private final UserService userService;
     private final ModelMapper mapper;
 
     public List<Product> findAll(){
@@ -82,7 +84,10 @@ public class ProductService {
     }
 
     public Product store(UpsertProductDTO product){
+
+        User admin = userService.findUserById(1L);
         Product prod =  mapper.map(product, Product.class);
+        prod.setCreatedBy(admin);
         prod.create();
 
         return repository.save(prod);

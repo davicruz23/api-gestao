@@ -26,6 +26,7 @@ import tads.ufrn.apigestao.repository.ChargingRepository;
 import tads.ufrn.apigestao.repository.ProductRepository;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -142,7 +143,7 @@ public class ChargingService {
                 charging.setDescription(chargingDTO.getDescription());
                 charging.setDate(LocalDate.now());
                 charging.setUser(userCharging);
-                charging.setCreatedAt(LocalDate.now());
+                charging.setCreatedAt(OffsetDateTime.now());
                 charging.setDescription("MERCADORIAS");
             }
         }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tads.ufrn.apigestao.domain.CollectionAttempt;
 import tads.ufrn.apigestao.domain.Sale;
+import tads.ufrn.apigestao.domain.SaleReturn;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentStatusDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
@@ -11,6 +12,7 @@ import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleLocationDTO;
+import tads.ufrn.apigestao.enums.SaleStatus;
 import tads.ufrn.apigestao.repository.CollectionAttemptRepository;
 
 import java.math.BigDecimal;
@@ -34,6 +36,20 @@ public class SaleMapper {
 
     public static SaleDTO mapper(Sale src) {
 
+        Long idProductDevolvido = null;
+
+        if (src.getStatus() == SaleStatus.DEFEITO_PRODUTO
+                || src.getStatus() == SaleStatus.DESISTENCIA) {
+
+            if (src.getSaleReturns() != null && !src.getSaleReturns().isEmpty()) {
+                idProductDevolvido = src.getSaleReturns().stream()
+                        .filter(sr -> sr.getProductId() != null)
+                        .max(Comparator.comparing(SaleReturn::getId))
+                        .map(SaleReturn::getProductId)
+                        .orElse(null);
+            }
+        }
+
         return SaleDTO.builder()
                 .id(src.getId())
                 .numberSale(src.getNumberSale())
@@ -41,6 +57,8 @@ public class SaleMapper {
                         src.getSaleDate()
                                 .format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR")))
                 )
+                .idProductDevolvido(idProductDevolvido)
+                .saleStatus(src.getStatus())
                 .clientName(src.getPreSale().getClient().getName())
                 .paymentType(src.getPaymentMethod().toString())
                 .nParcel(src.getInstallments())

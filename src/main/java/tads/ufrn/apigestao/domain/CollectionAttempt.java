@@ -19,12 +19,10 @@ public class CollectionAttempt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Parcela relacionada
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "installment_id", nullable = false)
     private Installment installment;
 
-    // Cobrador que marcou
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collector_id", nullable = false)
     private Collector collector;
@@ -49,15 +47,6 @@ public class CollectionAttempt {
     @Column(name = "longitude")
     private Double longitude;
 
-    @Column(name = "location_accuracy")
-    private Double locationAccuracy;
-
-    @Column(name = "within_range")
-    private Boolean withinRange;
-
-    @Column(name = "distance_meters")
-    private Double distanceMeters;
-
     @Column(name = "new_due_date")
     private LocalDateTime newDueDate;
 
@@ -66,9 +55,5 @@ public class CollectionAttempt {
 
     @Column(name = "server_recorded_at", nullable = false)
     private LocalDateTime serverRecordedAt = LocalDateTime.now();
-
-    @Column(name = "receipt_ref")
-    private String receiptRef;
-
 }
 

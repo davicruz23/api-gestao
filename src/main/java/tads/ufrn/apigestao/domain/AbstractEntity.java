@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 @MappedSuperclass
@@ -14,16 +15,16 @@ import java.util.Date;
 @Setter
 public abstract class AbstractEntity {
 
-    private LocalDate deletedAt;
+    private OffsetDateTime deletedAt;
 
-    private LocalDate createdAt;
+    private OffsetDateTime createdAt;
 
     public void delete(){
-        this.deletedAt = LocalDate.now();
+        this.deletedAt = OffsetDateTime.now();
     }
 
     public void create(){
-        this.createdAt = LocalDate.now();
+        this.createdAt = OffsetDateTime.now();
     }
 
 }

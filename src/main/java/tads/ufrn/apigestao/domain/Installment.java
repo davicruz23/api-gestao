@@ -3,6 +3,7 @@ package tads.ufrn.apigestao.domain;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.enums.PaymentType;
 
@@ -10,11 +11,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Installment {
+public class Installment extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +35,6 @@ public class Installment {
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
     private BigDecimal paidAmount;
-
     @Transient
     private Boolean isValid;
 }

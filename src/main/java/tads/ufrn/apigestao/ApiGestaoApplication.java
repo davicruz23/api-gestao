@@ -17,6 +17,7 @@ import tads.ufrn.apigestao.service.*;
 import java.math.BigDecimal;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,6 +94,7 @@ public class ApiGestaoApplication {
                 charging1.setUser(carregador);
                 charging1.setDescription("CARREGAMENTO ATUAL");
                 charging1.setDate(LocalDate.now());
+                charging1.setCreatedAt(OffsetDateTime.now());
                 chargingRepository.save(charging1);
 
             }
