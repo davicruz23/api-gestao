@@ -11,12 +11,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Installment extends AbstractEntity {
+public class Installment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

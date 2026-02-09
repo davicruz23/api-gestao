@@ -60,39 +60,6 @@ public interface InstallmentRepository extends JpaRepository<Installment, Long> 
             LocalDate dueDate
     );
 
-    @Modifying
-    @Query("""
-    UPDATE Installment i
-       SET i.deletedAt = :deletedAt
-     WHERE i.sale.id = :saleId
-       AND i.deletedAt IS NULL
-""")
-    void softDeleteAllBySaleId(@Param("saleId") Long saleId,
-                              @Param("deletedAt") OffsetDateTime deletedAt);
-
-
-        @Modifying
-        @Query("""
-        update Installment i
-           set i.deletedAt = :deletedAt
-         where i.sale.id = :saleId
-           and i.paid = false
-           and i.deletedAt is null
-    """)
-        void softDeleteAllFutureBySaleId(@Param("saleId") Long saleId,
-                                         @Param("deletedAt") OffsetDateTime deletedAt);
-
-        List<Installment> findAllBySaleIdAndPaidFalseOrderByDueDateAsc(Long saleId);
-
-    @Modifying
-    @Query("""
-    update Installment i
-       set i.deletedAt = :deletedAt
-     where i.sale.id = :saleId
-       and i.paid = false
-       and i.deletedAt is null
-""")
-    void softDeleteAllBySaleIdAndPaidFalse(Long saleId, OffsetDateTime deletedAt);
-
+    List<Installment> findAllBySaleIdAndPaidFalseOrderByDueDateDesc(Long saleId);
 
 }

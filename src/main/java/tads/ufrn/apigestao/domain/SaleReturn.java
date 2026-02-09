@@ -7,13 +7,12 @@ import tads.ufrn.apigestao.enums.SaleStatus;
 
 import java.time.OffsetDateTime;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-public class SaleReturn extends AbstractEntity {
+public class SaleReturn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
