@@ -2,25 +2,28 @@ services:
   db:
     image: mysql:8.0
     container_name: api_gestao_db
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
     command: >
       --innodb-buffer-pool-size=256M
       --max-connections=60
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
     volumes:
       - db_data:/var/lib/mysql
-    deploy: {}
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -uroot -p@Davila147 || exit 1"]
+      test: ["CMD-SHELL", "mysqladmin ping -uroot -p$MYSQL_ROOT_PASSWORD || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - app_net
 
   app:
     build: .
     container_name: apigestao_web
-    restart: always
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
@@ -32,3 +35,11 @@ services:
       JAVA_OPTS: -Xms512m -Xmx900m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+AlwaysPreTouch
     ports:
       - "8081:8081"
+    networks:
+      - app_net
+
+volumes:
+  db_data:
+
+networks:
+  app_net:
