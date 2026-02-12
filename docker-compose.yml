@@ -1,18 +1,18 @@
-version: '3.9'
-
 services:
   db:
     image: mysql:8.0
     container_name: api_gestao_db
-    environment:
-      MYSQL_ROOT_PASSWORD: davila147
-      MYSQL_DATABASE: apigestao
-    ports:
-      - "3308:3306"  # porta externa 3308
+    restart: always
+    env_file:
+      - .env
+    command: >
+      --innodb-buffer-pool-size=256M
+      --max-connections=60
     volumes:
       - db_data:/var/lib/mysql
+    deploy: {}
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -uroot -pdavila147 || exit 1"]
+      test: ["CMD-SHELL", "mysqladmin ping -uroot -p@Davila147 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -20,16 +20,15 @@ services:
   app:
     build: .
     container_name: apigestao_web
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/apigestao?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: davila147
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    ports:
-      - "8081:8081"
+    restart: always
     depends_on:
       db:
         condition: service_healthy
-
-volumes:
-  db_data:
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JAVA_OPTS: -Xms512m -Xmx900m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+AlwaysPreTouch
+    ports:
+      - "8081:8081"

@@ -62,4 +62,6 @@ public interface InstallmentRepository extends JpaRepository<Installment, Long> 
 
     List<Installment> findAllBySaleIdAndPaidFalseOrderByDueDateDesc(Long saleId);
 
+    List<Installment> findAllBySaleIdAndPaidFalseOrderByDueDateAsc(Long saleId);
+
 }

@@ -140,9 +140,50 @@ public class SaleReturnService {
                 installmentRepository.saveAll(futureInstallments);
             }
 
+            case REAVIDO -> {
 
+                List<Installment> futureInstallments =
+                        installmentRepository.findAllBySaleIdAndPaidFalseOrderByDueDateAsc(saleId);
 
-            case ATIVO, DEFEITO_PRODUTO, DEVOLVIDO_CLIENTE -> {
+                for (Installment inst : futureInstallments) {
+                    inst.setAmount(BigDecimal.ZERO);
+                    inst.setPaidAmount(BigDecimal.ZERO);
+                    inst.setPaid(true);
+                }
+
+                installmentRepository.saveAll(futureInstallments);
+
+                // 2) cria SaleReturn para TODOS os itens da venda
+                List<SaleReturn> saleReturns = new ArrayList<>();
+
+                for (PreSaleItem item : sale.getPreSale().getItems()) {
+
+                    SaleReturn saleReturn = SaleReturn.builder()
+                            .sale(sale)
+                            .returnDate(now)
+                            .productId(item.getProduct().getId())
+                            .quantityReturned(item.getQuantity()) // recolhe tudo
+                            .saleStatus(newStatus)
+                            .build();
+
+                    saleReturns.add(saleReturn);
+                }
+
+                saleReturnRepository.saveAll(saleReturns);
+
+                // evita criar duplicado no final do método
+                return saleReturns.stream()
+                        .map(sr -> new SaleReturnDTO(
+                                sr.getId(),
+                                sr.getSale().getId(),
+                                sr.getProductId(),
+                                sr.getReturnDate(),
+                                sr.getSaleStatus()
+                        ))
+                        .toList();
+            }
+
+            case ATIVO, DEFEITO_PRODUTO -> {
                 // sem ação extra
             }
 
