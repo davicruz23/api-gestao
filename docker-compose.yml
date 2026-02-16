@@ -40,10 +40,6 @@ services:
       - "8081:8081"
     networks:
       app_net:
-        aliases:
-          - api
-          - backend
-          - apigestao_web
 
 volumes:
   db_data:
