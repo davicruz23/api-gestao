@@ -3,6 +3,7 @@ package tads.ufrn.apigestao.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import tads.ufrn.apigestao.domain.Address;
 import tads.ufrn.apigestao.domain.Client;
@@ -62,15 +63,7 @@ public class ClientService {
     }
 
     public List<ClientRecentDTO> findLastClients() {
-        return Optional.ofNullable(repository.findRecentClientsRaw())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(r -> new ClientRecentDTO(
-                        r[0] != null ? ((Number) r[0]).longValue() : null,
-                        (String) r[1],
-                        (String) r[2],
-                        (String) r[3]
-                ))
-                .toList();
+        return repository.findRecentClients(PageRequest.of(0, 6));
     }
+
 }

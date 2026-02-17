@@ -101,7 +101,7 @@ public class DashboardController {
 
     @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @GetMapping("/recents")
-    public List<ClientRecentDTO> getRecentClients(){
+    public List<ClientRecentDTO> getRecentClients() {
         return clientService.findLastClients();
     }
 
