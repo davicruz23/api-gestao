@@ -11,6 +11,7 @@ import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
 import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.ClientRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,16 +61,16 @@ public class ClientService {
 
     }
 
-    public List<ClientRecentDTO> findLastClients(){
-        return repository.findRecentClientsRaw()
+    public List<ClientRecentDTO> findLastClients() {
+        return Optional.ofNullable(repository.findRecentClientsRaw())
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(r -> new ClientRecentDTO(
-                        ((Number) r[0]).longValue(),
-                        ((String) r[1]),
-                        ((String) r[2]),
-                        ((String) r[3])
+                        r[0] != null ? ((Number) r[0]).longValue() : null,
+                        (String) r[1],
+                        (String) r[2],
+                        (String) r[3]
                 ))
                 .toList();
     }
-
 }
