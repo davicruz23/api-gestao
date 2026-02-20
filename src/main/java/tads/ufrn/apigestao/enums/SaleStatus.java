@@ -9,7 +9,8 @@ public enum SaleStatus {
         DEFEITO_PRODUTO(2),
         DEVOLVIDO_CLIENTE(3),
         DESISTENCIA(4),
-        REAVIDO(5);
+        REAVIDO(5),
+        DANIFICADO(6);
 
 
         private final int value;

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import tads.ufrn.apigestao.domain.Product;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -21,5 +22,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         WHERE (:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')))
     """)
     Page<Product> findAllByFilter(@Param("name") String name, Pageable pageable);
+
+    List<Product> findAllByIdIn(Set<Long> ids);
 
 }

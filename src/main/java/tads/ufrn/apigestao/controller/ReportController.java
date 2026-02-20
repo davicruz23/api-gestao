@@ -14,7 +14,7 @@ public class ReportController {
 
     private final ReportService service;
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'FUNCIONARIO')")
     @GetMapping("/{id}/chargings")
     public ResponseEntity<byte[]> gerarRelatorioCarregamento(@PathVariable Long id) {
         byte[] pdfBytes = service.generateChargingReport(id);
@@ -25,7 +25,7 @@ public class ReportController {
                 .body(pdfBytes);
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'FUNCIONARIO')")
     @GetMapping("/products")
     public ResponseEntity<byte[]> gerarRelatorioProdutos() {
         byte[] pdfBytes = service.generateProductReport();
@@ -36,7 +36,7 @@ public class ReportController {
                 .body(pdfBytes);
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'FUNCIONARIO')")
     @GetMapping("/clients-by-city")
     public ResponseEntity<byte[]> gerarRelatorioClientes(@RequestParam String city) {
 

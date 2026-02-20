@@ -12,6 +12,7 @@ import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleLocationDTO;
+import tads.ufrn.apigestao.domain.dto.sale.SaleReturnDTO;
 import tads.ufrn.apigestao.enums.SaleStatus;
 import tads.ufrn.apigestao.repository.CollectionAttemptRepository;
 
@@ -138,6 +139,15 @@ public class SaleMapper {
                 .nParcel(sale.getInstallments())
                 .clientName(sale.getPreSale().getClient().getName())
                 .total(sale.getTotal())
+                .build();
+    }
+
+    public static SaleReturnDTO toReturnDTO(Sale sale) {
+        if (sale == null) return null;
+
+        return SaleReturnDTO.builder()
+                .saleDate(sale.getSaleDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"))))
+                .clientName(sale.getPreSale().getClient().getName())
                 .build();
     }
 

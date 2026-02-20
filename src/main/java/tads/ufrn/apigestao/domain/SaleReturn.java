@@ -25,6 +25,8 @@ public class SaleReturn {
     @Column(nullable = false)
     private OffsetDateTime returnDate;
 
+    private String description;
+
     private Long productId;
     private Integer quantityReturned;
 

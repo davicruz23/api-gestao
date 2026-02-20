@@ -28,7 +28,7 @@ public class DashboardController {
     private final DashboardService dashboardService;
     private final ClientService clientService;
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/count/sales")
     public ResponseEntity<DashboardSaleDTO> getSalesDashboard(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
@@ -36,14 +36,14 @@ public class DashboardController {
         return ResponseEntity.ok(dashboard);
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/count/preSales/status")
     public ResponseEntity<Map<String, Long>> getSalesStatusCount() {
         Map<String, Long> statusCount = dashboardService.getSalesStatusCount();
         return ResponseEntity.ok(statusCount);
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/count/collector")
     public ResponseEntity<List<CollectorChargeSummaryDTO>> getChargeSummary(@RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate) {
 
@@ -51,7 +51,7 @@ public class DashboardController {
         return ResponseEntity.ok(summary);
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/commissions/collector")
     public ResponseEntity<List<CollectorCommissionDTO>> getAllCommissions(@RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate) {
 
@@ -59,53 +59,53 @@ public class DashboardController {
         return ResponseEntity.ok(commissions);
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/count/products-sold")
     public ResponseEntity<List<DashboardProductSalesDTO>> getTotalProductsSold(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         List<DashboardProductSalesDTO> result = dashboardService.getTotalProductsSold(startDate, endDate);
         return ResponseEntity.ok(result);
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/count/total-cobrado")
     public ResponseEntity<DashboardTotalCobradoDTO> getTotalCobrado() {
         return ResponseEntity.ok(dashboardService.getTotalCobrado());
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/count/total-clients")
     public ResponseEntity<DashboardTotalClientsDTO> getTotalClients() {
         DashboardTotalClientsDTO dto = dashboardService.getTotalClients();
         return ResponseEntity.ok(dto);
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/sales-per-month")
     public List<DashboardSalesPerMonthDTO> getSalesPerMonth(@RequestParam(defaultValue = "6") int meses) {
         return dashboardService.getSalesPerMonth(meses);
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/count/cities")
     public ResponseEntity<Long> getDistinctCityCount() {
         Long count = dashboardService.getDistinctCityCount();
         return ResponseEntity.ok(count);
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/count/chargings")
     public ResponseEntity<Long> getChargingCount() {
         Long count = dashboardService.getCountChargins();
         return ResponseEntity.ok(count);
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/recents")
     public List<ClientRecentDTO> getRecentClients() {
         return clientService.findLastClients();
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
     @GetMapping("/collector/top-today-status")
     public ResponseEntity<List<CollectorTopDTO>> getTopCollectorsStatus() {
         return ResponseEntity.ok(dashboardService.getTopCollectorsStatus());
