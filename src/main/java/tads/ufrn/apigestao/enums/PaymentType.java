@@ -5,16 +5,18 @@ import lombok.Getter;
 @Getter
 public enum PaymentType {
 
-    CASH(1),
-    PARCEL(2),
-    CREDIT(3),
-    DEBIT(4),
-    PIX(5);
+    CASH(1, "DINHEIRO"),
+    PARCEL(2, "PARCELADO"),
+    CREDIT(3, "CRÉDITO"),
+    DEBIT(4, "DÉBITO"),
+    PIX(5, "PIX");
 
     private final int value;
+    private final String description;
 
-    PaymentType(int value){
+    PaymentType(int value, String description) {
         this.value = value;
+        this.description = description;
     }
 
     public static PaymentType fromValue(int value){

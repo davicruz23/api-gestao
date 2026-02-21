@@ -88,7 +88,7 @@ public class SaleMapper {
                                 .format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR")))
                 )
                 .clientName(src.getPreSale().getClient().getName())
-                .paymentType(src.getPaymentMethod().toString())
+                .paymentType(src.getPaymentMethod().getDescription())
                 .nParcel(src.getInstallments())
                 .total(src.getTotal())
 
