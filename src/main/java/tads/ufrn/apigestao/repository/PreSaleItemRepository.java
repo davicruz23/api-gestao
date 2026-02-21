@@ -15,23 +15,24 @@ import java.util.List;
 public interface PreSaleItemRepository extends JpaRepository<PreSaleItem, Long> {
 
     @Query("""
-        SELECT new tads.ufrn.apigestao.domain.dto.dashboard.DashboardProductSalesDTO(
-            p.id,
-            p.name,
-            SUM(i.quantity),
-            SUM(p.value)
-        )
-        FROM PreSaleItem i
-        JOIN i.product p
-        JOIN i.preSale ps
-        WHERE (:startDate IS NULL OR ps.preSaleDate >= :startDate)
-          AND (:endDate IS NULL OR ps.preSaleDate <= :endDate)
-        GROUP BY p.id, p.name
-        ORDER BY SUM(i.quantity) DESC
-    """)
+    SELECT new tads.ufrn.apigestao.domain.dto.dashboard.DashboardProductSalesDTO(
+        p.id,
+        p.name,
+        SUM(i.quantity),
+        SUM(p.value)
+    )
+    FROM PreSaleItem i
+    JOIN i.product p
+    JOIN i.preSale ps
+    WHERE (:startDate IS NULL OR ps.preSaleDate >= :startDate)
+      AND (:endDate IS NULL OR ps.preSaleDate <= :endDate)
+    GROUP BY p.id, p.name
+    ORDER BY SUM(i.quantity) DESC
+""")
     List<DashboardProductSalesDTO> findTotalProductsSoldByDateRange(
             @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate
+            @Param("endDate") LocalDate endDate,
+            Pageable pageable
     );
 }
 

@@ -12,7 +12,12 @@ import java.util.List;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
-    @Query("SELECT COUNT(c) FROM Client c")
+        @Query("""
+        SELECT COUNT(DISTINCT c.id)
+        FROM Sale s
+        JOIN s.preSale ps
+        JOIN ps.client c
+    """)
     Long countTotalClients();
 
     List<Client> findByAddress_CityIgnoreCase(String city);
@@ -24,9 +29,12 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
         c.phone,
         a.city
     )
-    from Client c
+    from PreSale ps
+    join ps.client c
     join c.address a
-    order by c.id desc
+    where ps.status <> tads.ufrn.apigestao.enums.PreSaleStatus.RECUSADA
+    group by c.id, c.name, c.phone, a.city
+    order by max(ps.id) desc
 """)
     List<ClientRecentDTO> findRecentClients(Pageable pageable);
 

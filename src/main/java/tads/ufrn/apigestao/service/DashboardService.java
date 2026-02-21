@@ -1,6 +1,8 @@
 package tads.ufrn.apigestao.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import tads.ufrn.apigestao.domain.Collector;
 import tads.ufrn.apigestao.domain.Installment;
@@ -152,7 +154,11 @@ public class DashboardService {
 
 
     public List<DashboardProductSalesDTO> getTotalProductsSold(LocalDate startDate, LocalDate endDate) {
-        return preSaleItemRepository.findTotalProductsSoldByDateRange(startDate, endDate);
+
+        Pageable topFour = PageRequest.of(0, 4);
+
+        return preSaleItemRepository
+                .findTotalProductsSoldByDateRange(startDate, endDate, topFour);
     }
 
     public DashboardTotalCobradoDTO getTotalCobrado() {
