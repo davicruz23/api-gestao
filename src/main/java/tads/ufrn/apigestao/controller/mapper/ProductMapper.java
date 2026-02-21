@@ -6,6 +6,8 @@ import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
 import tads.ufrn.apigestao.domain.dto.product.UptadeProductDTO;
 import tads.ufrn.apigestao.enums.ProductStatus;
 
+import java.math.BigDecimal;
+
 public class ProductMapper {
 
     private static int resolveStatus(Integer amount) {
@@ -39,11 +41,12 @@ public class ProductMapper {
                 .build();
     }
 
-    public static ProductSaleDTO mapperProductSale(Product product, Integer quantity){
+    public static ProductSaleDTO mapperProductSale(Product product, Integer quantity, BigDecimal price) {
         return ProductSaleDTO.builder()
                 .id(product.getId())
                 .nameProduct(product.getName())
                 .quantity(quantity)
+                .price(price)
                 .build();
     }
 

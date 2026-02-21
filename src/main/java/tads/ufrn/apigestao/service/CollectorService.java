@@ -40,19 +40,37 @@ public class CollectorService {
     }
 
     @Transactional(readOnly = true)
-    public List<CollectorDTO> findAlll() {
+    public List<CollectorDTO> findAll(Integer status) {
 
         List<Collector> collectors = repository.findAll();
 
         for (Collector collector : collectors) {
-            if (collector.getSales() == null) {
-                continue;
+
+            if (collector.getSales() == null) continue;
+
+            if (status != null) {
+                collector.setSales(
+                        collector.getSales().stream()
+                                .filter(sale ->
+                                        sale.getStatus() != null &&
+                                                sale.getStatus().getValue() == status
+                                )
+                                .toList()
+                );
             }
 
             for (Sale sale : collector.getSales()) {
-                if (sale.getInstallmentsEntities() == null) {
-                    continue;
-                }
+
+                if (sale.getInstallmentsEntities() == null) continue;
+
+                sale.setInstallmentsEntities(
+                        sale.getInstallmentsEntities().stream()
+                                .filter(inst ->
+                                        !(inst.isPaid() &&
+                                                BigDecimal.ZERO.compareTo(inst.getAmount()) == 0)
+                                )
+                                .toList()
+                );
 
                 for (Installment installment : sale.getInstallmentsEntities()) {
 
@@ -75,7 +93,6 @@ public class CollectorService {
                 .map(CollectorMapper::mapper)
                 .toList();
     }
-
 
     public Collector findById(Long id) {
         return repository.findById(id).orElseThrow();

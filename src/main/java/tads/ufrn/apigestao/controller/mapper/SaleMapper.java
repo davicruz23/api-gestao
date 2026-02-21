@@ -3,12 +3,14 @@ package tads.ufrn.apigestao.controller.mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tads.ufrn.apigestao.domain.CollectionAttempt;
+import tads.ufrn.apigestao.domain.PreSaleItem;
 import tads.ufrn.apigestao.domain.Sale;
 import tads.ufrn.apigestao.domain.SaleReturn;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentStatusDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductSaleDTO;
+import tads.ufrn.apigestao.domain.dto.returnSale.SaleReturnInfoDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleLocationDTO;
@@ -37,18 +39,45 @@ public class SaleMapper {
 
     public static SaleDTO mapper(Sale src) {
 
-        Long idProductDevolvido = null;
+        List<SaleReturnInfoDTO> saleReturnInfos = null;
 
-        if (src.getStatus() == SaleStatus.DEFEITO_PRODUTO
-                || src.getStatus() == SaleStatus.DESISTENCIA) {
+        if (src.getSaleReturns() != null && !src.getSaleReturns().isEmpty()) {
 
-            if (src.getSaleReturns() != null && !src.getSaleReturns().isEmpty()) {
-                idProductDevolvido = src.getSaleReturns().stream()
-                        .filter(sr -> sr.getProductId() != null)
-                        .max(Comparator.comparing(SaleReturn::getId))
-                        .map(SaleReturn::getProductId)
-                        .orElse(null);
-            }
+            saleReturnInfos = src.getSaleReturns().stream()
+                    .map(sr -> {
+
+                        // Busca o item original para calcular valor abatido
+                        PreSaleItem item = src.getPreSale().getItems().stream()
+                                .filter(i -> i.getProduct().getId().equals(sr.getProductId()))
+                                .findFirst()
+                                .orElse(null);
+
+                        BigDecimal unitValue = item != null
+                                ? item.getProduct().getValue()
+                                : BigDecimal.ZERO;
+
+                        BigDecimal valueAbatido =
+                                unitValue.multiply(BigDecimal.valueOf(sr.getQuantityReturned()));
+
+                        return SaleReturnInfoDTO.builder()
+                                .saleReturnId(sr.getId())
+                                .productId(sr.getProductId())
+                                .productName(
+                                        item != null ? item.getProduct().getName() : null
+                                )
+                                .quantityReturned(sr.getQuantityReturned())
+                                .valueAbatido(valueAbatido)
+                                .returnDate(
+                                        sr.getReturnDate()
+                                                .format(DateTimeFormatter.ofPattern(
+                                                        "dd/MM/yyyy",
+                                                        new Locale("pt", "BR")
+                                                ))
+                                )
+                                .status(sr.getSaleStatus().getDescription())
+                                .build();
+                    })
+                    .toList();
         }
 
         return SaleDTO.builder()
@@ -58,8 +87,6 @@ public class SaleMapper {
                         src.getSaleDate()
                                 .format(DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR")))
                 )
-                .idProductDevolvido(idProductDevolvido)
-                .saleStatus(src.getStatus())
                 .clientName(src.getPreSale().getClient().getName())
                 .paymentType(src.getPaymentMethod().toString())
                 .nParcel(src.getInstallments())
@@ -71,12 +98,19 @@ public class SaleMapper {
 
                 .products(
                         src.getPreSale().getItems().stream()
-                                .map(item ->
-                                        ProductMapper.mapperProductSale(
-                                                item.getProduct(),
-                                                item.getQuantity()
-                                        )
-                                )
+                                .map(item -> {
+
+                                    BigDecimal valorTotal =
+                                            item.getProduct()
+                                                    .getValue()
+                                                    .multiply(BigDecimal.valueOf(item.getQuantity()));
+
+                                    return ProductMapper.mapperProductSale(
+                                            item.getProduct(),
+                                            item.getQuantity(),
+                                            valorTotal
+                                    );
+                                })
                                 .toList()
                 )
 
@@ -123,8 +157,7 @@ public class SaleMapper {
                                 })
                                 .toList()
                 )
-
-
+                .saleReturns(saleReturnInfos)
                 .build();
     }
 
@@ -162,7 +195,8 @@ public class SaleMapper {
                 .products(src.getPreSale().getItems().stream()
                         .map(item -> ProductMapper.mapperProductSale(
                                 item.getProduct(),
-                                item.getQuantity()
+                                item.getQuantity(),
+                                null
                         ))
                         .toList())
                 .installments(
