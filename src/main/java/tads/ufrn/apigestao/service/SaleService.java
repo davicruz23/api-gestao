@@ -16,6 +16,7 @@ import tads.ufrn.apigestao.domain.dto.product.ProductItemDTO;
 import tads.ufrn.apigestao.domain.dto.sale.*;
 import tads.ufrn.apigestao.enums.PaymentType;
 import tads.ufrn.apigestao.enums.SaleStatus;
+import tads.ufrn.apigestao.exception.BusinessException;
 import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.*;
 
@@ -44,7 +45,8 @@ public class SaleService {
             String clientName,
             String cpf,
             Integer status,
-            LocalDate saleDate
+            LocalDate saleDate,
+            Boolean unpaidOnly
     ) {
         Pageable pageable = PageRequest.of(page, size);
 
@@ -59,9 +61,40 @@ public class SaleService {
                         cpf,
                         saleStatus,
                         saleDate,
+                        unpaidOnly,
                         pageable
                 )
                 .map(SaleMapper::salesList);
+    }
+
+    @Transactional(readOnly = true)
+    public AdminPaymentInfoDTO getAdminPaymentInfo(Long saleId) {
+        Sale sale = repository.findById(saleId)
+                .orElseThrow(() -> new BusinessException("Venda não encontrada"));
+
+        List<Installment> installments = installmentRepository
+                .findBySaleIdOrderByDueDateAscIdAsc(saleId);
+
+        BigDecimal openBalance = installments.stream()
+                .filter(installment -> !installment.isPaid())
+                .map(Installment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<AdminPaymentInstallmentDTO> installmentDTOs = installments.stream()
+                .map(installment -> new AdminPaymentInstallmentDTO(
+                        installment.getId(),
+                        installment.getDueDate(),
+                        installment.getAmount(),
+                        installment.isPaid()
+                ))
+                .toList();
+
+        return new AdminPaymentInfoDTO(
+                sale.getId(),
+                sale.getPreSale().getClient().getName(),
+                openBalance,
+                installmentDTOs
+        );
     }
 
     public Sale findById(Long id) {

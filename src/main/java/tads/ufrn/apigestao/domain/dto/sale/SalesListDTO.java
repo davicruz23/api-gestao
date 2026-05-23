@@ -20,6 +20,7 @@ public class SalesListDTO {
     private String paymentType;
     private Integer nParcel;
     private String clientName;
+    private String statusSale;
     private List<ProductSaleDTO> products;
     private List<InstallmentListSalesDTO> installments;
 }

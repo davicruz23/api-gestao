@@ -8,6 +8,7 @@ import tads.ufrn.apigestao.controller.mapper.SaleMapper;
 import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.collector.*;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
+import tads.ufrn.apigestao.domain.dto.sale.AdminPaymentDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
 import tads.ufrn.apigestao.enums.SaleStatus;
 import tads.ufrn.apigestao.exception.BusinessException;
@@ -96,6 +97,76 @@ public class CollectorService {
         Collector collector = new Collector();
         collector.setUser(user);
         repository.save(collector);
+    }
+
+    @Transactional
+    public void registerAdminPayment(Long saleId, AdminPaymentDTO dto) {
+        Sale sale = saleRepository.findById(saleId)
+                .orElseThrow(() -> new BusinessException("Venda não encontrada"));
+
+        BigDecimal amountPaid = dto.getAmount();
+
+        if (amountPaid == null || amountPaid.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("Informe um valor de pagamento válido");
+        }
+
+        List<Installment> openInstallments = installmentRepository
+                .findBySaleIdAndPaidFalseOrderByDueDateAscIdAsc(saleId);
+
+        if (openInstallments.isEmpty()) {
+            throw new BusinessException("Essa venda não possui parcelas em aberto");
+        }
+
+        BigDecimal totalOpenAmount = openInstallments.stream()
+                .map(Installment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (amountPaid.compareTo(totalOpenAmount) > 0) {
+            throw new BusinessException("O pagamento não pode ser maior que o saldo devedor");
+        }
+
+        BigDecimal remainingPayment = amountPaid;
+
+        for (Installment installment : openInstallments) {
+            if (remainingPayment.compareTo(BigDecimal.ZERO) <= 0) {
+                break;
+            }
+
+            BigDecimal installmentAmount = installment.getAmount();
+            BigDecimal amountToPay = remainingPayment.min(installmentAmount);
+
+            markAsPaidByAdmin(installment, amountToPay);
+
+            remainingPayment = remainingPayment.subtract(amountToPay);
+        }
+
+        if (amountPaid.compareTo(totalOpenAmount) == 0) {
+            sale.setStatus(SaleStatus.FINALIZADO);
+            saleRepository.save(sale);
+        }
+    }
+
+    private void markAsPaidByAdmin(
+            Installment installment,
+            BigDecimal amountPaid
+    ) {
+        BigDecimal installmentAmount = installment.getAmount();
+        BigDecimal remaining = installmentAmount.subtract(amountPaid);
+
+        if (remaining.compareTo(BigDecimal.ZERO) > 0) {
+            installment.setAmount(remaining);
+            installment.setPaid(false);
+            installment.setPaidAmount(BigDecimal.ZERO);
+            installment.setPaymentDate(null);
+            installment.setCommissionable(true);
+        } else {
+            installment.setPaid(true);
+            installment.setPaymentDate(LocalDateTime.now());
+            installment.setPaidAmount(amountPaid);
+            installment.setCommissionable(false);
+        }
+
+        installmentRepository.save(installment);
     }
 
     @Transactional

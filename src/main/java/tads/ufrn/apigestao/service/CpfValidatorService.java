@@ -2,6 +2,8 @@ package tads.ufrn.apigestao.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tads.ufrn.apigestao.domain.Address;
+import tads.ufrn.apigestao.domain.dto.cep.CoordinatesDTO;
 
 @Service
 @RequiredArgsConstructor

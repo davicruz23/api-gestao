@@ -49,12 +49,23 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     AND (:cpf IS NULL OR s.preSale.client.cpf = :cpf)
     AND (:status IS NULL OR s.status = :status)
     AND (:saleDate IS NULL OR s.saleDate = :saleDate)
+    AND (
+        :unpaidOnly IS NULL
+        OR :unpaidOnly = false
+        OR NOT EXISTS (
+            SELECT i.id
+            FROM Installment i
+            WHERE i.sale = s
+            AND i.paid > false
+        )
+    )
 """)
     Page<Sale> findAllWithFilters(
             @Param("clientName") String clientName,
             @Param("cpf") String cpf,
             @Param("status") SaleStatus status,
             @Param("saleDate") LocalDate saleDate,
+            @Param("unpaidOnly") Boolean unpaidOnly,
             Pageable pageable
     );
 

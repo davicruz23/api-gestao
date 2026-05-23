@@ -12,13 +12,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tads.ufrn.apigestao.controller.mapper.SaleMapper;
 import tads.ufrn.apigestao.domain.Inspector;
 import tads.ufrn.apigestao.domain.Sale;
+import tads.ufrn.apigestao.domain.dto.cep.CoordinatesDTO;
 import tads.ufrn.apigestao.domain.dto.commissionHistory.CommissionHistoryDTO;
 import tads.ufrn.apigestao.domain.dto.sale.*;
 import tads.ufrn.apigestao.enums.SaleStatus;
-import tads.ufrn.apigestao.service.CommissionHistoryService;
-import tads.ufrn.apigestao.service.InspectorService;
-import tads.ufrn.apigestao.service.SaleService;
+import tads.ufrn.apigestao.service.*;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +30,8 @@ public class SaleController {
 
     private SaleService service;
     private InspectorService inspectorService;
+    private CollectorService collectorService;
+    private GeocodingService geocodingService;
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
     @GetMapping("/all")
@@ -39,11 +41,30 @@ public class SaleController {
             @RequestParam(required = false) String clientName,
             @RequestParam(required = false) String cpf,
             @RequestParam(required = false) Integer status,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate saleDate
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate saleDate,
+            @RequestParam(required = false) Boolean unpaidOnly
     ) {
         return ResponseEntity.ok(
-                service.findAll(page, size, clientName, cpf, status, saleDate)
+                service.findAll(page, size, clientName, cpf, status, saleDate, unpaidOnly)
         );
+    }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
+    @PutMapping("/{saleId}/admin-payment")
+    public ResponseEntity<Void> registerAdminPayment(
+            @PathVariable Long saleId,
+            @RequestBody AdminPaymentDTO dto
+    ) {
+        collectorService.registerAdminPayment(saleId, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FISCAL')")
+    @GetMapping("/{saleId}/admin-payment-info")
+    public ResponseEntity<AdminPaymentInfoDTO> getAdminPaymentInfo(
+            @PathVariable Long saleId
+    ) {
+        return ResponseEntity.ok(service.getAdminPaymentInfo(saleId));
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN')")
@@ -52,14 +73,32 @@ public class SaleController {
 
         Inspector inspector = inspectorService.findEntityById(1L);
 
+        var address = dto.getPreSale().getClient().getAddress();
+
+        CoordinatesDTO coordinates = geocodingService.getCoordinates(
+                address.getStreet(),
+                address.getNumber(),
+                address.getCity(),
+                address.getState(),
+                address.getZipCode()
+        );
+
+        Double latitude = coordinates != null
+                ? coordinates.getLatitude().doubleValue()
+                : null;
+
+        Double longitude = coordinates != null
+                ? coordinates.getLongitude().doubleValue()
+                : null;
+
         Sale sale = service.storeAndApprovePreSale(
                 dto.getPreSale(),
                 inspector,
                 dto.getPaymentMethod(),
                 dto.getInstallments(),
                 dto.getCashPaid(),
-                null,
-                null
+                latitude,
+                longitude
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(SaleMapper.mapper(sale));

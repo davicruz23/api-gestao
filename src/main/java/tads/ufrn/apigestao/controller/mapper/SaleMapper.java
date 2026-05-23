@@ -175,6 +175,7 @@ public class SaleMapper {
                 .clientName(src.getPreSale().getClient().getName())
                 .paymentType(src.getPaymentMethod().getDescription())
                 .nParcel(src.getInstallments())
+                .statusSale(src.getStatus().getDescription())
 
                 .products(
                         src.getPreSale().getItems().stream()
