@@ -7,11 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import tads.ufrn.apigestao.controller.mapper.InspectorMapper;
 import tads.ufrn.apigestao.controller.mapper.PreSaleMapper;
 import tads.ufrn.apigestao.domain.*;
+import tads.ufrn.apigestao.domain.dto.commissionHistory.SellerCommissionDTOO;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorHistoryPreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.preSale.PreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.preSale.UpsertPreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.preSaleItem.UpsertPreSaleItemDTO;
 import tads.ufrn.apigestao.domain.dto.seller.SellerCommissionDTO;
+import tads.ufrn.apigestao.enums.CommissionReason;
 import tads.ufrn.apigestao.enums.PreSaleStatus;
 import tads.ufrn.apigestao.exception.BusinessException;
 import tads.ufrn.apigestao.exception.ResourceNotFoundException;
@@ -48,7 +50,6 @@ public class PreSaleService {
 
     @Transactional
     public PreSaleDTO store(UpsertPreSaleDTO dto) {
-        System.out.println("Charging ID recebido: " + dto.getChargingId());
 
         Optional<PreSale> existing = repository.findByUuidPreSale(dto.getUuidPreSale());
 
@@ -155,11 +156,12 @@ public class PreSaleService {
     }
 
     @Transactional
-    public SellerCommissionDTO getCommissionByPeriod(
+    public SellerCommissionDTOO getCommissionByPeriod(
             Long sellerId,
             LocalDate startDate,
             LocalDate endDate,
-            boolean saveHistory
+            BigDecimal paymentPercentage,
+            CommissionReason reason
     ) {
 
         LocalDateTime now = LocalDateTime.now();
@@ -167,6 +169,19 @@ public class PreSaleService {
         if (endDate.isBefore(startDate)) {
             throw new BusinessException("A data final não pode ser anterior à data inicial.");
         }
+
+        if (reason == null) {
+            throw new BusinessException("O motivo da comissão é obrigatório.");
+        }
+
+        if (paymentPercentage == null
+                || paymentPercentage.compareTo(BigDecimal.ZERO) <= 0
+                || paymentPercentage.compareTo(BigDecimal.valueOf(100)) > 0) {
+            throw new BusinessException("O percentual de pagamento deve ser maior que 0 e menor ou igual a 100.");
+        }
+
+        boolean isOnlyConsultation = reason == CommissionReason.CONSULTA
+                || reason == CommissionReason.OUTRO;
 
         Seller seller = sellerService.findById(sellerId);
 
@@ -193,22 +208,53 @@ public class PreSaleService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
 
-        if (saveHistory) {
+        BigDecimal previousPaidAmount = commissionHistoryRepository
+                .sumPaidAmountBySellerAndPeriod(sellerId, startDate, endDate)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal percentageValue = paymentPercentage
+                .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+
+        BigDecimal calculatedAmountToPay = totalCommission
+                .multiply(percentageValue)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal amountToPay = calculatedAmountToPay;
+
+        if (!isOnlyConsultation) {
+            amountToPay = calculatedAmountToPay
+                    .subtract(previousPaidAmount)
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            if (amountToPay.compareTo(BigDecimal.ZERO) < 0) {
+                amountToPay = BigDecimal.ZERO;
+            }
+
             CommissionHistory history = new CommissionHistory();
             history.setSeller(seller);
             history.setGeneratedAt(now);
             history.setStartDate(startDate);
             history.setEndDate(endDate);
-            history.setAmount(totalCommission);
+
+            history.setAmount(amountToPay);
+            history.setTotalCommission(totalCommission);
+            history.setPaymentPercentage(paymentPercentage);
+            history.setPreviousPaidAmount(previousPaidAmount);
+            history.setReason(reason);
+
             commissionHistoryRepository.save(history);
         }
 
-        return new SellerCommissionDTO(
+        return new SellerCommissionDTOO(
                 seller.getId(),
                 seller.getUser().getName(),
                 startDate,
                 endDate,
-                totalCommission
+                totalCommission,
+                paymentPercentage,
+                previousPaidAmount,
+                amountToPay,
+                reason
         );
     }
 

@@ -1,27 +1,33 @@
 package tads.ufrn.apigestao.domain.dto.commissionHistory;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import tads.ufrn.apigestao.enums.CommissionReason;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class CommissionHistoryDTO {
+public class CollectorCommissionDTOO {
 
-    private String ownerName;
-    private String ownerType;
-    private String interval;
-    private LocalDateTime generatedAt;
+    private Long collectorId;
+
+    private String collectorName;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
+
     private BigDecimal totalCommission;
+
     private BigDecimal paymentPercentage;
+
     private BigDecimal previousPaidAmount;
-    private BigDecimal amount;
+
+    private BigDecimal amountToPay;
+
     private CommissionReason reason;
 }

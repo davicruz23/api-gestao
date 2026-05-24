@@ -38,8 +38,6 @@ public class PreSaleController {
     @PostMapping
     public ResponseEntity<?> store(@RequestBody UpsertPreSaleDTO model) {
 
-        System.out.println("recebi: "+model );
-
         try {
 
             PreSaleDTO dto = service.store(model);

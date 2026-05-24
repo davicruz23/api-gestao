@@ -13,6 +13,8 @@ import tads.ufrn.apigestao.domain.dto.charging.UpsertChargingDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorCommissionDTO;
 import tads.ufrn.apigestao.domain.dto.collector.CollectorDTO;
 import tads.ufrn.apigestao.domain.dto.commissionHistory.CommissionHistoryDTO;
+import tads.ufrn.apigestao.domain.dto.commissionHistory.SellerCommissionDTOO;
+import tads.ufrn.apigestao.domain.dto.commissionHistory.SellerCommissionRequestDTO;
 import tads.ufrn.apigestao.domain.dto.seller.*;
 import tads.ufrn.apigestao.service.CommissionHistoryService;
 import tads.ufrn.apigestao.service.PreSaleService;
@@ -66,14 +68,20 @@ public class SellerController {
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','VENDEDOR')")
-    @GetMapping("/{id}/commission")
-    public ResponseEntity<SellerCommissionDTO> getCommissionByPeriod(
+    @PostMapping("/{id}/commission")
+    public ResponseEntity<SellerCommissionDTOO> getCommissionByPeriod(
             @PathVariable Long id,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(defaultValue = "false") boolean saveHistory) {
+            @RequestBody SellerCommissionRequestDTO request
+    ) {
 
-        SellerCommissionDTO dto = preSaleService.getCommissionByPeriod(id, startDate, endDate, saveHistory);
+        SellerCommissionDTOO dto = preSaleService.getCommissionByPeriod(
+                id,
+                request.getStartDate(),
+                request.getEndDate(),
+                request.getPaymentPercentage(),
+                request.getReason()
+        );
+
         return ResponseEntity.ok(dto);
     }
 
@@ -84,6 +92,6 @@ public class SellerController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return commissionHistoryService.getBySeller( sellerId, page, size);
+        return commissionHistoryService.getBySeller(sellerId, page, size);
     }
 }

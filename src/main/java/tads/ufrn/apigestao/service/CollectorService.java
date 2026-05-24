@@ -7,9 +7,11 @@ import tads.ufrn.apigestao.controller.mapper.CollectorMapper;
 import tads.ufrn.apigestao.controller.mapper.SaleMapper;
 import tads.ufrn.apigestao.domain.*;
 import tads.ufrn.apigestao.domain.dto.collector.*;
+import tads.ufrn.apigestao.domain.dto.commissionHistory.CollectorCommissionDTOO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.domain.dto.sale.AdminPaymentDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
+import tads.ufrn.apigestao.enums.CommissionReason;
 import tads.ufrn.apigestao.enums.SaleStatus;
 import tads.ufrn.apigestao.exception.BusinessException;
 import tads.ufrn.apigestao.exception.ResourceNotFoundException;
@@ -263,16 +265,42 @@ public class CollectorService {
         }
     }
 
-    public CollectorCommissionDTO getCommissionByPeriod(
+    @Transactional
+    public CollectorCommissionDTOO getCommissionByPeriod(
             Long collectorId,
             LocalDate startDate,
             LocalDate endDate,
-            boolean saveHistory
+            BigDecimal paymentPercentage,
+            CommissionReason reason
     ) {
+
+        if (startDate == null) {
+            throw new BusinessException("A data inicial é obrigatória.");
+        }
+
+        if (endDate == null) {
+            throw new BusinessException("A data final é obrigatória.");
+        }
 
         if (endDate.isBefore(startDate)) {
             throw new BusinessException("A data final não pode ser anterior à data inicial.");
         }
+
+        if (reason == null) {
+            throw new BusinessException("O motivo da comissão é obrigatório.");
+        }
+
+        BigDecimal percentage = paymentPercentage != null
+                ? paymentPercentage
+                : BigDecimal.valueOf(100);
+
+        if (percentage.compareTo(BigDecimal.ZERO) <= 0
+                || percentage.compareTo(BigDecimal.valueOf(100)) > 0) {
+            throw new BusinessException("O percentual deve ser maior que 0 e menor ou igual a 100.");
+        }
+
+        boolean isOnlyConsultation = reason == CommissionReason.CONSULTA
+                || reason == CommissionReason.OUTRO;
 
         Collector collector = repository.findById(collectorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cobrador não encontrado"));
@@ -290,26 +318,57 @@ public class CollectorService {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal commission = totalCollected
+        BigDecimal totalCommission = totalCollected
                 .multiply(BigDecimal.valueOf(0.01))
                 .setScale(2, RoundingMode.HALF_UP);
 
-        if (saveHistory) {
+        BigDecimal previousPaidAmount = commissionHistoryRepository
+                .sumPaidAmountByCollectorAndPeriod(collectorId, startDate, endDate)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal percentageValue = percentage
+                .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+
+        BigDecimal calculatedAmountToPay = totalCommission
+                .multiply(percentageValue)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal amountToPay = calculatedAmountToPay;
+
+        if (!isOnlyConsultation) {
+            amountToPay = calculatedAmountToPay
+                    .subtract(previousPaidAmount)
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            if (amountToPay.compareTo(BigDecimal.ZERO) < 0) {
+                amountToPay = BigDecimal.ZERO;
+            }
+
             CommissionHistory history = new CommissionHistory();
             history.setCollector(collector);
             history.setGeneratedAt(LocalDateTime.now());
             history.setStartDate(startDate);
             history.setEndDate(endDate);
-            history.setAmount(commission);
+
+            history.setAmount(amountToPay);
+            history.setTotalCommission(totalCommission);
+            history.setPaymentPercentage(percentage);
+            history.setPreviousPaidAmount(previousPaidAmount);
+            history.setReason(reason);
+
             commissionHistoryRepository.save(history);
         }
 
-        return new CollectorCommissionDTO(
+        return new CollectorCommissionDTOO(
                 collector.getId(),
                 collector.getUser().getName(),
                 startDate,
                 endDate,
-                commission
+                totalCommission,
+                percentage,
+                previousPaidAmount,
+                amountToPay,
+                reason
         );
     }
 

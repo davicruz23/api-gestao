@@ -29,13 +29,16 @@ public class CommissionHistoryMapper {
                 + " - "
                 + src.getEndDate().format(DATE_FORMAT);
 
-
         return CommissionHistoryDTO.builder()
                 .ownerName(ownerName)
                 .ownerType(ownerType)
                 .generatedAt(src.getGeneratedAt())
                 .interval(interval)
-                .totalCommission(src.getAmount())
+                .totalCommission(src.getTotalCommission())
+                .paymentPercentage(src.getPaymentPercentage())
+                .previousPaidAmount(src.getPreviousPaidAmount())
+                .amount(src.getAmount())
+                .reason(src.getReason())
                 .build();
     }
 }

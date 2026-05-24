@@ -17,6 +17,8 @@ import tads.ufrn.apigestao.domain.Installment;
 import tads.ufrn.apigestao.domain.Sale;
 import tads.ufrn.apigestao.domain.dto.LocationSaleDTO;
 import tads.ufrn.apigestao.domain.dto.collector.*;
+import tads.ufrn.apigestao.domain.dto.commissionHistory.CollectorCommissionDTOO;
+import tads.ufrn.apigestao.domain.dto.commissionHistory.CollectorCommissionRequestDTO;
 import tads.ufrn.apigestao.domain.dto.commissionHistory.CommissionHistoryDTO;
 import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
 import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
@@ -92,7 +94,6 @@ public class CollectorController {
 //    @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
 //    @PutMapping("/{id}/pay")
 //    public ResponseEntity<?> payInstallment(@PathVariable Long id, @RequestParam BigDecimal amount) {
-//        System.out.println("chamei primeiro payinstallment");
 //        try {
 //            InstallmentPaidDTO paidInstallment =
 //                    service.markAsPaid(id, amount);
@@ -108,10 +109,20 @@ public class CollectorController {
 
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
-    @GetMapping("/{id}/commission")
-    public ResponseEntity<CollectorCommissionDTO> getCommissionByPeriod(@PathVariable Long id, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate, @RequestParam(defaultValue = "false") boolean saveHistory) {
+    @PostMapping("/{id}/commission")
+    public ResponseEntity<CollectorCommissionDTOO> getCommissionByPeriod(
+            @PathVariable Long id,
+            @RequestBody CollectorCommissionRequestDTO request
+    ) {
 
-        CollectorCommissionDTO dto = service.getCommissionByPeriod(id, startDate, endDate, saveHistory);
+        CollectorCommissionDTOO dto = service.getCommissionByPeriod(
+                id,
+                request.getStartDate(),
+                request.getEndDate(),
+                request.getPaymentPercentage(),
+                request.getReason()
+        );
+
         return ResponseEntity.ok(dto);
     }
 
@@ -132,7 +143,6 @@ public class CollectorController {
     @PreAuthorize("hasAnyRole('SUPERADMIN','COBRADOR')")
     @PutMapping("/{collectorId}/installment/{installmentId}/collect")
     public ResponseEntity<CollectionAttemptDTO> collectInstallment(@PathVariable Long collectorId, @PathVariable Long installmentId, @RequestBody CollectionAttemptDTO dto) {
-        System.out.println("agora chamei o collectInstallment");
         CollectionAttemptDTO attempt = collectionAttemptService.recordAttempt(
                 collectorId,
                 installmentId,
@@ -203,13 +213,13 @@ public class CollectorController {
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
-    @GetMapping("/commission-history")
-    public Page<CommissionHistoryDTO> getCommissionHistory(
+    @GetMapping("/collector-commission-history")
+    public Page<CommissionHistoryDTO> getCollectorCommissionHistory(
             @RequestParam(required = false) Long collectorId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return commissionHistoryService.getByCollector( collectorId, page, size);
+        return commissionHistoryService.getByCollector(collectorId, page, size);
     }
 
 

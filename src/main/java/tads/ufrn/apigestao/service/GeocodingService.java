@@ -31,8 +31,6 @@ public class GeocodingService {
         if (coordinates != null) {
             return coordinates;
         }
-
-        System.out.println("NENHUMA COORDENADA ENCONTRADA PARA O ENDEREÇO INFORMADO.");
         return null;
     }
 
@@ -41,13 +39,10 @@ public class GeocodingService {
             zipCode = cleanZipCode(zipCode);
 
             if (zipCode.isBlank()) {
-                System.out.println("CEP VAZIO.");
                 return null;
             }
 
             String url = "https://cep.awesomeapi.com.br/json/" + zipCode;
-
-            System.out.println("URL AWESOMEAPI CEP: " + url);
 
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url,
@@ -58,10 +53,7 @@ public class GeocodingService {
 
             Map<String, Object> result = response.getBody();
 
-            System.out.println("RESPOSTA AWESOMEAPI: " + result);
-
             if (result == null || result.isEmpty()) {
-                System.out.println("NENHUMA COORDENADA ENCONTRADA PELO CEP.");
                 return null;
             }
 
@@ -69,26 +61,19 @@ public class GeocodingService {
             Object lngObj = result.get("lng");
 
             if (latObj == null || lngObj == null) {
-                System.out.println("LATITUDE OU LONGITUDE VEIO NULL PELO CEP.");
                 return null;
             }
 
             if (latObj.toString().isBlank() || lngObj.toString().isBlank()) {
-                System.out.println("LATITUDE OU LONGITUDE VEIO VAZIA PELO CEP.");
                 return null;
             }
 
             BigDecimal latitude = new BigDecimal(latObj.toString());
             BigDecimal longitude = new BigDecimal(lngObj.toString());
 
-            System.out.println("COORDENADA ENCONTRADA PELO CEP.");
-            System.out.println("LATITUDE FINAL: " + latitude);
-            System.out.println("LONGITUDE FINAL: " + longitude);
-
             return new CoordinatesDTO(latitude, longitude);
 
         } catch (Exception e) {
-            System.out.println("ERRO AO BUSCAR COORDENADAS PELO CEP: " + e.getMessage());
             return null;
         }
     }
@@ -99,7 +84,6 @@ public class GeocodingService {
         state = clean(state);
 
         if (street.isBlank() || city.isBlank() || state.isBlank()) {
-            System.out.println("DADOS INSUFICIENTES PARA BUSCAR POR RUA E CIDADE.");
             return null;
         }
 
@@ -128,8 +112,6 @@ public class GeocodingService {
                     .encode()
                     .toUriString();
 
-            System.out.println("URL NOMINATIM: " + url);
-
             HttpHeaders headers = new HttpHeaders();
             headers.set("User-Agent", "apigestao/1.0 (davifieledeus@gmail.com)");
             headers.set("Accept-Language", "pt-BR,pt;q=0.9");
@@ -145,10 +127,7 @@ public class GeocodingService {
 
             List<Map<String, Object>> results = response.getBody();
 
-            System.out.println("RESPOSTA NOMINATIM: " + results);
-
             if (results == null || results.isEmpty()) {
-                System.out.println("NENHUMA COORDENADA ENCONTRADA NO NOMINATIM PARA: " + fullAddress);
                 return null;
             }
 
@@ -158,27 +137,19 @@ public class GeocodingService {
             Object lonObj = location.get("lon");
 
             if (latObj == null || lonObj == null) {
-                System.out.println("LATITUDE OU LONGITUDE VEIO NULL NO NOMINATIM.");
                 return null;
             }
 
             if (latObj.toString().isBlank() || lonObj.toString().isBlank()) {
-                System.out.println("LATITUDE OU LONGITUDE VEIO VAZIA NO NOMINATIM.");
                 return null;
             }
 
             BigDecimal latitude = new BigDecimal(latObj.toString());
             BigDecimal longitude = new BigDecimal(lonObj.toString());
 
-            System.out.println("COORDENADA ENCONTRADA PELO NOMINATIM.");
-            System.out.println("ENDEREÇO ENCONTRADO: " + location.get("display_name"));
-            System.out.println("LATITUDE FINAL: " + latitude);
-            System.out.println("LONGITUDE FINAL: " + longitude);
-
             return new CoordinatesDTO(latitude, longitude);
 
         } catch (Exception e) {
-            System.out.println("ERRO AO BUSCAR COORDENADAS NO NOMINATIM: " + e.getMessage());
             return null;
         }
     }
