@@ -216,4 +216,51 @@ public class ChargingService {
         repository.save(charging);
     }
 
+    @Transactional
+    public void returnItem(Long chargingItemId) {
+        ChargingItem item = chargingItemService.findById(chargingItemId);
+
+        Integer quantityToReturn = item.getQuantity();
+
+        if (quantityToReturn == null || quantityToReturn <= 0) {
+            throw new RuntimeException("Este item não possui quantidade para devolver.");
+        }
+
+        Product product = item.getProduct();
+
+        product.setAmount(product.getAmount() + quantityToReturn);
+        item.setQuantity(0);
+
+        productRepository.save(product);
+        chargingItemService.save(item);
+    }
+
+    @Transactional
+    public void returnAll(Long chargingId) {
+        Charging charging = repository.findById(chargingId)
+                .orElseThrow(() -> new RuntimeException("Carregamento não encontrado."));
+
+        boolean hasItemToReturn = false;
+
+        for (ChargingItem item : charging.getItems()) {
+            Integer quantityToReturn = item.getQuantity();
+
+            if (quantityToReturn != null && quantityToReturn > 0) {
+                Product product = item.getProduct();
+
+                product.setAmount(product.getAmount() + quantityToReturn);
+                item.setQuantity(0);
+
+                productRepository.save(product);
+
+                hasItemToReturn = true;
+            }
+        }
+
+        if (!hasItemToReturn) {
+            throw new RuntimeException("Não existem itens no carregamento para devolver.");
+        }
+
+        repository.save(charging);
+    }
 }

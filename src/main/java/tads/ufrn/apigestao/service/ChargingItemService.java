@@ -34,4 +34,8 @@ public class ChargingItemService {
         }
     }
 
+    public ChargingItem save(ChargingItem chargingItem) {
+        return repository.save(chargingItem);
+    }
+
 }

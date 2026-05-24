@@ -68,4 +68,17 @@ public class ChargingController {
         return ResponseEntity.ok(service.addProductsToCharging(items));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
+    @PostMapping("/item/{chargingItemId}")
+    public ResponseEntity<Void> returnItem(@PathVariable Long chargingItemId) {
+        service.returnItem(chargingItemId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyRole('SUPERADMIN','FUNCIONARIO')")
+    @PostMapping("/all/{chargingId}")
+    public ResponseEntity<Void> returnAll(@PathVariable Long chargingId) {
+        service.returnAll(chargingId);
+        return ResponseEntity.noContent().build();
+    }
 }
