@@ -37,6 +37,7 @@ public class SaleService {
     private final ApprovalLocationRepository approvalLocationRepository;
     private final ModelMapper mapper;
     private final SaleReturnRepository saleReturnRepository;
+    private final WhatsappService whatsappService;
 
     @Transactional(readOnly = true)
     public Page<SalesListDTO> findAll(
@@ -114,8 +115,15 @@ public class SaleService {
     }
 
     @Transactional
-    public Sale approvePreSale(Long preSaleId, Inspector inspector, PaymentType paymentMethod, int installments, BigDecimal cashPaid, Double latitude, Double longitude) {
-
+    public Sale approvePreSale(
+            Long preSaleId,
+            Inspector inspector,
+            PaymentType paymentMethod,
+            int installments,
+            BigDecimal cashPaid,
+            Double latitude,
+            Double longitude
+    ) {
         PreSale preSale = preSaleService.approvePreSale(preSaleId, inspector);
 
         Sale sale = new Sale();
@@ -163,6 +171,8 @@ public class SaleService {
         BigDecimal paid = cashPaid != null ? cashPaid : BigDecimal.ZERO;
         BigDecimal remaining = total.subtract(paid);
 
+        List<Installment> generatedInstallments = new ArrayList<>();
+
         if (remaining.compareTo(BigDecimal.ZERO) > 0 && installments > 0) {
 
             BigDecimal installmentValue = remaining.divide(
@@ -182,7 +192,22 @@ public class SaleService {
                 inst.setPaymentType(PaymentType.PARCEL);
 
                 installmentRepository.save(inst);
+
+                generatedInstallments.add(inst);
             }
+        }
+
+        try {
+            String formattedPhone = "55"+preSale.getClient().getPhone();
+            whatsappService.sendSaleApprovedMessage(
+                    formattedPhone,
+                    total,
+                    installments,
+                    preSale.getItems(),
+                    generatedInstallments
+            );
+        } catch (Exception e) {
+            System.err.println("Erro ao enviar mensagem de WhatsApp: " + e.getMessage());
         }
 
         return sale;
