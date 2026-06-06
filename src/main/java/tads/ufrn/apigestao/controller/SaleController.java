@@ -73,32 +73,12 @@ public class SaleController {
 
         Inspector inspector = inspectorService.findEntityById(1L);
 
-        var address = dto.getPreSale().getClient().getAddress();
-
-        CoordinatesDTO coordinates = geocodingService.getCoordinates(
-                address.getStreet(),
-                address.getNumber(),
-                address.getCity(),
-                address.getState(),
-                address.getZipCode()
-        );
-
-        Double latitude = coordinates != null
-                ? coordinates.getLatitude().doubleValue()
-                : null;
-
-        Double longitude = coordinates != null
-                ? coordinates.getLongitude().doubleValue()
-                : null;
-
         Sale sale = service.storeAndApprovePreSale(
                 dto.getPreSale(),
                 inspector,
                 dto.getPaymentMethod(),
                 dto.getInstallments(),
-                dto.getCashPaid(),
-                latitude,
-                longitude
+                dto.getCashPaid()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(SaleMapper.mapper(sale));

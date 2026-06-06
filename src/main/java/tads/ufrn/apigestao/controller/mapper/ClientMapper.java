@@ -4,6 +4,7 @@ import tads.ufrn.apigestao.domain.Client;
 import tads.ufrn.apigestao.domain.dto.client.ClientDTO;
 import tads.ufrn.apigestao.domain.dto.client.ClientHistoryDTO;
 import tads.ufrn.apigestao.domain.dto.client.ClientSaleDTO;
+import tads.ufrn.apigestao.domain.dto.client.ClientSearchDTO;
 
 public class ClientMapper {
         public static ClientDTO mapper(Client src){
@@ -35,6 +36,15 @@ public class ClientMapper {
                     .name(src.getName())
                     .cpf(src.getCpf())
                     .address(src.getAddress() != null ? AddressMapper.addressClientHistory(src.getAddress()) : null)
+                    .build();
+    }
+
+    public static ClientSearchDTO clientSearch(Client src) {
+            return ClientSearchDTO.builder()
+                    .id(src.getId())
+                    .name(src.getName())
+                    .cpf(src.getCpf())
+                    .phone(src.getPhone())
                     .build();
     }
 }

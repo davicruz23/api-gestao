@@ -53,11 +53,12 @@ public class PreSaleService {
 
         Optional<PreSale> existing = repository.findByUuidPreSale(dto.getUuidPreSale());
 
-        if(existing.isPresent()){
+        if (existing.isPresent()) {
             return PreSaleMapper.mapper(existing.get());
         }
 
-        Client client = clientService.store(dto.getClient());
+        Client client = resolveClient(dto);
+
         Seller seller = sellerService.findById(dto.getSellerId());
 
         if (seller == null) {
@@ -112,6 +113,18 @@ public class PreSaleService {
         PreSale saved = repository.save(preSale);
 
         return PreSaleMapper.mapper(saved);
+    }
+
+    private Client resolveClient(UpsertPreSaleDTO dto) {
+        if (dto.getClientId() != null) {
+            return clientService.findById(dto.getClientId());
+        }
+
+        if (dto.getClient() == null) {
+            throw new BusinessException("Informe um cliente existente ou os dados de um novo cliente.");
+        }
+
+        return clientService.store(dto.getClient());
     }
 
     public void deleteById(Long id){

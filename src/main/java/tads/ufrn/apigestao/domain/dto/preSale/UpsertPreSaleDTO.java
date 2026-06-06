@@ -18,6 +18,7 @@ import java.util.List;
 public class UpsertPreSaleDTO {
 
     private Long id;
+    private Long clientId;
     private LocalDate preSaleDate;
     private Long sellerId;
     private UpsertClientDTO client;

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tads.ufrn.apigestao.controller.mapper.SaleMapper;
 import tads.ufrn.apigestao.domain.*;
+import tads.ufrn.apigestao.domain.dto.cep.CoordinatesDTO;
 import tads.ufrn.apigestao.domain.dto.preSale.PreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.preSale.UpsertPreSaleDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductItemDTO;
@@ -35,8 +36,9 @@ public class SaleService {
     private final PreSaleService preSaleService;
     private final InstallmentRepository installmentRepository;
     private final ApprovalLocationRepository approvalLocationRepository;
-    private final ModelMapper mapper;
     private final SaleReturnRepository saleReturnRepository;
+    private final GeocodingService geocodingService;
+    private final ModelMapper mapper;
 
     @Transactional(readOnly = true)
     public Page<SalesListDTO> findAll(
@@ -194,11 +196,33 @@ public class SaleService {
             Inspector inspector,
             PaymentType paymentMethod,
             int installments,
-            BigDecimal cashPaid,
-            Double latitude,
-            Double longitude
+            BigDecimal cashPaid
     ) {
         PreSaleDTO savedPreSale = preSaleService.store(preSaleDTO);
+
+        PreSale preSale = preSaleService.findById(savedPreSale.getId());
+
+        Double latitude = null;
+        Double longitude = null;
+
+        Address address = preSale.getClient() != null
+                ? preSale.getClient().getAddress()
+                : null;
+
+        if (address != null) {
+            CoordinatesDTO coordinates = geocodingService.getCoordinates(
+                    address.getStreet(),
+                    address.getNumber(),
+                    address.getCity(),
+                    address.getState(),
+                    address.getZipCode()
+            );
+
+            if (coordinates != null) {
+                latitude = coordinates.getLatitude().doubleValue();
+                longitude = coordinates.getLongitude().doubleValue();
+            }
+        }
 
         return approvePreSale(
                 savedPreSale.getId(),

@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import tads.ufrn.apigestao.controller.mapper.ClientMapper;
 import tads.ufrn.apigestao.domain.Address;
 import tads.ufrn.apigestao.domain.Client;
 import tads.ufrn.apigestao.domain.dto.client.ClientRecentDTO;
+import tads.ufrn.apigestao.domain.dto.client.ClientSearchDTO;
 import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
 import tads.ufrn.apigestao.exception.ResourceNotFoundException;
 import tads.ufrn.apigestao.repository.ClientRepository;
@@ -64,6 +66,33 @@ public class ClientService {
 
     public List<ClientRecentDTO> findLastClients() {
         return repository.findRecentClients(PageRequest.of(0, 6));
+    }
+
+    public List<ClientSearchDTO> searchByNameOrCpf(String search) {
+        if (search == null || search.isBlank()) {
+            return List.of();
+        }
+
+        String normalizedSearch = search.trim();
+
+        if (normalizedSearch.length() < 3) {
+            return List.of();
+        }
+
+        String cpf = onlyNumbers(normalizedSearch);
+
+        if (cpf.isBlank()) {
+            cpf = null;
+        }
+
+        return repository.searchByNameOrCpf(normalizedSearch, cpf)
+                .stream()
+                .map(ClientMapper::clientSearch)
+                .toList();
+    }
+
+    private String onlyNumbers(String value) {
+        return value == null ? "" : value.replaceAll("\\D", "");
     }
 
 }

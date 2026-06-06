@@ -15,4 +15,5 @@ public class AddressService {
     public List<String> getDistinctCities() {
         return repository.findAllDistinctCities();
     }
+
 }

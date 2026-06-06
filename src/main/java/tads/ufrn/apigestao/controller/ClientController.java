@@ -9,6 +9,7 @@ import tads.ufrn.apigestao.controller.mapper.ClientMapper;
 import tads.ufrn.apigestao.controller.mapper.ProductMapper;
 import tads.ufrn.apigestao.domain.dto.client.ClientDTO;
 import tads.ufrn.apigestao.domain.dto.client.ClientRecentDTO;
+import tads.ufrn.apigestao.domain.dto.client.ClientSearchDTO;
 import tads.ufrn.apigestao.domain.dto.client.UpsertClientDTO;
 import tads.ufrn.apigestao.domain.dto.product.ProductDTO;
 import tads.ufrn.apigestao.domain.dto.product.UpsertProductDTO;
@@ -50,5 +51,10 @@ public class ClientController {
     public ResponseEntity<ClientDTO> deleteById(@PathVariable Long id){
         service.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public List<ClientSearchDTO> searchClients(@RequestParam String search) {
+        return service.searchByNameOrCpf(search);
     }
 }
