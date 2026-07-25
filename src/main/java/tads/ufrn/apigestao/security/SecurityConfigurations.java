@@ -44,6 +44,8 @@ public class SecurityConfigurations {
 
                         // Rotas públicas (login e swagger)
                         .requestMatchers("/api/auth/**").permitAll()
+//                        .requestMatchers("/api/locations/**").permitAll()
+//                        .requestMatchers("/api/tracking/**").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",

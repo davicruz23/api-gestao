@@ -31,7 +31,8 @@ public class CepService {
         return new CepResponse(
                 viaCep.getCep(),
                 streetComBairro,
-                viaCep.getLocalidade()
+                viaCep.getLocalidade(),
+                viaCep.getUf()
         );
     }
 }

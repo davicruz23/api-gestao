@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CepResponse {
+
     private String cep;
     private String street;
     private String city;
+    private String state;
 }

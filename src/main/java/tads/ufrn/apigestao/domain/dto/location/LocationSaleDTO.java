@@ -1,4 +1,4 @@
-package tads.ufrn.apigestao.domain.dto;
+package tads.ufrn.apigestao.domain.dto.location;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

@@ -1,5 +1,7 @@
 package tads.ufrn.apigestao.domain.dto.sale;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,10 +15,13 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class StoreAndApprovePreSaleDTO {
 
+    @NotNull(message = "Os dados da pré-venda são obrigatórios")
+    @Valid
     private UpsertPreSaleDTO preSale;
 
     private Long inspectorId;
 
+    @NotNull(message = "O método de pagamento é obrigatório")
     private PaymentType paymentMethod;
 
     private int installments;
@@ -26,5 +31,4 @@ public class StoreAndApprovePreSaleDTO {
     private Double latitude;
 
     private Double longitude;
-
 }

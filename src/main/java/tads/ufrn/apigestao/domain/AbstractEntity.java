@@ -19,6 +19,8 @@ public abstract class AbstractEntity {
 
     private OffsetDateTime createdAt;
 
+    private LocalDateTime updatedAt;
+
     public void delete(){
         this.deletedAt = OffsetDateTime.now();
     }
@@ -26,5 +28,7 @@ public abstract class AbstractEntity {
     public void create(){
         this.createdAt = OffsetDateTime.now();
     }
+
+    public void update(){ this.updatedAt = LocalDateTime.now(); }
 
 }

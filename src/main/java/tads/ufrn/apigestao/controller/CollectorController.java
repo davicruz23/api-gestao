@@ -1,9 +1,7 @@
 package tads.ufrn.apigestao.controller;
 
-import com.google.zxing.WriterException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,27 +9,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tads.ufrn.apigestao.controller.mapper.CollectorMapper;
-import tads.ufrn.apigestao.domain.CollectionAttempt;
-import tads.ufrn.apigestao.domain.Collector;
-import tads.ufrn.apigestao.domain.Installment;
-import tads.ufrn.apigestao.domain.Sale;
-import tads.ufrn.apigestao.domain.dto.LocationSaleDTO;
+import tads.ufrn.apigestao.domain.dto.location.LocationSaleDTO;
 import tads.ufrn.apigestao.domain.dto.collector.*;
 import tads.ufrn.apigestao.domain.dto.commissionHistory.CollectorCommissionDTOO;
 import tads.ufrn.apigestao.domain.dto.commissionHistory.CollectorCommissionRequestDTO;
 import tads.ufrn.apigestao.domain.dto.commissionHistory.CommissionHistoryDTO;
-import tads.ufrn.apigestao.domain.dto.inspector.InspectorIdUserDTO;
-import tads.ufrn.apigestao.domain.dto.installment.InstallmentPaidDTO;
 import tads.ufrn.apigestao.domain.dto.sale.AssignSalesCollectorRequest;
 import tads.ufrn.apigestao.domain.dto.sale.CitySalesDTO;
 import tads.ufrn.apigestao.domain.dto.sale.SaleCollectorDTO;
-import tads.ufrn.apigestao.enums.PaymentType;
 import tads.ufrn.apigestao.service.*;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

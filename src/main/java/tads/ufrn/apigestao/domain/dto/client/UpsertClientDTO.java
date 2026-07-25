@@ -1,5 +1,8 @@
 package tads.ufrn.apigestao.domain.dto.client;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +18,17 @@ import java.util.List;
 @Builder
 public class UpsertClientDTO {
 
-    private Long id;
+    @NotBlank(message = "O nome do cliente é obrigatório")
     private String name;
+
+    @NotBlank(message = "O CPF do cliente é obrigatório")
     private String cpf;
+
+    @NotBlank(message = "O telefone do cliente é obrigatório")
     private String phone;
+
+    @NotNull(message = "O endereço do cliente é obrigatório")
+    @Valid
     private UpsertAddressDTO address;
     //private List<SaleDTO> sales;
 }

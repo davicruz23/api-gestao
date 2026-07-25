@@ -1,7 +1,7 @@
 package tads.ufrn.apigestao.controller.mapper;
 
 import tads.ufrn.apigestao.domain.ApprovalLocation;
-import tads.ufrn.apigestao.domain.dto.LocationSaleDTO;
+import tads.ufrn.apigestao.domain.dto.location.LocationSaleDTO;
 
 public class LocationSaleMapper {
     public static LocationSaleDTO mapper (ApprovalLocation src) {
