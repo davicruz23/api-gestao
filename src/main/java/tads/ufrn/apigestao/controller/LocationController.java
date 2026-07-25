@@ -23,7 +23,7 @@ public class LocationController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('SUPERADMIN')")
     @GetMapping("/{userId}/latest")
     public ResponseEntity<UserLocation> getLatestLocation(
             @PathVariable Long userId
