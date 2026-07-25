@@ -15,7 +15,6 @@ public class LocationController {
 
     private final LocationService service;
 
-    @PreAuthorize("hasAnyRole('COBRADOR')")
     @PostMapping
     public ResponseEntity<Void> saveLocation(
             @RequestBody LocationRequestDTO dto

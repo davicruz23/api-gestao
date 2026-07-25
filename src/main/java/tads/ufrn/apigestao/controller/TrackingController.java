@@ -19,7 +19,7 @@ public class TrackingController {
 
     private final TrackingService trackingService;
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('COBRADOR')")
     @GetMapping("/collectors")
     public ResponseEntity<List<CollectorTrackingDTO>>
     getCollectorsTracking() {
